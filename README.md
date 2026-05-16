@@ -2,7 +2,7 @@
 
 中文 | [English](README.en.md)
 
-ZeroUI 是一个轻量级 Android SDUI 运行时，用于渲染由 JSON 描述的 Compose 页面，支持状态、动作、效果以及宿主侧集成能力。
+ZeroUI 是一个面向 Android 的轻量级 Server-Driven UI 运行时，让应用能够通过 JSON 动态下发并渲染原生 Compose 页面。无需频繁发版，即可快速搭建活动页、配置页、动态表单和业务工具界面，同时保留原生性能、状态管理、动作分发与宿主能力接入。
 
 ## 5 分钟开始
 

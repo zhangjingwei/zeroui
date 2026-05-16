@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-ZeroUI is a small Android SDUI runtime for rendering JSON-described Compose screens with state, actions, effects, and host-provided integrations.
+ZeroUI is a lightweight Server-Driven UI runtime for Android that lets apps dynamically deliver JSON descriptions and render native Jetpack Compose screens. Build campaign pages, settings screens, dynamic forms, and internal tools without frequent app releases, while keeping native performance, state management, action dispatch, and host capability integration.
 
 ## 5 Minute Start
 
