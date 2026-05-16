@@ -1,0 +1,21 @@
+# Default: let git auto-detect text vs binary and normalize line endings.
+* text=auto
+
+# Shell scripts MUST stay LF — gradlew is invoked by sh on Mac/Linux CI.
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows scripts must stay CRLF — cmd.exe stumbles on bare LF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Common binary blobs — disable text/diff handling so git doesn't try to merge them.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.jar binary
+*.aar binary
+*.keystore binary

@@ -1,0 +1,23 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+# Match build/ at root AND inside any subdirectory (app/build, zeroui/build, ...)
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Kotlin daemon cache
+.kotlin/
+
+# Tool-generated artifacts (derived from source)
+.codex/
+graphify-out/

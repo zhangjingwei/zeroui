@@ -1,0 +1,110 @@
+{
+  "root": {
+    "type": "column",
+    "spacing": 18,
+    "layout": {
+      "fillMaxWidth": true,
+      "padding": 20
+    },
+    "children": [
+      {
+        "type": "text",
+        "style": "title",
+        "text": {
+          "type": "value",
+          "value": "ZeroUI Skin Showcase"
+        }
+      },
+      {
+        "type": "text",
+        "tone": "muted",
+        "text": {
+          "type": "value",
+          "value": "Button variants and semantic tones for visual review."
+        }
+      },
+      {
+        "type": "row",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "button",
+            "text": "Primary",
+            "variant": "primary",
+            "onClick": {
+              "effects": [
+                {
+                  "type": "toast",
+                  "message": {
+                    "type": "literal",
+                    "value": "Primary"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "button",
+            "text": "Secondary",
+            "variant": "secondary",
+            "onClick": {
+              "effects": [
+                {
+                  "type": "toast",
+                  "message": {
+                    "type": "literal",
+                    "value": "Secondary"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "warning",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "warning",
+            "text": {
+              "type": "value",
+              "value": "Warning tone"
+            }
+          },
+          {
+            "type": "text",
+            "text": {
+              "type": "value",
+              "value": "Used for cautionary states without importing Material tone names into the protocol."
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "error",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "error",
+            "text": {
+              "type": "value",
+              "value": "Error tone"
+            }
+          },
+          {
+            "type": "text",
+            "text": {
+              "type": "value",
+              "value": "Used for destructive or failed states."
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

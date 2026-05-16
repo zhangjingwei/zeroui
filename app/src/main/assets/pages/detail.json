@@ -1,0 +1,102 @@
+{
+  "initialState": {
+    "viewCount": { "owner": "client", "value": 1 }
+  },
+  "root": {
+    "type": "column",
+    "spacing": 16,
+    "children": [
+      {
+        "type": "text",
+        "text": { "type": "value", "value": "Detail Page" },
+        "style": "title"
+      },
+      {
+        "type": "text",
+        "text": {
+          "type": "value",
+          "value": "由 home 页 Navigate 跳过来。这是第二个由 JSON 描述的 ZeroUI 页面。"
+        },
+        "style": "body",
+        "tone": "muted"
+      },
+      {
+        "type": "card",
+        "tone": "primary",
+        "children": [
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Expression 演示：viewCount 翻倍" },
+            "style": "sectionTitle"
+          },
+          {
+            "type": "text",
+            "text": {
+              "type": "binding",
+              "key": "doubled",
+              "fallback": "（点击下方按钮触发计算）",
+              "format": "double(viewCount) = {value}"
+            },
+            "style": "body"
+          },
+          {
+            "type": "button",
+            "text": "用 expression 把 viewCount 翻倍写回 doubled",
+            "onClick": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "doubled",
+                  "value": {
+                    "type": "expr",
+                    "expression": {
+                      "type": "binary",
+                      "op": "*",
+                      "lhs": { "type": "ref", "key": "viewCount" },
+                      "rhs": { "type": "lit", "value": 2 }
+                    }
+                  }
+                },
+                {
+                  "type": "incrementState",
+                  "key": "viewCount",
+                  "step": 1
+                }
+              ],
+              "effects": [
+                {
+                  "type": "track",
+                  "event": "detail_doubled_clicked",
+                  "params": {
+                    "currentViewCount": { "type": "state", "key": "viewCount" }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "row",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "button",
+            "text": "返回首页",
+            "variant": "secondary",
+            "onClick": {
+              "actions": [],
+              "effects": [
+                { "type": "back" },
+                {
+                  "type": "track",
+                  "event": "detail_back_clicked"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
