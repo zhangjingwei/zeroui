@@ -11,11 +11,11 @@ import com.zero.zero_tools.zeroui.value.Value
  * Params are already resolved [Value]s — the host typically flattens them via `asText()` or
  * branches on the Value subtype.
  */
-fun interface Tracker {
-    fun track(event: String, params: Map<String, Value>)
+public fun interface Tracker {
+    public fun track(event: String, params: Map<String, Value>)
 
-    companion object {
+    public companion object {
         /** Drops all events. Useful for previews and tests. */
-        val Noop: Tracker = Tracker { _, _ -> }
+        public val Noop: Tracker = Tracker { _, _ -> }
     }
 }

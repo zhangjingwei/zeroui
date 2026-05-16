@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun rememberTechElegantZeroSkin(darkTheme: Boolean): ZeroSkin {
+public fun rememberTechElegantZeroSkin(darkTheme: Boolean): ZeroSkin {
     val typography = MaterialTheme.typography
 
     return remember(darkTheme, typography) {

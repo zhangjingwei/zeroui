@@ -1,4 +1,4 @@
-package com.zero.zero_tools.host
+package com.zero.zero_tools.zeroui.host
 
 import com.zero.zero_tools.zeroui.action.Action
 import com.zero.zero_tools.zeroui.effect.Effect
@@ -30,7 +30,7 @@ class LifecycleTest {
 
         assertTrue(fired)
         assertEquals(nonEmptyAction, seen?.first)
-        assertNull(seen?.second) // onMount has no event value
+        assertNull(seen?.second)
     }
 
     @Test
@@ -52,13 +52,11 @@ class LifecycleTest {
         val fired = fireOnMountIfAny(empty, handle)
 
         assertFalse(fired)
-        assertFalse("handler must not be called for empty onMount", called)
+        assertFalse(called)
     }
 
     @Test
     fun nullHandleIsSafeAndReturnsFalse() {
-        // Defensive: during the brief composition window before handlerRef is populated,
-        // a navigator.navigate() could in principle race in. The helper must not NPE.
         val fired = fireOnMountIfAny(nonEmptyAction, handle = null)
         assertFalse(fired)
     }

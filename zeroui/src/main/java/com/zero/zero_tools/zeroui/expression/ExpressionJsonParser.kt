@@ -16,7 +16,7 @@ import org.json.JSONObject
  * - `{"type": "if", "cond": <expr>, "then": <expr>, "else": <expr>}`
  * - `{"type": "call", "name": "len", "args": [<expr>, ...]}`
  */
-fun parseExpression(json: JSONObject): Expression {
+public fun parseExpression(json: JSONObject): Expression {
     return when (val type = json.getString("type")) {
         "lit" -> Expression.Literal(parseRawValue(json.get("value")))
         "ref" -> Expression.Ref(key = json.getString("key"))

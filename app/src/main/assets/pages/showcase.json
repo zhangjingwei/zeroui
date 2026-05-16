@@ -1,4 +1,28 @@
 {
+  "schemaVersion": 1,
+  "initialState": {
+    "fieldValue": { "owner": "client", "value": "ZeroUI" },
+    "toggleValue": { "owner": "client", "value": true },
+    "selectedChip": { "owner": "client", "value": "primary" },
+    "showDialog": { "owner": "client", "value": false },
+    "imageUrl": {
+      "owner": "client",
+      "value": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1200&q=80"
+    },
+    "galleryItems": {
+      "owner": "client",
+      "value": [
+        {
+          "title": "Remote image",
+          "url": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=900&q=80"
+        },
+        {
+          "title": "Bound image",
+          "url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80"
+        }
+      ]
+    }
+  },
   "root": {
     "type": "column",
     "spacing": 18,
@@ -20,7 +44,55 @@
         "tone": "muted",
         "text": {
           "type": "value",
-          "value": "Button variants and semantic tones for visual review."
+          "value": "Core skin-driven components for visual review."
+        }
+      },
+      {
+        "type": "textField",
+        "label": "TextField",
+        "value": { "type": "binding", "key": "fieldValue", "fallback": "" },
+        "onValueChange": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "fieldValue",
+              "value": { "type": "event" }
+            }
+          ]
+        },
+        "layout": { "fillMaxWidth": true }
+      },
+      {
+        "type": "switch",
+        "text": "Switch token sample",
+        "checkedKey": "toggleValue",
+        "onCheckedChange": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "toggleValue",
+              "value": { "type": "event" }
+            }
+          ]
+        }
+      },
+      {
+        "type": "chipGroup",
+        "selectedKey": "selectedChip",
+        "spacing": 8,
+        "options": [
+          { "label": "Default", "value": "default" },
+          { "label": "Primary", "value": "primary" },
+          { "label": "Muted", "value": "muted" }
+        ],
+        "onSelected": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "selectedChip",
+              "value": { "type": "event" }
+            }
+          ]
         }
       },
       {
@@ -79,6 +151,158 @@
             "text": {
               "type": "value",
               "value": "Used for cautionary states without importing Material tone names into the protocol."
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": {
+              "type": "value",
+              "value": "Image"
+            }
+          },
+          {
+            "type": "image",
+            "source": {
+              "type": "binding",
+              "key": "imageUrl",
+              "fallback": ""
+            },
+            "contentDescription": "Remote architecture image",
+            "contentScale": "crop",
+            "aspectRatio": 1.6,
+            "cornerRadius": 16
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": {
+              "type": "value",
+              "value": "LazyColumn"
+            }
+          },
+          {
+            "type": "lazyColumn",
+            "spacing": 10,
+            "layout": {
+              "fillMaxWidth": true,
+              "maxHeight": 280
+            },
+            "children": [
+              {
+                "type": "text",
+                "tone": "muted",
+                "text": {
+                  "type": "value",
+                  "value": "Header item rendered before data-backed rows."
+                }
+              }
+            ],
+            "itemsKey": "galleryItems",
+            "item": {
+              "type": "card",
+              "padding": 12,
+              "spacing": 8,
+              "children": [
+                {
+                  "type": "image",
+                  "source": {
+                    "type": "binding",
+                    "key": "item.url",
+                    "fallback": ""
+                  },
+                  "contentScale": "crop",
+                  "aspectRatio": 2.2,
+                  "cornerRadius": 12
+                },
+                {
+                  "type": "text",
+                  "style": "label",
+                  "text": {
+                    "type": "binding",
+                    "key": "item.title",
+                    "fallback": "Gallery item"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "text": "Open Dialog",
+        "variant": "secondary",
+        "onClick": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "showDialog",
+              "value": {
+                "type": "literal",
+                "value": true
+              }
+            }
+          ]
+        },
+        "layout": {
+          "fillMaxWidth": true
+        }
+      },
+      {
+        "type": "dialog",
+        "visibleKey": "showDialog",
+        "title": {
+          "type": "value",
+          "value": "Dialog"
+        },
+        "onDismiss": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "showDialog",
+              "value": {
+                "type": "literal",
+                "value": false
+              }
+            }
+          ]
+        },
+        "children": [
+          {
+            "type": "text",
+            "text": {
+              "type": "value",
+              "value": "This modal is controlled by client state and closes through onDismiss."
+            }
+          },
+          {
+            "type": "button",
+            "text": "Close",
+            "onClick": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showDialog",
+                  "value": {
+                    "type": "literal",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            "layout": {
+              "fillMaxWidth": true
             }
           }
         ]

@@ -14,7 +14,7 @@ import com.zero.zero_tools.zeroui.value.Value
  * instead it coerces via [asText]/[asNumber]/[asBoolean] and falls back to
  * [Value.Text]("") so the renderer always has something to paint.
  */
-fun Expression.evaluate(state: State, eventValue: Value? = null): Value {
+public fun Expression.evaluate(state: State, eventValue: Value? = null): Value {
     return when (this) {
         is Expression.Literal -> value
         is Expression.Ref -> state.getValue(key) ?: Value.Text("")
@@ -105,4 +105,3 @@ private fun isEmpty(value: Value?): Boolean = when (value) {
     is Value.List -> value.items.isEmpty()
     is Value.Record -> value.fields.isEmpty()
 }
-

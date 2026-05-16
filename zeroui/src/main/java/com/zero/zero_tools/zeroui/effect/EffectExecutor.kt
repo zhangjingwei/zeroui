@@ -16,7 +16,7 @@ import com.zero.zero_tools.zeroui.value.Value
 
 private const val ZeroUiLogTag = "ZeroToolsZeroUi"
 
-fun executeEffects(
+public fun executeEffects(
     context: Context,
     state: State,
     effects: List<Effect>,

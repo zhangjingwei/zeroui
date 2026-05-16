@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "initialState": {
     "viewCount": { "owner": "client", "value": 1 }
   },

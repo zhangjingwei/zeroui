@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "initialState": {
     "loading": { "owner": "client", "value": false },
     "response": { "owner": "server", "value": "" },

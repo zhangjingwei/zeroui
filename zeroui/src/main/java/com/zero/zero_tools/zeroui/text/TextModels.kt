@@ -1,23 +1,23 @@
 package com.zero.zero_tools.zeroui.text
 
-sealed interface Text {
-    data class Value(val value: String) : Text
+public sealed interface Text {
+    public data class Value(val value: String) : Text
 
-    data class Binding(
+    public data class Binding(
         val key: String,
         val fallback: String,
         val format: String? = null
     ) : Text
 }
 
-enum class TextStyle {
+public enum class TextStyle {
     Title,
     SectionTitle,
     Body,
     Label
 }
 
-enum class Tone {
+public enum class Tone {
     Default,
     Muted,
     Primary,

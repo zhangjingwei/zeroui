@@ -6,6 +6,8 @@ import com.zero.zero_tools.zeroui.state.State
 import com.zero.zero_tools.zeroui.state.asText
 import com.zero.zero_tools.zeroui.state.resolveValueSource
 import com.zero.zero_tools.zeroui.value.Value
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Resolves an [Effect.Http]'s ValueSource fields against the current state/event, then
@@ -16,7 +18,7 @@ import com.zero.zero_tools.zeroui.value.Value
  * Carved out of [com.zero.zero_tools.zeroui.effect.executeEffects] so it can be unit-tested
  * without an Android Context (which `Toast` / `Log` paths require).
  */
-fun dispatchHttp(
+public fun dispatchHttp(
     state: State,
     effect: Effect.Http,
     eventValue: Value?,
@@ -29,15 +31,22 @@ fun dispatchHttp(
     }
     val body = effect.body?.let { resolveValueSource(state, it, eventValue).asText() }
 
-    return client.request(
+    val cancelable = RetiringCancelable()
+    val clientCancelable = client.request(
         method = effect.method.uppercase(),
         url = url,
         headers = headers,
         body = body
     ) { response ->
-        val (interaction, payload) = response.routeFor(effect)
-        onFollowUp(interaction, payload)
+        try {
+            val (interaction, payload) = response.routeFor(effect)
+            onFollowUp(interaction, payload)
+        } finally {
+            cancelable.retire()
+        }
     }
+    cancelable.attach(clientCancelable)
+    return cancelable
 }
 
 /**
@@ -57,5 +66,59 @@ private fun HttpResponse.routeFor(effect: Effect.Http): Pair<Interaction, Value>
             )
         )
         effect.onError to errorRecord
+    }
+}
+
+internal interface RetirableCancelable : Cancelable {
+    val isRetired: Boolean
+    fun invokeOnRetired(callback: () -> Unit)
+}
+
+private class RetiringCancelable : RetirableCancelable {
+    private val delegate = AtomicReference<Cancelable?>(null)
+    private val cancelRequested = AtomicBoolean(false)
+    private val retired = AtomicBoolean(false)
+    private val callbacks = mutableListOf<() -> Unit>()
+
+    override val isRetired: Boolean
+        get() = retired.get()
+
+    fun attach(cancelable: Cancelable) {
+        delegate.set(cancelable)
+        if (isRetired) {
+            val attached = delegate.getAndSet(null)
+            if (cancelRequested.get()) {
+                attached?.cancel()
+            }
+        }
+    }
+
+    override fun cancel() {
+        cancelRequested.set(true)
+        delegate.getAndSet(null)?.cancel()
+        retire()
+    }
+
+    override fun invokeOnRetired(callback: () -> Unit) {
+        val invokeNow = synchronized(callbacks) {
+            if (isRetired) {
+                true
+            } else {
+                callbacks.add(callback)
+                false
+            }
+        }
+        if (invokeNow) {
+            callback()
+        }
+    }
+
+    fun retire() {
+        if (!retired.compareAndSet(false, true)) return
+        delegate.set(null)
+        val callbacksToInvoke = synchronized(callbacks) {
+            callbacks.toList().also { callbacks.clear() }
+        }
+        callbacksToInvoke.forEach { it() }
     }
 }

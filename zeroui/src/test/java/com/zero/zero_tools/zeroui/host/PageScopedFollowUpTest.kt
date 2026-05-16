@@ -1,4 +1,4 @@
-package com.zero.zero_tools.host
+package com.zero.zero_tools.zeroui.host
 
 import com.zero.zero_tools.zeroui.action.Action
 import com.zero.zero_tools.zeroui.interaction.Interaction
@@ -48,7 +48,7 @@ class PageScopedFollowUpTest {
         )
         callback(sampleInteraction, null)
 
-        assertTrue("onAllow must NOT fire when current top changed", !allowed)
+        assertTrue(!allowed)
         assertEquals(1L to 2L, dropped)
     }
 
@@ -59,7 +59,7 @@ class PageScopedFollowUpTest {
 
         val callback = pageScopedFollowUp(
             originEntryId = 7L,
-            currentTopId = { null },           // stack popped beyond origin
+            currentTopId = { null },
             onAllow = { _, _ -> allowed = true },
             onDrop = { o, c -> dropped = o to c }
         )
@@ -72,8 +72,6 @@ class PageScopedFollowUpTest {
 
     @Test
     fun readsCurrentTopFreshlyOnEachInvocation() {
-        // Simulates: callback created when top=1; first invocation while still 1,
-        // then user navigates so top=2, second invocation must now drop.
         var currentTop = 1L
         var allowCount = 0
         var dropCount = 0
@@ -85,9 +83,9 @@ class PageScopedFollowUpTest {
             onDrop = { _, _ -> dropCount++ }
         )
 
-        callback(sampleInteraction, null) // still on entry 1
+        callback(sampleInteraction, null)
         currentTop = 2L
-        callback(sampleInteraction, null) // navigated away
+        callback(sampleInteraction, null)
 
         assertEquals(1, allowCount)
         assertEquals(1, dropCount)
@@ -95,8 +93,6 @@ class PageScopedFollowUpTest {
 
     @Test
     fun returningToOriginEntryReallowsFollowUp() {
-        // Real-world case: user on entry 2, fires http, navigates to 3, navigates back to 2;
-        // by the time the response lands, top is 2 again and follow-up should apply.
         var currentTop = 2L
         var allowCount = 0
         var dropCount = 0
@@ -109,9 +105,9 @@ class PageScopedFollowUpTest {
         )
 
         currentTop = 3L
-        callback(sampleInteraction, null) // dropped while away
+        callback(sampleInteraction, null)
         currentTop = 2L
-        callback(sampleInteraction, null) // back on origin → allowed
+        callback(sampleInteraction, null)
 
         assertEquals(1, allowCount)
         assertEquals(1, dropCount)

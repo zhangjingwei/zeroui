@@ -8,17 +8,17 @@ import com.zero.zero_tools.zeroui.text.TextStyle
 import com.zero.zero_tools.zeroui.text.Tone
 
 @Stable
-class ZeroStyleResolver(
+public class ZeroStyleResolver(
     private val skin: ZeroSkin
 ) {
-    fun textStyle(style: TextStyle): ComposeTextStyle = when (style) {
+    public fun textStyle(style: TextStyle): ComposeTextStyle = when (style) {
         TextStyle.Title -> skin.typography.title
         TextStyle.SectionTitle -> skin.typography.sectionTitle
         TextStyle.Body -> skin.typography.body
         TextStyle.Label -> skin.typography.label
     }
 
-    fun contentColor(tone: Tone): Color = when (tone) {
+    public fun contentColor(tone: Tone): Color = when (tone) {
         Tone.Default -> skin.palette.content
         Tone.Muted -> skin.palette.mutedContent
         Tone.Primary -> skin.palette.primaryContent
@@ -27,7 +27,7 @@ class ZeroStyleResolver(
         Tone.Warning -> skin.palette.warningContent
     }
 
-    fun containerColor(tone: Tone): Color = when (tone) {
+    public fun containerColor(tone: Tone): Color = when (tone) {
         Tone.Default -> skin.palette.container
         Tone.Muted -> skin.palette.mutedContainer
         Tone.Primary -> skin.palette.primaryContainer
@@ -36,26 +36,47 @@ class ZeroStyleResolver(
         Tone.Warning -> skin.palette.warningContainer
     }
 
-    fun buttonTokens(variant: ButtonVariant): ZeroButtonVariantTokens = when (variant) {
+    public fun buttonTokens(variant: ButtonVariant): ZeroButtonVariantTokens = when (variant) {
         ButtonVariant.Primary -> skin.components.button.primary
         ButtonVariant.Secondary -> skin.components.button.secondary
     }
 
-    val bodyTextStyle: ComposeTextStyle
+    public fun fieldTokens(): ZeroFieldTokens = skin.components.field
+
+    public fun chipTokens(selected: Boolean): ZeroChipTokens = skin.components.chip
+
+    public fun switchTokens(): ZeroSwitchTokens = skin.components.switch
+
+    public fun cardTokens(tone: Tone): ZeroCardResolvedTokens {
+        val toneTokens = when (tone) {
+            Tone.Default -> skin.components.card.default
+            Tone.Muted -> skin.components.card.muted
+            Tone.Primary -> skin.components.card.primary
+            Tone.Success -> skin.components.card.success
+            Tone.Error -> skin.components.card.error
+            Tone.Warning -> skin.components.card.warning
+        }
+        return ZeroCardResolvedTokens(
+            colors = toneTokens,
+            cornerRadius = skin.components.card.cornerRadius
+        )
+    }
+
+    public val bodyTextStyle: ComposeTextStyle
         get() = skin.typography.body
 
-    val labelTextStyle: ComposeTextStyle
+    public val labelTextStyle: ComposeTextStyle
         get() = skin.typography.label
 
-    val supportTextStyle: ComposeTextStyle
+    public val supportTextStyle: ComposeTextStyle
         get() = skin.typography.support
 
-    val errorContentColor: Color
+    public val errorContentColor: Color
         get() = skin.palette.errorContent
 
-    val mutedContentColor: Color
+    public val mutedContentColor: Color
         get() = skin.palette.mutedContent
 
-    val unknownContainerColor: Color
+    public val unknownContainerColor: Color
         get() = skin.palette.unknownContainer
 }

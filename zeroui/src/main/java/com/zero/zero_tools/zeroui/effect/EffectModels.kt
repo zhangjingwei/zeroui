@@ -3,12 +3,12 @@ package com.zero.zero_tools.zeroui.effect
 import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.value.ValueSource
 
-sealed interface Effect {
-    data class Toast(
+public sealed interface Effect {
+    public data class Toast(
         val message: ValueSource
     ) : Effect
 
-    data class Log(
+    public data class Log(
         val message: ValueSource
     ) : Effect
 
@@ -18,18 +18,18 @@ sealed interface Effect {
      * which the host's [com.zero.zero_tools.zeroui.navigation.Navigator] interprets
      * (asset name, route id, URL, ...).
      */
-    data class Navigate(
+    public data class Navigate(
         val target: ValueSource
     ) : Effect
 
     /** Pop the top page from the host's navigation stack. */
-    data object Back : Effect
+    public data object Back : Effect
 
     /**
      * Emit a tracking event. Params are resolved against the current state/event scope at
      * execute time and handed to the host-supplied [com.zero.zero_tools.zeroui.tracking.Tracker].
      */
-    data class Track(
+    public data class Track(
         val event: String,
         val params: Map<String, ValueSource> = emptyMap()
     ) : Effect
@@ -45,7 +45,7 @@ sealed interface Effect {
      * - 2xx, no transport error → [onSuccess]
      * - 4xx/5xx OR transport error → [onError]
      */
-    data class Http(
+    public data class Http(
         val method: String,
         val url: ValueSource,
         val headers: Map<String, ValueSource> = emptyMap(),

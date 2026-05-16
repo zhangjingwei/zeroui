@@ -7,48 +7,65 @@ import com.zero.zero_tools.zeroui.text.Text
 import com.zero.zero_tools.zeroui.text.TextStyle
 import com.zero.zero_tools.zeroui.text.Tone
 
-sealed interface Node {
-    data class Column(
+public sealed interface Node {
+    public data class Column(
         val spacing: Int = 0,
         val layout: Layout = Layout(),
         val children: List<Node>
     ) : Node
 
-    data class Row(
+    public data class Row(
         val spacing: Int = 0,
         val layout: Layout = Layout(),
         val children: List<Node>
     ) : Node
 
-    data class Text(
+    public data class LazyColumn(
+        val spacing: Int = 0,
+        val layout: Layout = Layout(),
+        val children: List<Node> = emptyList(),
+        val itemsKey: String? = null,
+        val item: Node? = null
+    ) : Node
+
+    public data class Text(
         val text: com.zero.zero_tools.zeroui.text.Text,
         val style: TextStyle = TextStyle.Body,
         val tone: Tone = Tone.Default,
         val layout: Layout = Layout()
     ) : Node
 
-    data class TextField(
+    public data class Image(
+        val source: ImageSource,
+        val contentDescription: String? = null,
+        val contentScale: ImageContentScale = ImageContentScale.Fit,
+        val aspectRatio: Float? = null,
+        val cornerRadius: Int = 0,
+        val layout: Layout = Layout(fillMaxWidth = true)
+    ) : Node
+
+    public data class TextField(
         val label: String,
         val value: Text.Binding,
         val onValueChange: Interaction,
         val layout: Layout = Layout(fillMaxWidth = true)
     ) : Node
 
-    data class Switch(
+    public data class Switch(
         val text: String,
         val checkedKey: String,
         val onCheckedChange: Interaction,
         val layout: Layout = Layout()
     ) : Node
 
-    data class Button(
+    public data class Button(
         val text: String,
         val onClick: Interaction,
         val variant: ButtonVariant = ButtonVariant.Primary,
         val layout: Layout = Layout()
     ) : Node
 
-    data class ChipGroup(
+    public data class ChipGroup(
         val selectedKey: String,
         val options: List<ChipOption>,
         val onSelected: Interaction,
@@ -56,7 +73,7 @@ sealed interface Node {
         val layout: Layout = Layout()
     ) : Node
 
-    data class Card(
+    public data class Card(
         val tone: Tone = Tone.Default,
         val padding: Int = 16,
         val spacing: Int = 8,
@@ -64,39 +81,60 @@ sealed interface Node {
         val children: List<Node>
     ) : Node
 
-    data class Spacer(
+    public data class Spacer(
         val height: Int = 0,
         val width: Int = 0
     ) : Node
 
-    data class Condition(
+    public data class Condition(
         val condition: com.zero.zero_tools.zeroui.condition.Condition,
         val child: Node
     ) : Node
 
-    data class ForEach(
+    public data class ForEach(
         val itemsKey: String,
         val child: Node,
         val spacing: Int = 8,
         val layout: Layout = Layout()
     ) : Node
 
+    public data class Dialog(
+        val visibleKey: String,
+        val onDismiss: Interaction = Interaction(),
+        val title: com.zero.zero_tools.zeroui.text.Text? = null,
+        val spacing: Int = 8,
+        val padding: Int = 20,
+        val children: List<Node>
+    ) : Node
+
     /**
      * Fallback node returned when [parseNode] encounters an unsupported `type`.
      * Renderers should display a non-fatal placeholder so the rest of the page keeps rendering.
      */
-    data class Unknown(
+    public data class Unknown(
         val typeName: String,
         val raw: String
     ) : Node
 }
 
-enum class ButtonVariant {
+public enum class ButtonVariant {
     Primary,
     Secondary
 }
 
-data class ChipOption(
+public sealed interface ImageSource {
+    public data class Url(val value: String) : ImageSource
+    public data class Resource(val name: String) : ImageSource
+    public data class Binding(val key: String, val fallback: String = "") : ImageSource
+}
+
+public enum class ImageContentScale {
+    Fit,
+    Crop,
+    FillWidth
+}
+
+public data class ChipOption(
     val label: String,
     val value: String
 )

@@ -4,3 +4,6 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.compose) apply false
 }
+
+group = "com.zero.zero-tools"
+version = "0.1.0"

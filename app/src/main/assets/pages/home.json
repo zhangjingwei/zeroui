@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "initialState": {
     "greetingText": { "owner": "client", "value": "" },
     "inputText": { "owner": "client", "value": "Zero Tools" },
@@ -329,6 +330,24 @@
                 {
                   "type": "navigate",
                   "target": { "type": "literal", "value": "fetch" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "button",
+            "text": "查看 Showcase",
+            "variant": "secondary",
+            "onClick": {
+              "actions": [],
+              "effects": [
+                {
+                  "type": "navigate",
+                  "target": { "type": "literal", "value": "showcase" }
+                },
+                {
+                  "type": "track",
+                  "event": "home_to_showcase_clicked"
                 }
               ]
             }

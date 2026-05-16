@@ -1,6 +1,7 @@
 package com.zero.zero_tools.zeroui.value
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -40,6 +41,10 @@ internal fun Layout.toModifier(): Modifier {
 
     if (padding > 0) {
         result = result.padding(padding.dp)
+    }
+
+    if (maxHeight > 0) {
+        result = result.heightIn(max = maxHeight.dp)
     }
 
     return result

@@ -24,7 +24,7 @@ internal fun parseValueSource(json: JSONObject): ValueSource {
  * Public so hosts can map HTTP / WebSocket payloads into the same Value shape the
  * reducer / renderer consumes.
  */
-fun parseRawValue(value: Any): Value {
+public fun parseRawValue(value: Any): Value {
     return when (value) {
         is Boolean -> Value.Bool(value)
         is Int -> Value.Number(value)

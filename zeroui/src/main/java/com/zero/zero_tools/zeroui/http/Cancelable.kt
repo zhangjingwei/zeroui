@@ -10,11 +10,11 @@ package com.zero.zero_tools.zeroui.http
  *
  * Calling [cancel] more than once must be safe (subsequent calls are no-ops).
  */
-fun interface Cancelable {
-    fun cancel()
+public fun interface Cancelable {
+    public fun cancel()
 
-    companion object {
+    public companion object {
         /** A cancelable that does nothing — for effects that have no abortable work. */
-        val Noop: Cancelable = Cancelable {}
+        public val Noop: Cancelable = Cancelable {}
     }
 }

@@ -7,16 +7,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
-val LocalZeroSkin = compositionLocalOf<ZeroSkin> {
+public val LocalZeroSkin: androidx.compose.runtime.ProvidableCompositionLocal<ZeroSkin> = compositionLocalOf {
     error("LocalZeroSkin is not provided")
 }
 
-val LocalZeroStyleResolver = compositionLocalOf<ZeroStyleResolver> {
+public val LocalZeroStyleResolver: androidx.compose.runtime.ProvidableCompositionLocal<ZeroStyleResolver> = compositionLocalOf {
     error("LocalZeroStyleResolver is not provided")
 }
 
 @Composable
-fun ZeroSkinProvider(
+public fun ZeroSkinProvider(
     skin: ZeroSkin = rememberZeroSkinFromMaterialTheme(),
     content: @Composable () -> Unit
 ) {
@@ -32,7 +32,7 @@ fun ZeroSkinProvider(
 }
 
 @Composable
-fun rememberZeroSkinFromMaterialTheme(): ZeroSkin {
+public fun rememberZeroSkinFromMaterialTheme(): ZeroSkin {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
 

@@ -6,7 +6,7 @@ import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.value.Value
 import com.zero.zero_tools.zeroui.value.ValueSource
 
-fun reduceState(
+public fun reduceState(
     state: State,
     action: Action,
     eventValue: Value? = null
@@ -33,7 +33,7 @@ fun reduceState(
     }
 }
 
-fun reduceState(
+public fun reduceState(
     state: State,
     interaction: Interaction,
     eventValue: Value? = null
@@ -43,7 +43,7 @@ fun reduceState(
     }
 }
 
-fun resolveValueSource(
+public fun resolveValueSource(
     state: State,
     source: ValueSource,
     eventValue: Value? = null

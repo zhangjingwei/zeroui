@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="zero_ui_image_loading">Loading…</string>
+    <string name="zero_ui_image_unavailable">Image unavailable</string>
+    <string name="zero_ui_unknown_node_title">Unknown component: %1$s</string>
+    <string name="zero_ui_unknown_node_support">The client does not support this type; a placeholder is shown.</string>
+</resources>

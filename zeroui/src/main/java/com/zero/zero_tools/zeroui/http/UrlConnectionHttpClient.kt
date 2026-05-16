@@ -1,8 +1,5 @@
-package com.zero.zero_tools.http
+package com.zero.zero_tools.zeroui.http
 
-import com.zero.zero_tools.zeroui.http.Cancelable
-import com.zero.zero_tools.zeroui.http.HttpClient
-import com.zero.zero_tools.zeroui.http.HttpResponse
 import com.zero.zero_tools.zeroui.value.Value
 import com.zero.zero_tools.zeroui.value.parseRawValue
 import kotlinx.coroutines.CoroutineScope
@@ -21,29 +18,22 @@ import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Zero-dependency [HttpClient] implementation. Uses [HttpURLConnection] on
- * [Dispatchers.IO] and delivers [HttpResponse] back on the dispatcher of [scope]
- * (which the host should bind to the main thread — typically `lifecycleScope`).
+ * Default [HttpClient] implementation backed by [HttpURLConnection].
  *
- * Cancellation (Wave 6): the returned [Cancelable] both cancels the coroutine `Job`
- * AND calls `disconnect()` on the live `HttpURLConnection`. On Android / OpenJDK,
- * `disconnect()` of a connection in the middle of a blocking read/connect causes
- * the in-flight I/O to throw `IOException`, ending the IO call promptly and freeing
- * the socket. Without this, [Job.cancel] alone would only flip `isActive` to false —
- * the coroutine would keep blocking on `responseCode` / `inputStream.read` until
- * the server replied or the read timeout elapsed.
+ * Scheme allowlist: only `http` and `https` URLs are dispatched. Other schemes
+ * (`file`, `content`, `data`, `ftp`, custom schemes) short-circuit to an
+ * `errorMessage` response without ever opening a connection — this is an SDK-side
+ * guard against server-driven JSON pointing the client at the host process's
+ * private storage. Hosts that need additional schemes should implement [HttpClient]
+ * directly.
  *
- * Response bodies are parsed into [Value] via [parseRawValue]:
- * JSON objects → [Value.Record], JSON arrays → [Value.List], otherwise → [Value.Text].
+ * Threading: `onResponse` is invoked on `Dispatchers.Main`, satisfying the
+ * [HttpClient] contract.
  */
-class UrlConnectionHttpClient(
+public class UrlConnectionHttpClient(
     private val scope: CoroutineScope,
     private val connectTimeoutMs: Int = 10_000,
     private val readTimeoutMs: Int = 15_000,
-    /**
-     * Test seam: lets tests inject a fake [HttpURLConnection] without going through
-     * real DNS / socket. Production code uses the JDK default.
-     */
     private val openConnection: (String) -> HttpURLConnection = { spec ->
         URL(spec).openConnection() as HttpURLConnection
     }
@@ -56,21 +46,18 @@ class UrlConnectionHttpClient(
         body: String?,
         onResponse: (HttpResponse) -> Unit
     ): Cancelable {
-        // One AtomicReference per request. Holds the live HttpURLConnection between
-        // "open" (inside runRequest) and "finally" (back inside runRequest) — or
-        // "cancel" (from the host on the main thread).
         val connectionRef = AtomicReference<HttpURLConnection?>(null)
 
         val job = scope.launch {
             val response = withContext(Dispatchers.IO) {
                 runRequest(method, url, headers, body, connectionRef)
             }
-            // Wave 4 first-line defense: if the host cancelled this request while the
-            // IO call was in flight, suppress onResponse so the late body does not
-            // reach the reducer. The page-scope guard would also drop it, but failing
-            // earlier saves work and is observable in tests.
             if (!isActive) return@launch
-            onResponse(response)
+            withContext(Dispatchers.Main) {
+                if (isActive) {
+                    onResponse(response)
+                }
+            }
         }
 
         return buildHttpCancelable(job, connectionRef)
@@ -83,6 +70,14 @@ class UrlConnectionHttpClient(
         body: String?,
         connectionRef: AtomicReference<HttpURLConnection?>
     ): HttpResponse {
+        val parsed = runCatching { URL(url) }.getOrNull()
+        if (parsed == null) {
+            return transportError("Malformed URL: $url")
+        }
+        if (parsed.protocol.lowercase() !in AllowedSchemes) {
+            return transportError("Disallowed URL scheme: ${parsed.protocol}")
+        }
+
         var connection: HttpURLConnection? = null
         return try {
             connection = openConnection(url).apply {
@@ -100,7 +95,6 @@ class UrlConnectionHttpClient(
                     outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
                 }
             }
-            // Publish the live connection so a concurrent cancel() can disconnect it.
             connectionRef.set(connection)
 
             val statusCode = connection.responseCode
@@ -117,29 +111,24 @@ class UrlConnectionHttpClient(
                 errorMessage = t.message ?: t::class.simpleName.orEmpty()
             )
         } finally {
-            // Only disconnect if WE still own the ref. If cancel() already swapped it
-            // to null (and called disconnect itself), don't double-disconnect.
-            // compareAndSet is the atomic "claim and clear" we need here.
             val live = connection
             if (live != null && connectionRef.compareAndSet(live, null)) {
                 live.disconnect()
             }
         }
     }
+
+    private companion object {
+        private val AllowedSchemes: Set<String> = setOf("http", "https")
+
+        private fun transportError(message: String): HttpResponse = HttpResponse(
+            statusCode = 0,
+            body = Value.Text(""),
+            errorMessage = message
+        )
+    }
 }
 
-/**
- * Builds the [Cancelable] returned to the host. Extracted so the disconnect routing
- * is unit-testable without spinning up the coroutine pipeline.
- *
- * Semantics:
- * - `job.cancel()` flips the coroutine's `isActive` to false; the suppression in
- *   [UrlConnectionHttpClient.request] then prevents `onResponse` from firing.
- * - `connectionRef.getAndSet(null)?.disconnect()` atomically takes the connection
- *   away from the IO thread's finally block (so it won't double-disconnect) and
- *   forcibly closes the socket — this is what makes a blocking `responseCode` /
- *   `read` actually return, instead of waiting up to `readTimeoutMs`.
- */
 internal fun buildHttpCancelable(
     job: Job,
     connectionRef: AtomicReference<HttpURLConnection?>
@@ -151,10 +140,6 @@ internal fun buildHttpCancelable(
 private fun java.io.InputStream.toText(): String =
     BufferedReader(InputStreamReader(this, Charsets.UTF_8)).use(BufferedReader::readText)
 
-/**
- * Tries JSONObject first, then JSONArray; if both fail, returns the raw string as
- * [Value.Text]. Empty body becomes empty Text.
- */
 private fun String.parseJsonValueOrText(): Value {
     if (isBlank()) return Value.Text("")
     return try {

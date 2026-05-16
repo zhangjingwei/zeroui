@@ -25,11 +25,28 @@ internal fun parseNode(json: JSONObject): Node {
             children = json.getChildren()
         )
 
+        "lazyColumn" -> Node.LazyColumn(
+            spacing = json.optInt("spacing", 0),
+            layout = json.optLayout(),
+            children = json.optChildren(),
+            itemsKey = json.optStringOrNull("itemsKey"),
+            item = json.optJSONObject("item")?.let(::parseNode)
+        )
+
         "text" -> Node.Text(
             text = parseText(json.getJSONObject("text")),
             style = json.optTextStyle(),
             tone = json.optTone(),
             layout = json.optLayout()
+        )
+
+        "image" -> Node.Image(
+            source = json.getJSONObject("source").parseImageSource(),
+            contentDescription = json.optStringOrNull("contentDescription"),
+            contentScale = json.optImageContentScale(),
+            aspectRatio = json.optFloatOrNull("aspectRatio"),
+            cornerRadius = json.optInt("cornerRadius", 0),
+            layout = json.optLayout(default = Layout(fillMaxWidth = true))
         )
 
         "textField" -> Node.TextField(
@@ -86,6 +103,15 @@ internal fun parseNode(json: JSONObject): Node {
             layout = json.optLayout()
         )
 
+        "dialog" -> Node.Dialog(
+            visibleKey = json.getString("visibleKey"),
+            onDismiss = json.optJSONObject("onDismiss")?.let(::parseInteraction) ?: com.zero.zero_tools.zeroui.interaction.Interaction(),
+            title = json.optJSONObject("title")?.let(::parseText),
+            spacing = json.optInt("spacing", 8),
+            padding = json.optInt("padding", 20),
+            children = json.getChildren()
+        )
+
         else -> Node.Unknown(
             typeName = type,
             raw = json.toString()
@@ -102,6 +128,10 @@ private fun JSONObject.getChildren(): List<Node> {
     return getJSONArray("children").mapObjects(::parseNode)
 }
 
+private fun JSONObject.optChildren(): List<Node> {
+    return optJSONArray("children")?.mapObjects(::parseNode).orEmpty()
+}
+
 private fun JSONArray.toChipOptions(): List<ChipOption> {
     return mapObjects { json ->
         ChipOption(
@@ -111,12 +141,43 @@ private fun JSONArray.toChipOptions(): List<ChipOption> {
     }
 }
 
+private fun JSONObject.parseImageSource(): ImageSource {
+    return when (val type = getString("type")) {
+        "url" -> ImageSource.Url(getString("url"))
+        "resource" -> ImageSource.Resource(getString("name"))
+        "binding" -> ImageSource.Binding(
+            key = getString("key"),
+            fallback = optString("fallback", "")
+        )
+
+        else -> error("Unsupported ZeroUI image source type: $type")
+    }
+}
+
+private fun JSONObject.optImageContentScale(): ImageContentScale {
+    return when (val value = optString("contentScale", "fit")) {
+        "fit" -> ImageContentScale.Fit
+        "crop" -> ImageContentScale.Crop
+        "fillWidth" -> ImageContentScale.FillWidth
+        else -> error("Unsupported ZeroUI image contentScale: $value")
+    }
+}
+
+private fun JSONObject.optStringOrNull(name: String): String? {
+    return if (has(name) && !isNull(name)) getString(name) else null
+}
+
+private fun JSONObject.optFloatOrNull(name: String): Float? {
+    return if (has(name) && !isNull(name)) getDouble(name).toFloat() else null
+}
+
 private fun JSONObject.optLayout(default: Layout = Layout()): Layout {
     val json = optJSONObject("layout") ?: return default
 
     return Layout(
         fillMaxWidth = json.optBoolean("fillMaxWidth", default.fillMaxWidth),
-        padding = json.optInt("padding", default.padding)
+        padding = json.optInt("padding", default.padding),
+        maxHeight = json.optInt("maxHeight", default.maxHeight)
     )
 }
 

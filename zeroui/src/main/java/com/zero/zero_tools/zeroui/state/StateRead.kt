@@ -8,7 +8,7 @@ import com.zero.zero_tools.zeroui.value.Value
  * Supports dotted-path access into [Value.Record] entries — e.g. `item.title`
  * walks into the `item` record's `title` field. Used by `forEach` item scopes.
  */
-fun State.getValue(key: String): Value? {
+public fun State.getValue(key: String): Value? {
     if (!key.contains('.')) return values[key]?.value
 
     val parts = key.split('.')
@@ -20,15 +20,15 @@ fun State.getValue(key: String): Value? {
     return current
 }
 
-fun State.getOwner(key: String): StateOwner? = values[key]?.owner
+public fun State.getOwner(key: String): StateOwner? = values[key]?.owner
 
-fun State.getText(key: String): String = getValue(key).asText()
+public fun State.getText(key: String): String = getValue(key).asText()
 
-fun State.getNumber(key: String): Int = getValue(key).asNumber()
+public fun State.getNumber(key: String): Int = getValue(key).asNumber()
 
-fun State.getBoolean(key: String): Boolean = getValue(key).asBoolean()
+public fun State.getBoolean(key: String): Boolean = getValue(key).asBoolean()
 
-fun State.getList(key: String): List<Value> {
+public fun State.getList(key: String): List<Value> {
     return when (val value = getValue(key)) {
         is Value.List -> value.items
         null -> emptyList()
@@ -41,7 +41,7 @@ fun State.getList(key: String): List<Value> {
  * inside `forEach` child rendering. Existing top-level keys are preserved;
  * `item` / `index` are shadowed if they happen to collide.
  */
-fun State.withItemScope(item: Value, index: Int): State {
+public fun State.withItemScope(item: Value, index: Int): State {
     return copy(
         values = values + mapOf(
             "item" to StateEntry(value = item, owner = StateOwner.Client),
@@ -50,7 +50,7 @@ fun State.withItemScope(item: Value, index: Int): State {
     )
 }
 
-fun Value?.asText(): String {
+public fun Value?.asText(): String {
     return when (this) {
         is Value.Text -> value
         is Value.Number -> value.toString()

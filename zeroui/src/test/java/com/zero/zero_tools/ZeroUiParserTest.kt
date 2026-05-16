@@ -4,8 +4,11 @@ import com.zero.zero_tools.zeroui.action.Action
 import com.zero.zero_tools.zeroui.condition.Condition
 import com.zero.zero_tools.zeroui.core.parseZeroUiPage
 import com.zero.zero_tools.zeroui.effect.Effect
+import com.zero.zero_tools.zeroui.node.ImageContentScale
+import com.zero.zero_tools.zeroui.node.ImageSource
 import com.zero.zero_tools.zeroui.node.ButtonVariant
 import com.zero.zero_tools.zeroui.node.Node
+import com.zero.zero_tools.zeroui.page.ZeroUiSchemaVersion
 import com.zero.zero_tools.zeroui.state.StateOwner
 import com.zero.zero_tools.zeroui.text.Text
 import com.zero.zero_tools.zeroui.text.TextStyle
@@ -40,7 +43,22 @@ class ZeroUiParserTest {
         assertEquals(Value.Number(3), page.initialState.values["count"]?.value)
         assertEquals(StateOwner.Shared, page.initialState.values["count"]?.owner)
         assertEquals(StateOwner.Client, page.initialState.values["title"]?.owner)
+        assertEquals(ZeroUiSchemaVersion.Current, page.schemaVersion)
         assertTrue(page.root is Node.Column)
+    }
+
+    @Test
+    fun parsesExplicitSchemaVersion() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "schemaVersion": 7,
+                "root": { "type": "column", "children": [] }
+              }
+            """.trimIndent()
+        )
+
+        assertEquals(7, page.schemaVersion)
     }
 
     @Test
@@ -78,6 +96,93 @@ class ZeroUiParserTest {
         assertEquals("user", binding.key)
         assertEquals("Guest", binding.fallback)
         assertEquals("user: {value}", binding.format)
+    }
+
+    @Test
+    fun parsesImageLazyColumnAndDialogNodes() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "initialState": {
+                  "showDialog": true,
+                  "photos": [
+                    { "url": "https://example.test/a.png", "title": "A" },
+                    { "url": "https://example.test/b.png", "title": "B" }
+                  ]
+                },
+                "root": {
+                  "type": "lazyColumn",
+                  "spacing": 10,
+                  "children": [
+                    {
+                      "type": "image",
+                      "source": { "type": "resource", "name": "hero" },
+                      "contentDescription": "Hero",
+                      "contentScale": "crop",
+                      "aspectRatio": 1.7,
+                      "cornerRadius": 14
+                    }
+                  ],
+                  "itemsKey": "photos",
+                  "item": {
+                    "type": "image",
+                    "source": { "type": "binding", "key": "item.url", "fallback": "" },
+                    "contentScale": "fillWidth"
+                  }
+                }
+              }
+            """.trimIndent()
+        )
+
+        val lazyColumn = page.root as Node.LazyColumn
+        assertEquals(10, lazyColumn.spacing)
+        assertEquals("photos", lazyColumn.itemsKey)
+        assertTrue(lazyColumn.item is Node.Image)
+
+        val hero = lazyColumn.children.single() as Node.Image
+        assertEquals(ImageSource.Resource("hero"), hero.source)
+        assertEquals("Hero", hero.contentDescription)
+        assertEquals(ImageContentScale.Crop, hero.contentScale)
+        assertEquals(1.7f, hero.aspectRatio)
+        assertEquals(14, hero.cornerRadius)
+
+        val itemImage = lazyColumn.item as Node.Image
+        assertEquals(ImageSource.Binding("item.url", ""), itemImage.source)
+        assertEquals(ImageContentScale.FillWidth, itemImage.contentScale)
+
+        val photos = page.initialState.values["photos"]?.value as Value.List
+        assertEquals(2, photos.items.size)
+    }
+
+    @Test
+    fun parsesDialogNode() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "root": {
+                  "type": "dialog",
+                  "visibleKey": "showConfirm",
+                  "title": { "type": "value", "value": "Confirm" },
+                  "spacing": 12,
+                  "padding": 24,
+                  "onDismiss": {
+                    "actions": [{ "type": "setState", "key": "showConfirm", "value": { "type": "literal", "value": false } }]
+                  },
+                  "children": [
+                    { "type": "text", "text": { "type": "value", "value": "Are you sure?" } }
+                  ]
+                }
+              }
+            """.trimIndent()
+        )
+
+        val dialog = page.root as Node.Dialog
+        assertEquals("showConfirm", dialog.visibleKey)
+        assertEquals(Text.Value("Confirm"), dialog.title)
+        assertEquals(12, dialog.spacing)
+        assertEquals(24, dialog.padding)
+        assertTrue(dialog.onDismiss.actions.single() is Action.SetState)
+        assertTrue(dialog.children.single() is Node.Text)
     }
 
     @Test

@@ -4,7 +4,14 @@ import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.node.Node
 import com.zero.zero_tools.zeroui.state.State
 
-data class Page(
+public data class Page(
+    /**
+     * Server-side protocol version for this page schema.
+     *
+     * Missing versions default to 1 so existing pages remain compatible. Hosts can inspect
+     * this value for telemetry or preflight checks before rendering.
+     */
+    val schemaVersion: Int = ZeroUiSchemaVersion.Current,
     val initialState: State,
     val root: Node,
     /**
@@ -21,7 +28,12 @@ data class Page(
     val onMount: Interaction = Interaction()
 )
 
-data class Layout(
+public object ZeroUiSchemaVersion {
+    public const val Current: Int = 1
+}
+
+public data class Layout(
     val fillMaxWidth: Boolean = false,
-    val padding: Int = 0
+    val padding: Int = 0,
+    val maxHeight: Int = 0
 )
