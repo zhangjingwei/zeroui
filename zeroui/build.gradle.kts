@@ -6,8 +6,23 @@ plugins {
     `maven-publish`
 }
 
-group = "com.zero.zero-tools"
-version = "0.1.0"
+val isJitPackBuild = providers.environmentVariable("JITPACK").isPresent
+val publicationGroup = if (isJitPackBuild) {
+    listOfNotNull(
+        providers.environmentVariable("GROUP").orNull,
+        providers.environmentVariable("ARTIFACT").orNull,
+    ).joinToString(".")
+} else {
+    "com.zero.zero-tools"
+}
+val publicationVersion = if (isJitPackBuild) {
+    providers.environmentVariable("VERSION").orNull ?: "0.1.0"
+} else {
+    "0.1.0"
+}
+
+group = publicationGroup
+version = publicationVersion
 
 val projectUrl = "https://github.com/zhangjingwei/zeroui"
 
@@ -64,9 +79,9 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-                groupId = "com.zero.zero-tools"
+                groupId = publicationGroup
                 artifactId = "zeroui"
-                version = project.version.toString()
+                version = publicationVersion
 
                 pom {
                     name.set("ZeroUI")

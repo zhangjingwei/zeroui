@@ -6,11 +6,24 @@ ZeroUI is a lightweight Server-Driven UI runtime for Android that lets apps dyna
 
 ## 5 Minute Start
 
-Add the `zeroui` Android library module or published artifact:
+Add the JitPack repository:
+
+```kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+}
+```
+
+Then add the `zeroui` Android library dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.zero.zero-tools:zeroui:0.1.0")
+    implementation("com.github.zhangjingwei.zeroui:zeroui:v0.1.0")
 }
 ```
 
@@ -100,15 +113,29 @@ The sample `assets/pages/showcase.json` page exercises these skin-driven compone
 
 ## Publishing
 
-The `zeroui` module publishes a release AAR with sources using Maven coordinates:
+The `zeroui` module publishes a release AAR with sources through JitPack:
 
 ```text
-groupId: com.zero.zero-tools
+groupId: com.github.zhangjingwei.zeroui
 artifactId: zeroui
-version: 0.1.0
+version: v0.1.0
 ```
 
-`publishReleasePublicationToMavenLocal` is configured for local/team validation. For JitPack or a private Maven repository, point the repository service at the `:zeroui` release publication and reuse the same coordinates.
+Validate the publication locally before creating a release:
+
+```bash
+./gradlew :zeroui:publishReleasePublicationToMavenLocal
+```
+
+Then create a GitHub release:
+
+- Tag: `v0.1.0`
+- Target: `main`
+- Release title: `v0.1.0`
+- Release notes: `ZeroUI 0.1.0 initial JitPack release.`
+- Leave `Set as a pre-release` unchecked
+
+After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.0) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
 
 ## Protocol Quick Reference
 
