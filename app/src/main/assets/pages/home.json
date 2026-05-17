@@ -311,7 +311,10 @@
               "effects": [
                 {
                   "type": "navigate",
-                  "target": { "type": "literal", "value": "detail" }
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "detail" }
+                  }
                 },
                 {
                   "type": "track",
@@ -329,7 +332,10 @@
               "effects": [
                 {
                   "type": "navigate",
-                  "target": { "type": "literal", "value": "fetch" }
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "fetch" }
+                  }
                 }
               ]
             }
@@ -343,7 +349,10 @@
               "effects": [
                 {
                   "type": "navigate",
-                  "target": { "type": "literal", "value": "showcase" }
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "showcase" }
+                  }
                 },
                 {
                   "type": "track",

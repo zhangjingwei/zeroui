@@ -21,6 +21,14 @@
           "url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80"
         }
       ]
+    },
+    "iconItems": {
+      "owner": "client",
+      "value": [
+        { "title": "Resource icon", "icon": "ic_launcher_foreground" },
+        { "title": "Tinted icon", "icon": "ic_launcher_foreground" },
+        { "title": "Clickable card", "icon": "ic_launcher_foreground" }
+      ]
     }
   },
   "root": {
@@ -45,6 +53,14 @@
         "text": {
           "type": "value",
           "value": "Core skin-driven components for visual review."
+        },
+        "onClick": {
+          "effects": [
+            {
+              "type": "toast",
+              "message": { "type": "literal", "value": "Text click uses the same onClick interaction." }
+            }
+          ]
         }
       },
       {
@@ -98,11 +114,29 @@
       {
         "type": "row",
         "spacing": 12,
+        "verticalAlignment": "center",
+        "layout": { "fillMaxWidth": true },
         "children": [
+          {
+            "type": "icon",
+            "source": { "type": "resource", "name": "ic_launcher_foreground" },
+            "contentDescription": "ZeroUI icon",
+            "tone": "primary",
+            "size": 28,
+            "onClick": {
+              "effects": [
+                {
+                  "type": "toast",
+                  "message": { "type": "literal", "value": "Icon clicked" }
+                }
+              ]
+            }
+          },
           {
             "type": "button",
             "text": "Primary",
             "variant": "primary",
+            "layout": { "weight": 1 },
             "onClick": {
               "effects": [
                 {
@@ -119,6 +153,7 @@
             "type": "button",
             "text": "Secondary",
             "variant": "secondary",
+            "layout": { "weight": 1 },
             "onClick": {
               "effects": [
                 {
@@ -157,6 +192,14 @@
       },
       {
         "type": "card",
+        "onClick": {
+          "effects": [
+            {
+              "type": "track",
+              "event": "showcase_image_card_clicked"
+            }
+          ]
+        },
         "children": [
           {
             "type": "text",
@@ -176,7 +219,15 @@
             "contentDescription": "Remote architecture image",
             "contentScale": "crop",
             "aspectRatio": 1.6,
-            "cornerRadius": 16
+            "cornerRadius": 16,
+            "onClick": {
+              "effects": [
+                {
+                  "type": "toast",
+                  "message": { "type": "literal", "value": "Image clicked" }
+                }
+              ]
+            }
           }
         ]
       },
@@ -233,6 +284,78 @@
                     "key": "item.title",
                     "fallback": "Gallery item"
                   }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": {
+              "type": "value",
+              "value": "LazyRow + Icon"
+            }
+          },
+          {
+            "type": "lazyRow",
+            "spacing": 10,
+            "verticalAlignment": "center",
+            "layout": {
+              "fillMaxWidth": true,
+              "height": 96
+            },
+            "itemsKey": "iconItems",
+            "item": {
+              "type": "card",
+              "padding": 12,
+              "spacing": 6,
+              "layout": {
+                "width": 132,
+                "height": 84
+              },
+              "onClick": {
+                "effects": [
+                  {
+                    "type": "track",
+                    "event": "showcase_icon_card_clicked",
+                    "params": {
+                      "title": { "type": "state", "key": "item.title" }
+                    }
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "type": "row",
+                  "spacing": 8,
+                  "verticalAlignment": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "source": {
+                        "type": "binding",
+                        "key": "item.icon",
+                        "fallback": "ic_launcher_foreground"
+                      },
+                      "tone": "primary",
+                      "size": 28
+                    },
+                    {
+                      "type": "text",
+                      "style": "label",
+                      "layout": { "weight": 1 },
+                      "text": {
+                        "type": "binding",
+                        "key": "item.title",
+                        "fallback": "Icon"
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -325,6 +448,29 @@
             "text": {
               "type": "value",
               "value": "Used for destructive or failed states."
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "inverse",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "inverse",
+            "text": {
+              "type": "value",
+              "value": "Inverse tone"
+            }
+          },
+          {
+            "type": "text",
+            "tone": "inverse",
+            "text": {
+              "type": "value",
+              "value": "Used for high-contrast overlays, banners, and reversed surfaces."
             }
           }
         ]

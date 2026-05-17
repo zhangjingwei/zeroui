@@ -3,21 +3,24 @@ package com.zero.zero_tools.zeroui.node
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -41,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -78,36 +82,38 @@ internal fun RenderColumnNode(
 ) {
     Column(
         modifier = modifier.then(node.layout.toModifier()),
-        verticalArrangement = Arrangement.spacedBy(node.spacing.dp)
+        verticalArrangement = Arrangement.spacedBy(node.spacing.dp),
+        horizontalAlignment = node.horizontalAlignment.toComposeAlignment()
     ) {
         node.children.forEach { child ->
             ZeroUiRenderer(
                 node = child,
                 state = state,
-                onInteraction = onInteraction
+                onInteraction = onInteraction,
+                modifier = parentWeightModifier(child)
             )
         }
     }
 }
 
 @Composable
-@OptIn(ExperimentalLayoutApi::class)
 internal fun RenderRowNode(
     node: Node.Row,
     state: State,
     onInteraction: (Interaction, Value?) -> Unit,
     modifier: Modifier
 ) {
-    FlowRow(
+    Row(
         modifier = modifier.then(node.layout.toModifier()),
         horizontalArrangement = Arrangement.spacedBy(node.spacing.dp),
-        verticalArrangement = Arrangement.spacedBy(node.spacing.dp)
+        verticalAlignment = node.verticalAlignment.toComposeAlignment()
     ) {
         node.children.forEach { child ->
             ZeroUiRenderer(
                 node = child,
                 state = state,
-                onInteraction = onInteraction
+                onInteraction = onInteraction,
+                modifier = parentWeightModifier(child)
             )
         }
     }
@@ -125,6 +131,44 @@ internal fun RenderLazyColumnNode(
     LazyColumn(
         modifier = modifier.then(node.layout.toModifier()),
         verticalArrangement = Arrangement.spacedBy(node.spacing.dp)
+    ) {
+        node.children.forEach { child ->
+            item {
+                ZeroUiRenderer(
+                    node = child,
+                    state = state,
+                    onInteraction = onInteraction
+                )
+            }
+        }
+
+        val itemNode = node.item
+        if (itemNode != null) {
+            itemsIndexed(items) { index, item ->
+                val scopedState = state.withItemScope(item, index)
+                ZeroUiRenderer(
+                    node = itemNode,
+                    state = scopedState,
+                    onInteraction = onInteraction
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun RenderLazyRowNode(
+    node: Node.LazyRow,
+    state: State,
+    onInteraction: (Interaction, Value?) -> Unit,
+    modifier: Modifier
+) {
+    val items = node.itemsKey?.let(state::getList).orEmpty()
+
+    LazyRow(
+        modifier = modifier.then(node.layout.toModifier()),
+        horizontalArrangement = Arrangement.spacedBy(node.spacing.dp),
+        verticalAlignment = node.verticalAlignment.toComposeAlignment()
     ) {
         node.children.forEach { child ->
             item {
@@ -171,13 +215,16 @@ internal fun RenderConditionNode(
 internal fun RenderTextNode(
     node: Node.Text,
     state: State,
+    onInteraction: (Interaction, Value?) -> Unit,
     modifier: Modifier
 ) {
     Text(
         text = node.text.resolve(state),
         style = node.style.toTextStyle(),
         color = node.tone.toColor(),
-        modifier = modifier.then(node.layout.toModifier())
+        modifier = modifier
+            .then(node.layout.toModifier())
+            .then(node.onClick?.let { Modifier.clickable { onInteraction(it, null) } } ?: Modifier)
     )
 }
 
@@ -185,6 +232,7 @@ internal fun RenderTextNode(
 internal fun RenderImageNode(
     node: Node.Image,
     state: State,
+    onInteraction: (Interaction, Value?) -> Unit,
     modifier: Modifier
 ) {
     val resolver = LocalZeroStyleResolver.current
@@ -206,6 +254,7 @@ internal fun RenderImageNode(
         .then(node.layout.toModifier())
         .then(node.aspectRatio?.let { Modifier.aspectRatio(it) } ?: Modifier)
         .clip(shape)
+        .then(node.onClick?.let { Modifier.clickable { onInteraction(it, null) } } ?: Modifier)
 
     when (val current = result) {
         is ZeroImageResult.Success -> Image(
@@ -229,6 +278,54 @@ internal fun RenderImageNode(
                 style = resolver.supportTextStyle,
                 color = resolver.mutedContentColor,
                 modifier = Modifier.padding(12.dp)
+            )
+        }
+    }
+}
+
+@Composable
+internal fun RenderIconNode(
+    node: Node.Icon,
+    state: State,
+    onInteraction: (Interaction, Value?) -> Unit,
+    modifier: Modifier
+) {
+    val resolver = LocalZeroStyleResolver.current
+    val loader = LocalZeroImageLoader.current
+    val source = node.source.toZeroImageSource(state)
+
+    var result by remember(source) { mutableStateOf<ZeroImageResult?>(null) }
+
+    DisposableEffect(source, loader) {
+        result = null
+        val cancelable = loader.load(ZeroImageRequest(source = source)) { outcome ->
+            result = outcome
+        }
+        onDispose { cancelable.cancel() }
+    }
+
+    val iconModifier = modifier
+        .then(node.layout.toModifier())
+        .size(node.size.dp)
+        .then(node.onClick?.let { Modifier.clickable { onInteraction(it, null) } } ?: Modifier)
+
+    when (val current = result) {
+        is ZeroImageResult.Success -> Image(
+            bitmap = current.bitmap,
+            contentDescription = node.contentDescription,
+            contentScale = ContentScale.Fit,
+            colorFilter = if (node.tint) ColorFilter.tint(node.tone.toColor()) else null,
+            modifier = iconModifier
+        )
+        ZeroImageResult.Unavailable,
+        null -> Box(
+            modifier = iconModifier.background(resolver.unknownContainerColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "",
+                style = resolver.supportTextStyle,
+                color = resolver.mutedContentColor
             )
         }
     }
@@ -411,7 +508,9 @@ internal fun RenderCardNode(
     val tokens = LocalZeroStyleResolver.current.cardTokens(node.tone)
 
     Card(
-        modifier = modifier.then(node.layout.toModifier()),
+        modifier = modifier
+            .then(node.layout.toModifier())
+            .then(node.onClick?.let { Modifier.clickable { onInteraction(it, null) } } ?: Modifier),
         colors = CardDefaults.cardColors(
             containerColor = tokens.colors.container,
             contentColor = tokens.colors.content
@@ -516,6 +615,62 @@ private fun ImageSource.toZeroImageSource(state: State): ZeroImageSource {
         is ImageSource.Resource -> ZeroImageSource.Resource(name)
         is ImageSource.Url -> ZeroImageSource.Url(value)
         is ImageSource.Binding -> ZeroImageSource.Url(state.getText(key).ifBlank { fallback })
+    }
+}
+
+private fun IconSource.toZeroImageSource(state: State): ZeroImageSource {
+    return when (this) {
+        is IconSource.Resource -> ZeroImageSource.Resource(name)
+        is IconSource.Url -> ZeroImageSource.Url(value)
+        is IconSource.Binding -> ZeroImageSource.Url(state.getText(key).ifBlank { fallback })
+    }
+}
+
+private fun Node.layoutWeight(): Float {
+    return when (this) {
+        is Node.Card -> layout.weight
+        is Node.ChipGroup -> layout.weight
+        is Node.Column -> layout.weight
+        is Node.ForEach -> layout.weight
+        is Node.Icon -> layout.weight
+        is Node.Image -> layout.weight
+        is Node.LazyColumn -> layout.weight
+        is Node.LazyRow -> layout.weight
+        is Node.Row -> layout.weight
+        is Node.Switch -> layout.weight
+        is Node.Text -> layout.weight
+        is Node.TextField -> layout.weight
+        is Node.Button -> layout.weight
+        is Node.Condition,
+        is Node.Dialog,
+        is Node.Spacer,
+        is Node.Unknown -> 0f
+    }
+}
+
+private fun ColumnScope.parentWeightModifier(node: Node): Modifier {
+    val weight = node.layoutWeight()
+    return if (weight > 0f) Modifier.weight(weight) else Modifier
+}
+
+private fun RowScope.parentWeightModifier(node: Node): Modifier {
+    val weight = node.layoutWeight()
+    return if (weight > 0f) Modifier.weight(weight) else Modifier
+}
+
+private fun HorizontalAlignment.toComposeAlignment(): Alignment.Horizontal {
+    return when (this) {
+        HorizontalAlignment.Start -> Alignment.Start
+        HorizontalAlignment.Center -> Alignment.CenterHorizontally
+        HorizontalAlignment.End -> Alignment.End
+    }
+}
+
+private fun VerticalAlignment.toComposeAlignment(): Alignment.Vertical {
+    return when (this) {
+        VerticalAlignment.Top -> Alignment.Top
+        VerticalAlignment.Center -> Alignment.CenterVertically
+        VerticalAlignment.Bottom -> Alignment.Bottom
     }
 }
 

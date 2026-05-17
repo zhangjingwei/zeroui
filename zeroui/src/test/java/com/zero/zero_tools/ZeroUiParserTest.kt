@@ -7,7 +7,10 @@ import com.zero.zero_tools.zeroui.effect.Effect
 import com.zero.zero_tools.zeroui.node.ImageContentScale
 import com.zero.zero_tools.zeroui.node.ImageSource
 import com.zero.zero_tools.zeroui.node.ButtonVariant
+import com.zero.zero_tools.zeroui.node.HorizontalAlignment
+import com.zero.zero_tools.zeroui.node.IconSource
 import com.zero.zero_tools.zeroui.node.Node
+import com.zero.zero_tools.zeroui.node.VerticalAlignment
 import com.zero.zero_tools.zeroui.page.ZeroUiSchemaVersion
 import com.zero.zero_tools.zeroui.state.StateOwner
 import com.zero.zero_tools.zeroui.text.Text
@@ -96,6 +99,35 @@ class ZeroUiParserTest {
         assertEquals("user", binding.key)
         assertEquals("Guest", binding.fallback)
         assertEquals("user: {value}", binding.format)
+    }
+
+    @Test
+    fun parsesSupportTextStyleAndFallsBackForUnknownStyle() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "root": {
+                  "type": "column",
+                  "children": [
+                    {
+                      "type": "text",
+                      "style": "support",
+                      "text": { "type": "value", "value": "Helper copy" }
+                    },
+                    {
+                      "type": "text",
+                      "style": "captionFromFuture",
+                      "text": { "type": "value", "value": "Future copy" }
+                    }
+                  ]
+                }
+              }
+            """.trimIndent()
+        )
+
+        val column = page.root as Node.Column
+        assertEquals(TextStyle.Support, (column.children[0] as Node.Text).style)
+        assertEquals(TextStyle.Body, (column.children[1] as Node.Text).style)
     }
 
     @Test
@@ -239,6 +271,95 @@ class ZeroUiParserTest {
     }
 
     @Test
+    fun parsesExtendedLayoutListsClickableNodesAndIcon() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "initialState": {
+                  "icons": [
+                    { "name": "ic_one", "label": "One" },
+                    { "name": "ic_two", "label": "Two" }
+                  ]
+                },
+                "root": {
+                  "type": "column",
+                  "spacing": 12,
+                  "horizontalAlignment": "center",
+                  "layout": {
+                    "fillMaxWidth": true,
+                    "fillMaxHeight": true,
+                    "padding": { "start": 8, "top": 10, "end": 12, "bottom": 14 }
+                  },
+                  "children": [
+                    {
+                      "type": "row",
+                      "verticalAlignment": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": { "type": "value", "value": "Tap" },
+                          "layout": { "weight": 1.5, "minHeight": 24 },
+                          "onClick": { "effects": [{ "type": "toast", "message": { "type": "literal", "value": "text" } }] }
+                        },
+                        {
+                          "type": "icon",
+                          "source": { "type": "resource", "name": "ic_zero" },
+                          "tone": "primary",
+                          "size": 20,
+                          "onClick": { "effects": [{ "type": "track", "event": "icon" }] }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "lazyRow",
+                      "spacing": 6,
+                      "itemsKey": "icons",
+                      "item": {
+                        "type": "card",
+                        "onClick": { "effects": [{ "type": "track", "event": "card" }] },
+                        "children": [
+                          {
+                            "type": "image",
+                            "source": { "type": "binding", "key": "item.name", "fallback": "" },
+                            "onClick": { "effects": [{ "type": "track", "event": "image" }] }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            """.trimIndent()
+        )
+
+        val column = page.root as Node.Column
+        assertEquals(HorizontalAlignment.Center, column.horizontalAlignment)
+        assertEquals(12, column.spacing)
+        assertEquals(true, column.layout.fillMaxWidth)
+        assertEquals(true, column.layout.fillMaxHeight)
+        assertEquals(8, column.layout.paddingStart)
+        assertEquals(10, column.layout.paddingTop)
+        assertEquals(12, column.layout.paddingEnd)
+        assertEquals(14, column.layout.paddingBottom)
+
+        val row = column.children[0] as Node.Row
+        assertEquals(VerticalAlignment.Center, row.verticalAlignment)
+        val text = row.children[0] as Node.Text
+        assertEquals(1.5f, text.layout.weight, 0.001f)
+        assertEquals(24, text.layout.minHeight)
+        assertTrue(text.onClick?.effects?.single() is Effect.Toast)
+        val icon = row.children[1] as Node.Icon
+        assertEquals(IconSource.Resource("ic_zero"), icon.source)
+        assertTrue(icon.onClick?.effects?.single() is Effect.Track)
+
+        val lazyRow = column.children[1] as Node.LazyRow
+        assertEquals("icons", lazyRow.itemsKey)
+        val card = lazyRow.item as Node.Card
+        assertTrue(card.onClick?.effects?.single() is Effect.Track)
+        assertTrue((card.children.single() as Node.Image).onClick?.effects?.single() is Effect.Track)
+    }
+
+    @Test
     fun parsesChipGroupAndCardAndConditionAndSpacer() {
         val page = parseZeroUiPage(
             """
@@ -290,7 +411,7 @@ class ZeroUiParserTest {
     }
 
     @Test
-    fun parsesErrorAndWarningTones() {
+    fun parsesErrorWarningAndInverseTones() {
         val page = parseZeroUiPage(
             """
               {
@@ -298,7 +419,8 @@ class ZeroUiParserTest {
                   "type": "column",
                   "children": [
                     { "type": "text", "tone": "error", "text": { "type": "value", "value": "Error" } },
-                    { "type": "card", "tone": "warning", "children": [] }
+                    { "type": "card", "tone": "warning", "children": [] },
+                    { "type": "text", "tone": "inverse", "text": { "type": "value", "value": "Inverse" } }
                   ]
                 }
               }
@@ -308,9 +430,11 @@ class ZeroUiParserTest {
         val column = page.root as Node.Column
         val text = column.children[0] as Node.Text
         val card = column.children[1] as Node.Card
+        val inverse = column.children[2] as Node.Text
 
         assertEquals(Tone.Error, text.tone)
         assertEquals(Tone.Warning, card.tone)
+        assertEquals(Tone.Inverse, inverse.tone)
     }
 
     @Test

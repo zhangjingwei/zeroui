@@ -67,7 +67,9 @@ private fun techElegantLightPalette() = ZeroPalette(
     mutedOutline = Color(0xFFDCE2EA),
     focusedOutline = Color(0xFF255CDE),
     errorOutline = Color(0xFFC84444),
-    unknownContainer = Color(0xFFF4EAD4)
+    unknownContainer = Color(0xFFF4EAD4),
+    inverseContent = Color(0xFFF7F9FC),
+    inverseContainer = Color(0xFF10141F)
 )
 
 private fun techElegantDarkPalette() = ZeroPalette(
@@ -87,5 +89,7 @@ private fun techElegantDarkPalette() = ZeroPalette(
     mutedOutline = Color(0xFF2A3445),
     focusedOutline = Color(0xFF8FB0FF),
     errorOutline = Color(0xFFFF9999),
-    unknownContainer = Color(0xFF3B3020)
+    unknownContainer = Color(0xFF3B3020),
+    inverseContent = Color(0xFF10141F),
+    inverseContainer = Color(0xFFEAF0F8)
 )

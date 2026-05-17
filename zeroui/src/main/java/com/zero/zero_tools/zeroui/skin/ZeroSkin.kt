@@ -34,7 +34,9 @@ public data class ZeroPalette(
     val mutedOutline: Color,
     val focusedOutline: Color,
     val errorOutline: Color,
-    val unknownContainer: Color
+    val unknownContainer: Color,
+    val inverseContent: Color = container,
+    val inverseContainer: Color = content
 )
 
 public typealias ZeroColors = ZeroPalette
@@ -326,6 +328,10 @@ public data class ZeroCardTokens(
     val success: CardToneTokens,
     val error: CardToneTokens,
     val warning: CardToneTokens,
+    val inverse: CardToneTokens = CardToneTokens(
+        container = default.content,
+        content = default.container
+    ),
     val cornerRadius: Dp
 ) {
     public companion object {
@@ -337,6 +343,7 @@ public data class ZeroCardTokens(
                 success = CardToneTokens(container = palette.successContainer, content = palette.content),
                 error = CardToneTokens(container = palette.errorContainer, content = palette.content),
                 warning = CardToneTokens(container = palette.warningContainer, content = palette.content),
+                inverse = CardToneTokens(container = palette.inverseContainer, content = palette.inverseContent),
                 cornerRadius = 8.dp
             )
         }

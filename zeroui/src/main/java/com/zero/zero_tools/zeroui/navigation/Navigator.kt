@@ -1,16 +1,23 @@
 package com.zero.zero_tools.zeroui.navigation
 
+import com.zero.zero_tools.zeroui.effect.NavigationTargetKind
+
 /**
  * Host-supplied navigation contract for ZeroUI pages.
  *
- * The library does not know whether a "target" is an asset name, a deeplink, a URL,
- * or a route in some Compose Navigation graph — the host implements those semantics.
+ * ZeroUI supplies target semantics through [NavigationTargetKind] rather than private
+ * string schemes. The default [com.zero.zero_tools.zeroui.host.ZeroUiHost] consumes
+ * [NavigationTargetKind.Page] targets as page names in its own stack.
  *
  * Effects [com.zero.zero_tools.zeroui.effect.Effect.Navigate] / [com.zero.zero_tools.zeroui.effect.Effect.Back]
  * are translated into calls on this interface by [com.zero.zero_tools.zeroui.effect.executeEffects].
  */
 public fun interface Navigator {
     public fun navigate(target: String)
+
+    public fun navigate(target: String, kind: NavigationTargetKind) {
+        navigate(target)
+    }
 
     public fun back() {
         // default: no-op. Hosts that maintain a stack should override.

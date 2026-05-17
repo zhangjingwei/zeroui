@@ -2,6 +2,7 @@ package com.zero.zero_tools.zeroui.interaction
 
 import com.zero.zero_tools.zeroui.action.Action
 import com.zero.zero_tools.zeroui.effect.Effect
+import com.zero.zero_tools.zeroui.effect.NavigationTargetKind
 import com.zero.zero_tools.zeroui.value.parseValueSource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -41,7 +42,7 @@ private fun parseEffect(json: JSONObject): Effect {
     return when (val type = json.getString("type")) {
         "toast" -> Effect.Toast(message = parseValueSource(json.getJSONObject("message")))
         "log" -> Effect.Log(message = parseValueSource(json.getJSONObject("message")))
-        "navigate" -> Effect.Navigate(target = parseValueSource(json.getJSONObject("target")))
+        "navigate" -> parseNavigateEffect(json)
         "back" -> Effect.Back
         "track" -> Effect.Track(
             event = json.getString("event"),
@@ -64,6 +65,36 @@ private fun parseEffect(json: JSONObject): Effect {
             onError = json.optJSONObject("onError")?.let(::parseInteraction) ?: Interaction()
         )
         else -> error("Unsupported ZeroUI effect type: $type")
+    }
+}
+
+private fun parseNavigateEffect(json: JSONObject): Effect.Navigate {
+    val targetJson = json.getJSONObject("target")
+    val targetType = targetJson.optString("type", "")
+    return when (targetType) {
+        "page",
+        "route",
+        "url",
+        "external" -> Effect.Navigate(
+            target = targetJson.optJSONObject("value")?.let(::parseValueSource)
+                ?: targetJson.optJSONObject("name")?.let(::parseValueSource)
+                ?: error("ZeroUI navigate target '$targetType' requires value or name"),
+            targetKind = targetType.toNavigationTargetKind()
+        )
+        else -> Effect.Navigate(
+            target = parseValueSource(targetJson),
+            targetKind = json.optString("targetKind", "page").toNavigationTargetKind()
+        )
+    }
+}
+
+private fun String.toNavigationTargetKind(): NavigationTargetKind {
+    return when (this) {
+        "page" -> NavigationTargetKind.Page
+        "route" -> NavigationTargetKind.Route
+        "url" -> NavigationTargetKind.Url
+        "external" -> NavigationTargetKind.External
+        else -> error("Unsupported ZeroUI navigation target kind: $this")
     }
 }
 

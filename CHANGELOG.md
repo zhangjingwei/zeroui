@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1
+
+- Added `inverse` tone support across JSON parsing, skin palette tokens, text/icon foreground color, and card container tokens.
+- Added JSON `support` text style parsing and made unknown text styles fall back to `body` instead of failing page parsing.
+- Extended schemaVersion 1 with additive ZeroUI public protocol fields for layout alignment/weight/dimensions/padding, `lazyRow`, generic `icon`, optional `onClick` on text/image/card, and structured navigation target kinds.
+- Updated the app showcase assets so new public protocol capabilities are consumed through `ZeroUiHost`.
+- Added skin integration docs, AI integration notes, and a copyable brand skin template so external packages can build `ZeroSkin` without reading local SDK sources.
+- Added vector drawable fallback support to the default image loader so drawable resources work for `icon` as well as `image`.
+- Corrected the JitPack consumer coordinate to `com.github.zhangjingwei:zeroui`.
+
 ## 0.1.0
 
 - Introduced reusable `ZeroUiHost` in the `zeroui` module.

@@ -1,7 +1,9 @@
 package com.zero.zero_tools.zeroui.image
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.util.LruCache
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -18,6 +20,8 @@ import java.net.URL
  * Default in-process image loader.
  *
  * Resources: looked up by name via `Resources.getIdentifier(name, "drawable", packageName)`.
+ * Bitmap drawables are decoded directly; drawable/vector resources fall back to drawing
+ * into a bounded bitmap.
  *
  * URLs: fetched via [HttpURLConnection]. Only `http` and `https` schemes are allowed —
  * `file://`, `content://`, `data:`, etc. are rejected to keep server-driven payloads
@@ -93,6 +97,25 @@ internal class DefaultZeroImageLoader(
             inSampleSize = calculateSampleSize(bounds.outWidth, bounds.outHeight, maxDim)
         }
         return BitmapFactory.decodeResource(context.resources, id, opts)?.asImageBitmap()
+            ?: drawResource(id, maxDim)
+    }
+
+    private fun drawResource(id: Int, maxDim: Int): ImageBitmap? {
+        val drawable = context.getDrawable(id) ?: return null
+        val intrinsicWidth = drawable.intrinsicWidth.takeIf { it > 0 } ?: maxDim
+        val intrinsicHeight = drawable.intrinsicHeight.takeIf { it > 0 } ?: maxDim
+        val scale = minOf(
+            maxDim.toFloat() / intrinsicWidth.toFloat(),
+            maxDim.toFloat() / intrinsicHeight.toFloat(),
+            1f
+        )
+        val width = (intrinsicWidth * scale).toInt().coerceAtLeast(1)
+        val height = (intrinsicHeight * scale).toInt().coerceAtLeast(1)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap.asImageBitmap()
     }
 
     private fun decodeUrl(url: String, maxDim: Int): ImageBitmap? {

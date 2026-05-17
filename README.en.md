@@ -23,7 +23,7 @@ Then add the `zeroui` Android library dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.github.zhangjingwei.zeroui:zeroui:v0.1.0")
+    implementation("com.github.zhangjingwei:zeroui:v0.1.1")
 }
 ```
 
@@ -87,7 +87,7 @@ Use `PageLoader` to load schemas from assets, memory, or a prefilled cache. It i
 
 Use `HttpClient` to replace the default `HttpURLConnection` implementation with your own network stack. Use `Tracker` to forward `track` effects into your analytics system.
 
-Use `ZeroImageLoader` to plug in your image-loading stack. The bundled `rememberDefaultZeroImageLoader()` decodes drawable resources and HTTP(S) URLs with `inSampleSize` downsampling, a small in-memory LRU cache, and an SDK-side `http`/`https` scheme allowlist. For lazy lists, animated formats, disk caching, or request prioritisation, plug in a Coil- or Glide-backed `ZeroImageLoader` instead:
+Use `ZeroImageLoader` to plug in your image/icon loading stack. The bundled `rememberDefaultZeroImageLoader()` constrains drawable resources (including vector drawables) and HTTP(S) URLs, keeps a small in-memory LRU cache, and enforces an SDK-side `http`/`https` scheme allowlist. For lazy lists, animated formats, disk caching, or request prioritisation, plug in a Coil- or Glide-backed `ZeroImageLoader` instead:
 
 ```kotlin
 class CoilZeroImageLoader(...) : ZeroImageLoader {
@@ -100,6 +100,18 @@ class CoilZeroImageLoader(...) : ZeroImageLoader {
 ## Skin System
 
 ZeroUI exposes semantic `style` and `tone` values in JSON, while Android implementation details stay inside `ZeroSkin`.
+
+`ZeroSkinProvider` accepts a `ZeroSkin` object constructed by the host or a brand integration package. It does not accept JSON strings, file paths, or remote loaders. Brand packages should expose `rememberBrandZeroSkin(): ZeroSkin`, then the host passes it in:
+
+```kotlin
+ZeroSkinProvider(
+    skin = rememberBrandZeroSkin(darkTheme)
+) {
+    ZeroUiHost(startPage = "home")
+}
+```
+
+See [docs/skin.md](docs/skin.md) for the field-level contract, [examples/brand-skin-integration/BrandZeroSkin.kt](examples/brand-skin-integration/BrandZeroSkin.kt) for a copyable template, and [docs/ai-integration.md](docs/ai-integration.md) for coding-agent constraints.
 
 Current component token coverage:
 
@@ -116,9 +128,9 @@ The sample `assets/pages/showcase.json` page exercises these skin-driven compone
 The `zeroui` module publishes a release AAR with sources through JitPack:
 
 ```text
-groupId: com.github.zhangjingwei.zeroui
+groupId: com.github.zhangjingwei
 artifactId: zeroui
-version: v0.1.0
+version: v0.1.1
 ```
 
 Validate the publication locally before creating a release:
@@ -129,22 +141,76 @@ Validate the publication locally before creating a release:
 
 Then create a GitHub release:
 
-- Tag: `v0.1.0`
+- Tag: `v0.1.1`
 - Target: `main`
-- Release title: `v0.1.0`
-- Release notes: `ZeroUI 0.1.0 initial JitPack release.`
+- Release title: `v0.1.1`
+- Release notes: `ZeroUI 0.1.1 adds schemaVersion 1 layout, list, icon, navigation, and skin integration documentation improvements.`
 - Leave `Set as a pre-release` unchecked
 
-After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.0) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
+After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.1) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
 
 ## Protocol Quick Reference
+
+`schemaVersion: 1` remains backward compatible. ZeroUI extends v1 through optional fields, so existing pages do not need a migration.
+
+Common `layout` fields work on most visible nodes:
+
+```json
+{
+  "layout": {
+    "fillMaxWidth": true,
+    "fillMaxHeight": false,
+    "weight": 1,
+    "padding": { "start": 12, "top": 8, "end": 12, "bottom": 8 },
+    "width": 120,
+    "height": 48,
+    "minWidth": 80,
+    "minHeight": 40,
+    "maxWidth": 320,
+    "maxHeight": 480
+  }
+}
+```
+
+`column` supports `spacing` and `horizontalAlignment: "start" | "center" | "end"`; `row` supports `spacing` and `verticalAlignment: "top" | "center" | "bottom"`. Children can use `layout.weight` to share remaining space in a parent `row` / `column`.
+
+`lazyColumn` and `lazyRow` both support static `children`, `itemsKey`, and a reusable `item` template. Templates read the current item through `item.*` and `itemIndex`.
+
+`text`, `image`, `card`, and `button` share the same `onClick` interaction model. `button.onClick` is still required; `text` / `image` / `card` `onClick` is optional.
+
+`icon` is a generic icon node, not a business-specific `iconText` / `iconButton`. It uses the common source shape:
+
+```json
+{
+  "type": "icon",
+  "source": { "type": "resource", "name": "ic_launcher_foreground" },
+  "tone": "primary",
+  "size": 24,
+  "tint": true,
+  "onClick": { "effects": [{ "type": "track", "event": "icon_clicked" }] }
+}
+```
+
+`navigate` supports the legacy shape and ZeroUI-level target semantics:
+
+```json
+{
+  "type": "navigate",
+  "target": {
+    "type": "page",
+    "name": { "type": "literal", "value": "detail" }
+  }
+}
+```
+
+`type` can be `page`, `route`, `url`, or `external`. The bundled `ZeroUiHost` consumes `page` targets with its own page stack; ZeroUI does not introduce app-private schemes such as `page://` or `sdui://`.
 
 Nodes:
 
 | Node | Stability |
 | --- | --- |
-| `column`, `row`, `text`, `textField`, `switch`, `button`, `chipGroup`, `card`, `spacer`, `condition`, `image` | Stable for `0.1.x` internal/team use (`image` requires a `ZeroImageLoader`; the default loader covers resources + HTTP/HTTPS URLs) |
-| `forEach`, `lazyColumn`, `dialog` | Experimental in `0.1.x`; keep behind server-side capability gates |
+| `column`, `row`, `text`, `textField`, `switch`, `button`, `chipGroup`, `card`, `spacer`, `condition`, `image`, `icon` | Stable for `0.1.x` internal/team use (`image` / `icon` require a `ZeroImageLoader`; the default loader covers drawable resources + HTTP/HTTPS URLs) |
+| `forEach`, `lazyColumn`, `lazyRow`, `dialog` | Experimental in `0.1.x`; keep behind server-side capability gates |
 
 Actions:
 `setState`, `incrementState`, `toggleState`, `batch`.
@@ -153,10 +219,10 @@ Effects:
 `toast`, `log`, `track`, `navigate`, `back`, `http`.
 
 Text styles:
-`title`, `sectionTitle`, `body`, `label`.
+`title`, `sectionTitle`, `body`, `label`, `support`. Unknown `style` values fall back to `body` so one typo does not fail page parsing.
 
 Tones:
-`default`, `muted`, `primary`, `success`, `error`, `warning`.
+`default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`.
 
 ## Protocol Versioning
 
@@ -179,7 +245,7 @@ Notable missing pieces:
 state restoration after configuration changes/process death, binary compatibility validation, and a formal publishing pipeline.
 
 Experimental protocol/rendering pieces available in `0.1.x`:
-`lazyColumn`, `dialog`, and `forEach`. Treat these as early surface area and gate rollout by client capability.
+`lazyColumn`, `lazyRow`, `dialog`, and `forEach`. Treat these as early surface area and gate rollout by client capability.
 
 ## API Boundary
 

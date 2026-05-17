@@ -24,8 +24,8 @@ public val LocalZeroImageLoader: ProvidableCompositionLocal<ZeroImageLoader> = c
  * Remembers a process-wide default image loader bound to the current Compose scope.
  *
  * The default implementation:
- * - Decodes drawable resources via `BitmapFactory.decodeResource` with a two-pass
- *   `inJustDecodeBounds` + `inSampleSize` to cap memory.
+ * - Decodes drawable resources via `BitmapFactory.decodeResource` when possible, and
+ *   falls back to drawing drawable/vector resources into a bounded bitmap.
  * - Fetches HTTP/HTTPS URLs via `HttpURLConnection`. Other URL schemes
  *   (`file`, `content`, `data`, …) resolve to [ZeroImageResult.Unavailable]
  *   — this is an SDK-side allowlist, not user-configurable.

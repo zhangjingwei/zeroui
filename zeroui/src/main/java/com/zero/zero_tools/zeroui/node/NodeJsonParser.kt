@@ -15,12 +15,14 @@ internal fun parseNode(json: JSONObject): Node {
     return when (val type = json.getString("type")) {
         "column" -> Node.Column(
             spacing = json.optInt("spacing", 0),
+            horizontalAlignment = json.optHorizontalAlignment("horizontalAlignment"),
             layout = json.optLayout(),
             children = json.getChildren()
         )
 
         "row" -> Node.Row(
             spacing = json.optInt("spacing", 0),
+            verticalAlignment = json.optVerticalAlignment("verticalAlignment"),
             layout = json.optLayout(),
             children = json.getChildren()
         )
@@ -33,11 +35,21 @@ internal fun parseNode(json: JSONObject): Node {
             item = json.optJSONObject("item")?.let(::parseNode)
         )
 
+        "lazyRow" -> Node.LazyRow(
+            spacing = json.optInt("spacing", 0),
+            verticalAlignment = json.optVerticalAlignment("verticalAlignment"),
+            layout = json.optLayout(),
+            children = json.optChildren(),
+            itemsKey = json.optStringOrNull("itemsKey"),
+            item = json.optJSONObject("item")?.let(::parseNode)
+        )
+
         "text" -> Node.Text(
             text = parseText(json.getJSONObject("text")),
             style = json.optTextStyle(),
             tone = json.optTone(),
-            layout = json.optLayout()
+            layout = json.optLayout(),
+            onClick = json.optJSONObject("onClick")?.let(::parseInteraction)
         )
 
         "image" -> Node.Image(
@@ -46,7 +58,18 @@ internal fun parseNode(json: JSONObject): Node {
             contentScale = json.optImageContentScale(),
             aspectRatio = json.optFloatOrNull("aspectRatio"),
             cornerRadius = json.optInt("cornerRadius", 0),
-            layout = json.optLayout(default = Layout(fillMaxWidth = true))
+            layout = json.optLayout(default = Layout(fillMaxWidth = true)),
+            onClick = json.optJSONObject("onClick")?.let(::parseInteraction)
+        )
+
+        "icon" -> Node.Icon(
+            source = json.getJSONObject("source").parseIconSource(),
+            contentDescription = json.optStringOrNull("contentDescription"),
+            tone = json.optTone(),
+            size = json.optInt("size", 24),
+            tint = json.optBoolean("tint", true),
+            layout = json.optLayout(),
+            onClick = json.optJSONObject("onClick")?.let(::parseInteraction)
         )
 
         "textField" -> Node.TextField(
@@ -83,6 +106,7 @@ internal fun parseNode(json: JSONObject): Node {
             padding = json.optInt("padding", 16),
             spacing = json.optInt("spacing", 8),
             layout = json.optLayout(default = Layout(fillMaxWidth = true)),
+            onClick = json.optJSONObject("onClick")?.let(::parseInteraction),
             children = json.getChildren()
         )
 
@@ -154,6 +178,19 @@ private fun JSONObject.parseImageSource(): ImageSource {
     }
 }
 
+private fun JSONObject.parseIconSource(): IconSource {
+    return when (val type = getString("type")) {
+        "url" -> IconSource.Url(getString("url"))
+        "resource" -> IconSource.Resource(getString("name"))
+        "binding" -> IconSource.Binding(
+            key = getString("key"),
+            fallback = optString("fallback", "")
+        )
+
+        else -> error("Unsupported ZeroUI icon source type: $type")
+    }
+}
+
 private fun JSONObject.optImageContentScale(): ImageContentScale {
     return when (val value = optString("contentScale", "fit")) {
         "fit" -> ImageContentScale.Fit
@@ -173,12 +210,71 @@ private fun JSONObject.optFloatOrNull(name: String): Float? {
 
 private fun JSONObject.optLayout(default: Layout = Layout()): Layout {
     val json = optJSONObject("layout") ?: return default
+    val padding = json.optPadding(default.padding)
 
     return Layout(
         fillMaxWidth = json.optBoolean("fillMaxWidth", default.fillMaxWidth),
-        padding = json.optInt("padding", default.padding),
+        fillMaxHeight = json.optBoolean("fillMaxHeight", default.fillMaxHeight),
+        weight = json.optFloat("weight", default.weight),
+        padding = padding.all,
+        paddingStart = padding.start ?: default.paddingStart,
+        paddingTop = padding.top ?: default.paddingTop,
+        paddingEnd = padding.end ?: default.paddingEnd,
+        paddingBottom = padding.bottom ?: default.paddingBottom,
+        width = json.optInt("width", default.width),
+        height = json.optInt("height", default.height),
+        minWidth = json.optInt("minWidth", default.minWidth),
+        minHeight = json.optInt("minHeight", default.minHeight),
+        maxWidth = json.optInt("maxWidth", default.maxWidth),
         maxHeight = json.optInt("maxHeight", default.maxHeight)
     )
+}
+
+private data class ParsedPadding(
+    val all: Int,
+    val start: Int? = null,
+    val top: Int? = null,
+    val end: Int? = null,
+    val bottom: Int? = null
+)
+
+private fun JSONObject.optPadding(default: Int): ParsedPadding {
+    val raw = opt("padding") ?: return ParsedPadding(default)
+    val json = raw as? JSONObject ?: return ParsedPadding(optInt("padding", default))
+    val all = json.optInt("all", default)
+    return ParsedPadding(
+        all = all,
+        start = json.optNullableInt("start") ?: json.optNullableInt("left"),
+        top = json.optNullableInt("top"),
+        end = json.optNullableInt("end") ?: json.optNullableInt("right"),
+        bottom = json.optNullableInt("bottom")
+    )
+}
+
+private fun JSONObject.optNullableInt(name: String): Int? {
+    return if (has(name) && !isNull(name)) getInt(name) else null
+}
+
+private fun JSONObject.optFloat(name: String, default: Float): Float {
+    return if (has(name) && !isNull(name)) getDouble(name).toFloat() else default
+}
+
+private fun JSONObject.optHorizontalAlignment(name: String): HorizontalAlignment {
+    return when (val value = optString(name, "start")) {
+        "start" -> HorizontalAlignment.Start
+        "center" -> HorizontalAlignment.Center
+        "end" -> HorizontalAlignment.End
+        else -> error("Unsupported ZeroUI horizontalAlignment: $value")
+    }
+}
+
+private fun JSONObject.optVerticalAlignment(name: String): VerticalAlignment {
+    return when (val value = optString(name, "top")) {
+        "top" -> VerticalAlignment.Top
+        "center" -> VerticalAlignment.Center
+        "bottom" -> VerticalAlignment.Bottom
+        else -> error("Unsupported ZeroUI verticalAlignment: $value")
+    }
 }
 
 private fun JSONObject.optButtonVariant(): ButtonVariant {

@@ -41,7 +41,8 @@ public fun executeEffects(
             )
 
             is Effect.Navigate -> navigator.navigate(
-                resolveValueSource(state, effect.target, eventValue).asText()
+                target = resolveValueSource(state, effect.target, eventValue).asText(),
+                kind = effect.targetKind
             )
 
             Effect.Back -> navigator.back()

@@ -1,8 +1,13 @@
 package com.zero.zero_tools.zeroui.value
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,7 +28,8 @@ internal fun TextStyle.toTextStyle() = when (this) {
     TextStyle.Title,
     TextStyle.SectionTitle,
     TextStyle.Body,
-    TextStyle.Label -> LocalZeroStyleResolver.current.textStyle(this)
+    TextStyle.Label,
+    TextStyle.Support -> LocalZeroStyleResolver.current.textStyle(this)
 }
 
 @Composable
@@ -39,12 +45,46 @@ internal fun Layout.toModifier(): Modifier {
         result = result.fillMaxWidth()
     }
 
-    if (padding > 0) {
-        result = result.padding(padding.dp)
+    if (fillMaxHeight) {
+        result = result.fillMaxHeight()
     }
 
-    if (maxHeight > 0) {
-        result = result.heightIn(max = maxHeight.dp)
+    if (width > 0 && height > 0) {
+        result = result.size(width = width.dp, height = height.dp)
+    } else {
+        if (width > 0) {
+            result = result.width(width.dp)
+        }
+        if (height > 0) {
+            result = result.height(height.dp)
+        }
+    }
+
+    if (minWidth > 0 || maxWidth > 0) {
+        result = result.widthIn(
+            min = minWidth.takeIf { it > 0 }?.dp ?: androidx.compose.ui.unit.Dp.Unspecified,
+            max = maxWidth.takeIf { it > 0 }?.dp ?: androidx.compose.ui.unit.Dp.Unspecified
+        )
+    }
+
+    if (minHeight > 0 || maxHeight > 0) {
+        result = result.heightIn(
+            min = minHeight.takeIf { it > 0 }?.dp ?: androidx.compose.ui.unit.Dp.Unspecified,
+            max = maxHeight.takeIf { it > 0 }?.dp ?: androidx.compose.ui.unit.Dp.Unspecified
+        )
+    }
+
+    val start = paddingStart ?: padding
+    val top = paddingTop ?: padding
+    val end = paddingEnd ?: padding
+    val bottom = paddingBottom ?: padding
+    if (start > 0 || top > 0 || end > 0 || bottom > 0) {
+        result = result.padding(
+            start = start.dp,
+            top = top.dp,
+            end = end.dp,
+            bottom = bottom.dp
+        )
     }
 
     return result

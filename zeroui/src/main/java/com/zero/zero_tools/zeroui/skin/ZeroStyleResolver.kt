@@ -16,6 +16,7 @@ public class ZeroStyleResolver(
         TextStyle.SectionTitle -> skin.typography.sectionTitle
         TextStyle.Body -> skin.typography.body
         TextStyle.Label -> skin.typography.label
+        TextStyle.Support -> skin.typography.support
     }
 
     public fun contentColor(tone: Tone): Color = when (tone) {
@@ -25,6 +26,7 @@ public class ZeroStyleResolver(
         Tone.Success -> skin.palette.successContent
         Tone.Error -> skin.palette.errorContent
         Tone.Warning -> skin.palette.warningContent
+        Tone.Inverse -> skin.palette.inverseContent
     }
 
     public fun containerColor(tone: Tone): Color = when (tone) {
@@ -34,6 +36,7 @@ public class ZeroStyleResolver(
         Tone.Success -> skin.palette.successContainer
         Tone.Error -> skin.palette.errorContainer
         Tone.Warning -> skin.palette.warningContainer
+        Tone.Inverse -> skin.palette.inverseContainer
     }
 
     public fun buttonTokens(variant: ButtonVariant): ZeroButtonVariantTokens = when (variant) {
@@ -55,6 +58,7 @@ public class ZeroStyleResolver(
             Tone.Success -> skin.components.card.success
             Tone.Error -> skin.components.card.error
             Tone.Warning -> skin.components.card.warning
+            Tone.Inverse -> skin.components.card.inverse
         }
         return ZeroCardResolvedTokens(
             colors = toneTokens,

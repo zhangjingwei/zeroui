@@ -2,6 +2,7 @@ package com.zero.zero_tools
 
 import com.zero.zero_tools.zeroui.core.parseZeroUiPage
 import com.zero.zero_tools.zeroui.effect.Effect
+import com.zero.zero_tools.zeroui.effect.NavigationTargetKind
 import com.zero.zero_tools.zeroui.node.Node
 import com.zero.zero_tools.zeroui.value.ValueSource
 import org.junit.Assert.assertEquals
@@ -56,6 +57,35 @@ class ZeroUiEffectParserTest {
         )
         val nav = (page.root as Node.Button).onClick.effects.single() as Effect.Navigate
         assertEquals(ValueSource.StateValue("nextPage"), nav.target)
+    }
+
+    @Test
+    fun parsesNavigateWithZeroUiTargetSemantics() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "root": {
+                  "type": "button",
+                  "text": "Go",
+                  "onClick": {
+                    "effects": [
+                      {
+                        "type": "navigate",
+                        "target": {
+                          "type": "page",
+                          "name": { "type": "literal", "value": "detail" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            """.trimIndent()
+        )
+
+        val nav = (page.root as Node.Button).onClick.effects.single() as Effect.Navigate
+        assertEquals(NavigationTargetKind.Page, nav.targetKind)
+        assertEquals(ValueSource.Literal(com.zero.zero_tools.zeroui.value.Value.Text("detail")), nav.target)
     }
 
     @Test

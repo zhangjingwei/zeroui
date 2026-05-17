@@ -12,8 +12,10 @@ import com.zero.zero_tools.zeroui.node.RenderColumnNode
 import com.zero.zero_tools.zeroui.node.RenderConditionNode
 import com.zero.zero_tools.zeroui.node.RenderDialogNode
 import com.zero.zero_tools.zeroui.node.RenderForEachNode
+import com.zero.zero_tools.zeroui.node.RenderIconNode
 import com.zero.zero_tools.zeroui.node.RenderImageNode
 import com.zero.zero_tools.zeroui.node.RenderLazyColumnNode
+import com.zero.zero_tools.zeroui.node.RenderLazyRowNode
 import com.zero.zero_tools.zeroui.node.RenderRowNode
 import com.zero.zero_tools.zeroui.node.RenderSpacerNode
 import com.zero.zero_tools.zeroui.node.RenderSwitchNode
@@ -38,9 +40,11 @@ public fun ZeroUiRenderer(
         is Node.Column -> RenderColumnNode(node, state, onInteraction, modifier)
         is Node.Row -> RenderRowNode(node, state, onInteraction, modifier)
         is Node.LazyColumn -> RenderLazyColumnNode(node, state, onInteraction, modifier)
+        is Node.LazyRow -> RenderLazyRowNode(node, state, onInteraction, modifier)
         is Node.Condition -> RenderConditionNode(node, state, onInteraction, modifier)
-        is Node.Text -> RenderTextNode(node, state, modifier)
-        is Node.Image -> RenderImageNode(node, state, modifier)
+        is Node.Text -> RenderTextNode(node, state, onInteraction, modifier)
+        is Node.Image -> RenderImageNode(node, state, onInteraction, modifier)
+        is Node.Icon -> RenderIconNode(node, state, onInteraction, modifier)
         is Node.TextField -> RenderTextFieldNode(node, state, onInteraction, modifier)
         is Node.Switch -> RenderSwitchNode(node, state, onInteraction, modifier)
         is Node.Button -> RenderButtonNode(node, onInteraction, modifier)

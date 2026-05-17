@@ -55,7 +55,9 @@ public fun rememberZeroSkinFromMaterialTheme(): ZeroSkin {
                 mutedOutline = colorScheme.outlineVariant,
                 focusedOutline = colorScheme.primary,
                 errorOutline = colorScheme.error,
-                unknownContainer = Color(0x1A000000)
+                unknownContainer = Color(0x1A000000),
+                inverseContent = colorScheme.inverseOnSurface,
+                inverseContainer = colorScheme.inverseSurface
             ),
             typography = ZeroTypography(
                 title = typography.headlineMedium,

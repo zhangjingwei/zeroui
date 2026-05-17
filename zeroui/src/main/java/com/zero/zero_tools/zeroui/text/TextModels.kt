@@ -14,7 +14,8 @@ public enum class TextStyle {
     Title,
     SectionTitle,
     Body,
-    Label
+    Label,
+    Support
 }
 
 public enum class Tone {
@@ -23,5 +24,6 @@ public enum class Tone {
     Primary,
     Success,
     Error,
-    Warning
+    Warning,
+    Inverse
 }

@@ -13,13 +13,16 @@ public sealed interface Effect {
     ) : Effect
 
     /**
-     * Push a new page onto the host's navigation stack.
-     * `target` resolves at execute time to a [com.zero.zero_tools.zeroui.value.Value.Text],
-     * which the host's [com.zero.zero_tools.zeroui.navigation.Navigator] interprets
-     * (asset name, route id, URL, ...).
+     * Push a target through the host navigation contract.
+     *
+     * `target` resolves at execute time to a [com.zero.zero_tools.zeroui.value.Value.Text].
+     * [targetKind] is ZeroUI-level semantics; [NavigationTargetKind.Page] is consumed by
+     * [com.zero.zero_tools.zeroui.host.ZeroUiHost]'s page stack. Other kinds are reserved
+     * for hosts that supply a custom [com.zero.zero_tools.zeroui.navigation.Navigator].
      */
     public data class Navigate(
-        val target: ValueSource
+        val target: ValueSource,
+        val targetKind: NavigationTargetKind = NavigationTargetKind.Page
     ) : Effect
 
     /** Pop the top page from the host's navigation stack. */
@@ -53,4 +56,11 @@ public sealed interface Effect {
         val onSuccess: Interaction = Interaction(),
         val onError: Interaction = Interaction()
     ) : Effect
+}
+
+public enum class NavigationTargetKind {
+    Page,
+    Route,
+    Url,
+    External
 }

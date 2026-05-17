@@ -34,6 +34,17 @@ public object ZeroUiSchemaVersion {
 
 public data class Layout(
     val fillMaxWidth: Boolean = false,
+    val fillMaxHeight: Boolean = false,
+    val weight: Float = 0f,
     val padding: Int = 0,
+    val paddingStart: Int? = null,
+    val paddingTop: Int? = null,
+    val paddingEnd: Int? = null,
+    val paddingBottom: Int? = null,
+    val width: Int = 0,
+    val height: Int = 0,
+    val minWidth: Int = 0,
+    val minHeight: Int = 0,
+    val maxWidth: Int = 0,
     val maxHeight: Int = 0
 )

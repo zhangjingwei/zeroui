@@ -29,7 +29,8 @@ private fun String.toTextStyle(): TextStyle {
         "sectionTitle" -> TextStyle.SectionTitle
         "body" -> TextStyle.Body
         "label" -> TextStyle.Label
-        else -> error("Unsupported ZeroUI text style: $this")
+        "support" -> TextStyle.Support
+        else -> TextStyle.Body
     }
 }
 
@@ -41,6 +42,7 @@ private fun String.toTone(): Tone {
         "success" -> Tone.Success
         "error" -> Tone.Error
         "warning" -> Tone.Warning
+        "inverse" -> Tone.Inverse
         else -> error("Unsupported ZeroUI tone: $this")
     }
 }

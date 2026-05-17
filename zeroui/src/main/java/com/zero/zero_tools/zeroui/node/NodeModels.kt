@@ -10,12 +10,14 @@ import com.zero.zero_tools.zeroui.text.Tone
 public sealed interface Node {
     public data class Column(
         val spacing: Int = 0,
+        val horizontalAlignment: HorizontalAlignment = HorizontalAlignment.Start,
         val layout: Layout = Layout(),
         val children: List<Node>
     ) : Node
 
     public data class Row(
         val spacing: Int = 0,
+        val verticalAlignment: VerticalAlignment = VerticalAlignment.Top,
         val layout: Layout = Layout(),
         val children: List<Node>
     ) : Node
@@ -28,11 +30,21 @@ public sealed interface Node {
         val item: Node? = null
     ) : Node
 
+    public data class LazyRow(
+        val spacing: Int = 0,
+        val verticalAlignment: VerticalAlignment = VerticalAlignment.Top,
+        val layout: Layout = Layout(),
+        val children: List<Node> = emptyList(),
+        val itemsKey: String? = null,
+        val item: Node? = null
+    ) : Node
+
     public data class Text(
         val text: com.zero.zero_tools.zeroui.text.Text,
         val style: TextStyle = TextStyle.Body,
         val tone: Tone = Tone.Default,
-        val layout: Layout = Layout()
+        val layout: Layout = Layout(),
+        val onClick: Interaction? = null
     ) : Node
 
     public data class Image(
@@ -41,7 +53,18 @@ public sealed interface Node {
         val contentScale: ImageContentScale = ImageContentScale.Fit,
         val aspectRatio: Float? = null,
         val cornerRadius: Int = 0,
-        val layout: Layout = Layout(fillMaxWidth = true)
+        val layout: Layout = Layout(fillMaxWidth = true),
+        val onClick: Interaction? = null
+    ) : Node
+
+    public data class Icon(
+        val source: IconSource,
+        val contentDescription: String? = null,
+        val tone: Tone = Tone.Default,
+        val size: Int = 24,
+        val tint: Boolean = true,
+        val layout: Layout = Layout(),
+        val onClick: Interaction? = null
     ) : Node
 
     public data class TextField(
@@ -78,6 +101,7 @@ public sealed interface Node {
         val padding: Int = 16,
         val spacing: Int = 8,
         val layout: Layout = Layout(fillMaxWidth = true),
+        val onClick: Interaction? = null,
         val children: List<Node>
     ) : Node
 
@@ -122,10 +146,28 @@ public enum class ButtonVariant {
     Secondary
 }
 
+public enum class HorizontalAlignment {
+    Start,
+    Center,
+    End
+}
+
+public enum class VerticalAlignment {
+    Top,
+    Center,
+    Bottom
+}
+
 public sealed interface ImageSource {
     public data class Url(val value: String) : ImageSource
     public data class Resource(val name: String) : ImageSource
     public data class Binding(val key: String, val fallback: String = "") : ImageSource
+}
+
+public sealed interface IconSource {
+    public data class Url(val value: String) : IconSource
+    public data class Resource(val name: String) : IconSource
+    public data class Binding(val key: String, val fallback: String = "") : IconSource
 }
 
 public enum class ImageContentScale {
