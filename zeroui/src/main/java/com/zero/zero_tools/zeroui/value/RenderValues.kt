@@ -25,6 +25,7 @@ import com.zero.zero_tools.zeroui.skin.LocalZeroStyleResolver
 
 @Composable
 internal fun TextStyle.toTextStyle() = when (this) {
+    TextStyle.Display,
     TextStyle.Title,
     TextStyle.SectionTitle,
     TextStyle.Body,

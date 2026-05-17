@@ -7,6 +7,7 @@ import com.zero.zero_tools.zeroui.page.Layout
 import com.zero.zero_tools.zeroui.text.Text
 import com.zero.zero_tools.zeroui.text.optTextStyle
 import com.zero.zero_tools.zeroui.text.optTone
+import com.zero.zero_tools.zeroui.text.optToneOrNull
 import com.zero.zero_tools.zeroui.text.parseText
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,6 +24,7 @@ internal fun parseNode(json: JSONObject): Node {
         "row" -> Node.Row(
             spacing = json.optInt("spacing", 0),
             verticalAlignment = json.optVerticalAlignment("verticalAlignment"),
+            arrangement = json.optRowArrangement("arrangement"),
             layout = json.optLayout(),
             children = json.getChildren()
         )
@@ -47,7 +49,8 @@ internal fun parseNode(json: JSONObject): Node {
         "text" -> Node.Text(
             text = parseText(json.getJSONObject("text")),
             style = json.optTextStyle(),
-            tone = json.optTone(),
+            tone = json.optToneOrNull("tone"),
+            surfaceTone = json.optToneOrNull("surfaceTone"),
             layout = json.optLayout(),
             onClick = json.optJSONObject("onClick")?.let(::parseInteraction)
         )
@@ -273,7 +276,21 @@ private fun JSONObject.optVerticalAlignment(name: String): VerticalAlignment {
         "top" -> VerticalAlignment.Top
         "center" -> VerticalAlignment.Center
         "bottom" -> VerticalAlignment.Bottom
+        "baseline" -> VerticalAlignment.Baseline
         else -> error("Unsupported ZeroUI verticalAlignment: $value")
+    }
+}
+
+private fun JSONObject.optRowArrangement(name: String): RowArrangement? {
+    if (!has(name) || isNull(name)) return null
+    return when (val value = getString(name)) {
+        "start" -> RowArrangement.Start
+        "center" -> RowArrangement.Center
+        "end" -> RowArrangement.End
+        "spaceBetween" -> RowArrangement.SpaceBetween
+        "spaceAround" -> RowArrangement.SpaceAround
+        "spaceEvenly" -> RowArrangement.SpaceEvenly
+        else -> error("Unsupported ZeroUI row arrangement: $value")
     }
 }
 

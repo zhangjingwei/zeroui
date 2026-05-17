@@ -1,7 +1,9 @@
 # Changelog
 
-## 0.1.1
+## 0.1.2
 
+- Added `display` text style support with a 48sp black-weight default slot and updated default chip/secondary-button derived tokens to use neutral and inverse roles.
+- Added optional text `surfaceTone`, row `arrangement`, and row baseline `verticalAlignment` fields to schemaVersion 1; `card.onClick` remains on the shared interaction schema.
 - Added `inverse` tone support across JSON parsing, skin palette tokens, text/icon foreground color, and card container tokens.
 - Added JSON `support` text style parsing and made unknown text styles fall back to `body` instead of failing page parsing.
 - Extended schemaVersion 1 with additive ZeroUI public protocol fields for layout alignment/weight/dimensions/padding, `lazyRow`, generic `icon`, optional `onClick` on text/image/card, and structured navigation target kinds.

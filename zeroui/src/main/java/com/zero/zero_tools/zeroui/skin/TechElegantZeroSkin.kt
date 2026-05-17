@@ -37,6 +37,11 @@ public fun rememberTechElegantZeroSkin(darkTheme: Boolean): ZeroSkin {
                 support = typography.bodySmall.copy(
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.sp
+                ),
+                display = typography.displayLarge.copy(
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = (-1.2).sp
                 )
             ),
             shapes = ZeroShapes(

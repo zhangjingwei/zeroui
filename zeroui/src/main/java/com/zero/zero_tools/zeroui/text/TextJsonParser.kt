@@ -23,8 +23,13 @@ internal fun JSONObject.optTone(): Tone {
     return optString("tone", "default").toTone()
 }
 
+internal fun JSONObject.optToneOrNull(name: String): Tone? {
+    return if (has(name) && !isNull(name)) getString(name).toTone() else null
+}
+
 private fun String.toTextStyle(): TextStyle {
     return when (this) {
+        "display" -> TextStyle.Display
         "title" -> TextStyle.Title
         "sectionTitle" -> TextStyle.SectionTitle
         "body" -> TextStyle.Body

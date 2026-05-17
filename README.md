@@ -23,7 +23,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("com.github.zhangjingwei:zeroui:v0.1.1")
+    implementation("com.github.zhangjingwei:zeroui:v0.1.2")
 }
 ```
 
@@ -130,7 +130,7 @@ ZeroSkinProvider(
 ```text
 groupId: com.github.zhangjingwei
 artifactId: zeroui
-version: v0.1.1
+version: v0.1.2
 ```
 
 发布前先在本地验证：
@@ -141,13 +141,13 @@ version: v0.1.1
 
 然后在 GitHub 创建 release：
 
-- Tag: `v0.1.1`
+- Tag: `v0.1.2`
 - Target: `main`
-- Release title: `v0.1.1`
-- Release notes: `ZeroUI 0.1.1 增强 schemaVersion 1 布局、列表、图标、导航和皮肤集成文档。`
+- Release title: `v0.1.2`
+- Release notes: `ZeroUI 0.1.2 增强 schemaVersion 1 布局、列表、交互、图标、导航和皮肤能力。`
 - 不勾选 `Set as a pre-release`
 
-发布后打开 [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.1)，点击 `Get it` 触发构建。构建成功后即可通过上面的 Gradle 依赖引入。
+发布后打开 [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.2)，点击 `Get it` 触发构建。构建成功后即可通过上面的 Gradle 依赖引入。
 
 ## 协议速查
 
@@ -172,11 +172,15 @@ version: v0.1.1
 }
 ```
 
-`column` 支持 `spacing` 和 `horizontalAlignment: "start" | "center" | "end"`；`row` 支持 `spacing` 和 `verticalAlignment: "top" | "center" | "bottom"`。子节点可通过 `layout.weight` 在父 `row` / `column` 中分配剩余空间。
+`column` 支持 `spacing` 和 `horizontalAlignment: "start" | "center" | "end"`；`row` 支持 `spacing`、`verticalAlignment: "top" | "center" | "bottom" | "baseline"`，以及可选 `arrangement: "start" | "center" | "end" | "spaceBetween" | "spaceAround" | "spaceEvenly"`。`arrangement` 控制水平排列，`verticalAlignment` 控制垂直对齐；`baseline` 会对 row 子节点应用 Compose `alignByBaseline()`，适合数字和单位混排。未设置 `arrangement` 时，`row` 使用 `spacing` 渲染间距；设置后直接透传 Compose `Arrangement.Horizontal`。子节点可通过 `layout.weight` 在父 `row` / `column` 中分配剩余空间。
 
 `lazyColumn` 与 `lazyRow` 都支持静态 `children`、`itemsKey` 和可复用 `item` 模板；模板内可通过 `item.*` 与 `itemIndex` 读取当前项。
 
+`card` 支持 `padding` 和 `spacing`。`padding` 控制内容内边距，`spacing` 控制子节点之间的垂直间距。
+
 `text`、`image`、`card`、`button` 使用一致的 `onClick` 交互模型。`button.onClick` 仍为必填；`text` / `image` / `card` 的 `onClick` 为可选。
+
+`text.surfaceTone` 可选，取值同 `tone`，只控制文本背景 container。文字颜色仍由 `tone` 控制；如果没有显式设置 `tone`，才会使用 `surfaceTone` 匹配的 content 作为默认文字色。
 
 `icon` 是通用图标节点，不包含业务专用 `iconText` / `iconButton`。它使用通用 source：
 
@@ -219,7 +223,7 @@ version: v0.1.1
 `toast`, `log`, `track`, `navigate`, `back`, `http`。
 
 文本样式：
-`title`, `sectionTitle`, `body`, `label`, `support`。未知 `style` 会回落到 `body`，避免单个样式拼写问题导致页面解析失败。
+`display`, `title`, `sectionTitle`, `body`, `label`, `support`。未知 `style` 会回落到 `body`，避免单个样式拼写问题导致页面解析失败。
 
 色调：
 `default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`。

@@ -47,7 +47,8 @@ public data class ZeroTypography(
     val sectionTitle: TextStyle,
     val body: TextStyle,
     val label: TextStyle,
-    val support: TextStyle
+    val support: TextStyle,
+    val display: TextStyle = title
 )
 
 @Immutable
@@ -139,7 +140,7 @@ public data class ZeroButtonTokens(
                 secondary = ZeroButtonVariantTokens(
                     colors = ButtonStateColors(
                         container = Color.Transparent,
-                        content = palette.primaryContent,
+                        content = palette.content,
                         disabledContainer = Color.Transparent,
                         disabledContent = palette.content.copy(alpha = 0.38f)
                     ),
@@ -248,20 +249,20 @@ public data class ZeroChipTokens(
 
             return ZeroChipTokens(
                 selected = SelectableStateColors(
-                    container = palette.primaryContainer,
-                    content = palette.primaryContent,
-                    outline = palette.primaryContent,
+                    container = palette.inverseContainer,
+                    content = palette.inverseContent,
+                    outline = palette.inverseContainer,
                     disabledContainer = palette.mutedContainer.copy(alpha = 0.48f),
                     disabledContent = palette.content.copy(alpha = 0.38f),
                     disabledOutline = palette.mutedOutline.copy(alpha = 0.38f)
                 ),
                 unselected = SelectableStateColors(
-                    container = Color.Transparent,
+                    container = palette.mutedContainer,
                     content = palette.content,
-                    outline = palette.outline,
-                    disabledContainer = Color.Transparent,
+                    outline = Color.Transparent,
+                    disabledContainer = palette.mutedContainer.copy(alpha = 0.48f),
                     disabledContent = palette.content.copy(alpha = 0.38f),
-                    disabledOutline = palette.mutedOutline.copy(alpha = 0.38f)
+                    disabledOutline = Color.Transparent
                 ),
                 cornerRadius = cornerRadius.resolve(density),
                 minHeight = minHeight.resolve(density),

@@ -18,6 +18,7 @@ public sealed interface Node {
     public data class Row(
         val spacing: Int = 0,
         val verticalAlignment: VerticalAlignment = VerticalAlignment.Top,
+        val arrangement: RowArrangement? = null,
         val layout: Layout = Layout(),
         val children: List<Node>
     ) : Node
@@ -42,7 +43,8 @@ public sealed interface Node {
     public data class Text(
         val text: com.zero.zero_tools.zeroui.text.Text,
         val style: TextStyle = TextStyle.Body,
-        val tone: Tone = Tone.Default,
+        val tone: Tone? = null,
+        val surfaceTone: Tone? = null,
         val layout: Layout = Layout(),
         val onClick: Interaction? = null
     ) : Node
@@ -155,7 +157,17 @@ public enum class HorizontalAlignment {
 public enum class VerticalAlignment {
     Top,
     Center,
-    Bottom
+    Bottom,
+    Baseline
+}
+
+public enum class RowArrangement {
+    Start,
+    Center,
+    End,
+    SpaceBetween,
+    SpaceAround,
+    SpaceEvenly
 }
 
 public sealed interface ImageSource {

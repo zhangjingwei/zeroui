@@ -23,7 +23,7 @@ Then add the `zeroui` Android library dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.github.zhangjingwei:zeroui:v0.1.1")
+    implementation("com.github.zhangjingwei:zeroui:v0.1.2")
 }
 ```
 
@@ -130,7 +130,7 @@ The `zeroui` module publishes a release AAR with sources through JitPack:
 ```text
 groupId: com.github.zhangjingwei
 artifactId: zeroui
-version: v0.1.1
+version: v0.1.2
 ```
 
 Validate the publication locally before creating a release:
@@ -141,13 +141,13 @@ Validate the publication locally before creating a release:
 
 Then create a GitHub release:
 
-- Tag: `v0.1.1`
+- Tag: `v0.1.2`
 - Target: `main`
-- Release title: `v0.1.1`
-- Release notes: `ZeroUI 0.1.1 adds schemaVersion 1 layout, list, icon, navigation, and skin integration documentation improvements.`
+- Release title: `v0.1.2`
+- Release notes: `ZeroUI 0.1.2 enhances schemaVersion 1 layout, list, interaction, icon, navigation, and skin capabilities.`
 - Leave `Set as a pre-release` unchecked
 
-After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.1) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
+After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.2) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
 
 ## Protocol Quick Reference
 
@@ -172,11 +172,15 @@ Common `layout` fields work on most visible nodes:
 }
 ```
 
-`column` supports `spacing` and `horizontalAlignment: "start" | "center" | "end"`; `row` supports `spacing` and `verticalAlignment: "top" | "center" | "bottom"`. Children can use `layout.weight` to share remaining space in a parent `row` / `column`.
+`column` supports `spacing` and `horizontalAlignment: "start" | "center" | "end"`; `row` supports `spacing`, `verticalAlignment: "top" | "center" | "bottom" | "baseline"`, and optional `arrangement: "start" | "center" | "end" | "spaceBetween" | "spaceAround" | "spaceEvenly"`. `arrangement` controls horizontal placement and `verticalAlignment` controls vertical alignment; `baseline` applies Compose `alignByBaseline()` to row children, which fits number-and-unit typography. When `arrangement` is omitted, `row` renders spacing through `spacing`; when present, it is passed through to Compose `Arrangement.Horizontal`. Children can use `layout.weight` to share remaining space in a parent `row` / `column`.
 
 `lazyColumn` and `lazyRow` both support static `children`, `itemsKey`, and a reusable `item` template. Templates read the current item through `item.*` and `itemIndex`.
 
+`card` supports `padding` and `spacing`. `padding` controls inner content padding, while `spacing` controls vertical gaps between child nodes.
+
 `text`, `image`, `card`, and `button` share the same `onClick` interaction model. `button.onClick` is still required; `text` / `image` / `card` `onClick` is optional.
+
+`text.surfaceTone` is optional and uses the same values as `tone`; it only controls the text background container. Text color is still controlled by `tone`; when `tone` is omitted, ZeroUI uses the matching `surfaceTone` content color as the default text color.
 
 `icon` is a generic icon node, not a business-specific `iconText` / `iconButton`. It uses the common source shape:
 
@@ -219,7 +223,7 @@ Effects:
 `toast`, `log`, `track`, `navigate`, `back`, `http`.
 
 Text styles:
-`title`, `sectionTitle`, `body`, `label`, `support`. Unknown `style` values fall back to `body` so one typo does not fail page parsing.
+`display`, `title`, `sectionTitle`, `body`, `label`, `support`. Unknown `style` values fall back to `body` so one typo does not fail page parsing.
 
 Tones:
 `default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`.

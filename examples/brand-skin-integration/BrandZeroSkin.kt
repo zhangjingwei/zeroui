@@ -53,6 +53,11 @@ public fun rememberBrandZeroSkin(darkTheme: Boolean): ZeroSkin {
                 support = materialTypography.bodySmall.copy(
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.sp
+                ),
+                display = materialTypography.displayLarge.copy(
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = (-1.2).sp
                 )
             ),
             shapes = ZeroShapes(

@@ -10,6 +10,7 @@ import com.zero.zero_tools.zeroui.node.ButtonVariant
 import com.zero.zero_tools.zeroui.node.HorizontalAlignment
 import com.zero.zero_tools.zeroui.node.IconSource
 import com.zero.zero_tools.zeroui.node.Node
+import com.zero.zero_tools.zeroui.node.RowArrangement
 import com.zero.zero_tools.zeroui.node.VerticalAlignment
 import com.zero.zero_tools.zeroui.page.ZeroUiSchemaVersion
 import com.zero.zero_tools.zeroui.state.StateOwner
@@ -111,6 +112,11 @@ class ZeroUiParserTest {
                   "children": [
                     {
                       "type": "text",
+                      "style": "display",
+                      "text": { "type": "value", "value": "Hero copy" }
+                    },
+                    {
+                      "type": "text",
                       "style": "support",
                       "text": { "type": "value", "value": "Helper copy" }
                     },
@@ -126,8 +132,9 @@ class ZeroUiParserTest {
         )
 
         val column = page.root as Node.Column
-        assertEquals(TextStyle.Support, (column.children[0] as Node.Text).style)
-        assertEquals(TextStyle.Body, (column.children[1] as Node.Text).style)
+        assertEquals(TextStyle.Display, (column.children[0] as Node.Text).style)
+        assertEquals(TextStyle.Support, (column.children[1] as Node.Text).style)
+        assertEquals(TextStyle.Body, (column.children[2] as Node.Text).style)
     }
 
     @Test
@@ -293,11 +300,13 @@ class ZeroUiParserTest {
                   "children": [
                     {
                       "type": "row",
-                      "verticalAlignment": "center",
+                      "verticalAlignment": "baseline",
+                      "arrangement": "spaceBetween",
                       "children": [
                         {
                           "type": "text",
                           "text": { "type": "value", "value": "Tap" },
+                          "surfaceTone": "muted",
                           "layout": { "weight": 1.5, "minHeight": 24 },
                           "onClick": { "effects": [{ "type": "toast", "message": { "type": "literal", "value": "text" } }] }
                         },
@@ -343,8 +352,11 @@ class ZeroUiParserTest {
         assertEquals(14, column.layout.paddingBottom)
 
         val row = column.children[0] as Node.Row
-        assertEquals(VerticalAlignment.Center, row.verticalAlignment)
+        assertEquals(VerticalAlignment.Baseline, row.verticalAlignment)
+        assertEquals(RowArrangement.SpaceBetween, row.arrangement)
         val text = row.children[0] as Node.Text
+        assertEquals(null, text.tone)
+        assertEquals(Tone.Muted, text.surfaceTone)
         assertEquals(1.5f, text.layout.weight, 0.001f)
         assertEquals(24, text.layout.minHeight)
         assertTrue(text.onClick?.effects?.single() is Effect.Toast)
@@ -383,9 +395,10 @@ class ZeroUiParserTest {
                       "type": "condition",
                       "condition": { "type": "truthy", "key": "showCard" },
                       "child": {
-                        "type": "card",
-                        "tone": "success",
-                        "children": [
+                      "type": "card",
+                      "spacing": 10,
+                      "tone": "success",
+                      "children": [
                           { "type": "text", "text": { "type": "value", "value": "Hidden gem" } }
                         ]
                       }
@@ -407,6 +420,7 @@ class ZeroUiParserTest {
         val cond = column.children[2] as Node.Condition
         assertTrue(cond.condition is Condition.Truthy)
         val card = cond.child as Node.Card
+        assertEquals(10, card.spacing)
         assertEquals(Tone.Success, card.tone)
     }
 

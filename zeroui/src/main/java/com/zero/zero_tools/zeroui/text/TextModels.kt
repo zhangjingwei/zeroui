@@ -11,6 +11,7 @@ public sealed interface Text {
 }
 
 public enum class TextStyle {
+    Display,
     Title,
     SectionTitle,
     Body,

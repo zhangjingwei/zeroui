@@ -81,12 +81,19 @@ These fields are not Material color role names. They are ZeroUI roles:
 | `inverseContent` | Content rendered on inverse containers |
 | `inverseContainer` | High-contrast inverse containers |
 
+Text nodes can also set `surfaceTone` in JSON. It uses these same semantic roles for a local text background container. Text color remains controlled by `tone`; when `tone` is omitted, `surfaceTone` provides the matching default content color.
+
 ## Typography
 
 `ZeroTypography` maps ZeroUI's schema-level text styles to Compose text styles:
 
 ```kotlin
 ZeroTypography(
+    display = typography.displayLarge.copy(
+        fontSize = 48.sp,
+        fontWeight = FontWeight.Black,
+        letterSpacing = (-1.2).sp
+    ),
     title = typography.headlineMedium,
     sectionTitle = typography.titleMedium,
     body = typography.bodyMedium,
@@ -95,7 +102,7 @@ ZeroTypography(
 )
 ```
 
-JSON pages can refer to `style: "title" | "sectionTitle" | "body" | "label" | "support"`. Unknown style values fall back to `body` so a future or misspelled style does not fail page parsing.
+JSON pages can refer to `style: "display" | "title" | "sectionTitle" | "body" | "label" | "support"`. Unknown style values fall back to `body` so a future or misspelled style does not fail page parsing.
 
 ## Shapes
 

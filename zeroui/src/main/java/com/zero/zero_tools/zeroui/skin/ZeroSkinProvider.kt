@@ -6,6 +6,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 public val LocalZeroSkin: androidx.compose.runtime.ProvidableCompositionLocal<ZeroSkin> = compositionLocalOf {
     error("LocalZeroSkin is not provided")
@@ -64,7 +66,12 @@ public fun rememberZeroSkinFromMaterialTheme(): ZeroSkin {
                 sectionTitle = typography.titleMedium,
                 body = typography.bodyMedium,
                 label = typography.labelLarge,
-                support = typography.bodySmall
+                support = typography.bodySmall,
+                display = typography.displayLarge.copy(
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = (-1.2).sp
+                )
             )
         )
     }

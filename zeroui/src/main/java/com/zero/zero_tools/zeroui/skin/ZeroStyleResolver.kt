@@ -12,6 +12,7 @@ public class ZeroStyleResolver(
     private val skin: ZeroSkin
 ) {
     public fun textStyle(style: TextStyle): ComposeTextStyle = when (style) {
+        TextStyle.Display -> skin.typography.display
         TextStyle.Title -> skin.typography.title
         TextStyle.SectionTitle -> skin.typography.sectionTitle
         TextStyle.Body -> skin.typography.body

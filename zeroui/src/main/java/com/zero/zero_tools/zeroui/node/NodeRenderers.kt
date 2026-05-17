@@ -70,6 +70,7 @@ import com.zero.zero_tools.zeroui.value.Value
 import com.zero.zero_tools.zeroui.value.matches
 import com.zero.zero_tools.zeroui.value.resolve
 import com.zero.zero_tools.zeroui.value.toColor
+import com.zero.zero_tools.zeroui.value.toContainerColor
 import com.zero.zero_tools.zeroui.value.toModifier
 import com.zero.zero_tools.zeroui.value.toTextStyle
 
@@ -105,7 +106,7 @@ internal fun RenderRowNode(
 ) {
     Row(
         modifier = modifier.then(node.layout.toModifier()),
-        horizontalArrangement = Arrangement.spacedBy(node.spacing.dp),
+        horizontalArrangement = node.arrangement?.toComposeArrangement() ?: Arrangement.spacedBy(node.spacing.dp),
         verticalAlignment = node.verticalAlignment.toComposeAlignment()
     ) {
         node.children.forEach { child ->
@@ -113,7 +114,7 @@ internal fun RenderRowNode(
                 node = child,
                 state = state,
                 onInteraction = onInteraction,
-                modifier = parentWeightModifier(child)
+                modifier = parentRowChildModifier(child, node.verticalAlignment)
             )
         }
     }
@@ -218,12 +219,15 @@ internal fun RenderTextNode(
     onInteraction: (Interaction, Value?) -> Unit,
     modifier: Modifier
 ) {
+    val surfaceTone = node.surfaceTone
+    val contentTone = node.tone ?: surfaceTone ?: Tone.Default
     Text(
         text = node.text.resolve(state),
         style = node.style.toTextStyle(),
-        color = node.tone.toColor(),
+        color = contentTone.toColor(),
         modifier = modifier
             .then(node.layout.toModifier())
+            .then(surfaceTone?.let { Modifier.background(it.toContainerColor()) } ?: Modifier)
             .then(node.onClick?.let { Modifier.clickable { onInteraction(it, null) } } ?: Modifier)
     )
 }
@@ -658,6 +662,14 @@ private fun RowScope.parentWeightModifier(node: Node): Modifier {
     return if (weight > 0f) Modifier.weight(weight) else Modifier
 }
 
+private fun RowScope.parentRowChildModifier(
+    node: Node,
+    verticalAlignment: VerticalAlignment
+): Modifier {
+    val base = parentWeightModifier(node)
+    return if (verticalAlignment == VerticalAlignment.Baseline) base.alignByBaseline() else base
+}
+
 private fun HorizontalAlignment.toComposeAlignment(): Alignment.Horizontal {
     return when (this) {
         HorizontalAlignment.Start -> Alignment.Start
@@ -671,6 +683,18 @@ private fun VerticalAlignment.toComposeAlignment(): Alignment.Vertical {
         VerticalAlignment.Top -> Alignment.Top
         VerticalAlignment.Center -> Alignment.CenterVertically
         VerticalAlignment.Bottom -> Alignment.Bottom
+        VerticalAlignment.Baseline -> Alignment.Top
+    }
+}
+
+private fun RowArrangement.toComposeArrangement(): Arrangement.Horizontal {
+    return when (this) {
+        RowArrangement.Start -> Arrangement.Start
+        RowArrangement.Center -> Arrangement.Center
+        RowArrangement.End -> Arrangement.End
+        RowArrangement.SpaceBetween -> Arrangement.SpaceBetween
+        RowArrangement.SpaceAround -> Arrangement.SpaceAround
+        RowArrangement.SpaceEvenly -> Arrangement.SpaceEvenly
     }
 }
 
