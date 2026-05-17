@@ -112,6 +112,125 @@
         }
       },
       {
+        "type": "card",
+        "spacing": 14,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": {
+              "type": "value",
+              "value": "Protocol capabilities"
+            }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": {
+              "type": "value",
+              "value": "Schema v1 layout, list, icon, shared onClick, navigation targets, surface text, and baseline alignment."
+            }
+          },
+          {
+            "type": "row",
+            "arrangement": "spaceBetween",
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "muted",
+                "text": {
+                  "type": "value",
+                  "value": "surfaceTone"
+                }
+              },
+              {
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "inverse",
+                "text": {
+                  "type": "value",
+                  "value": "inside padding"
+                }
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 6,
+            "verticalAlignment": "baseline",
+            "children": [
+              {
+                "type": "text",
+                "style": "display",
+                "tone": "primary",
+                "text": {
+                  "type": "value",
+                  "value": "5"
+                }
+              },
+              {
+                "type": "text",
+                "style": "label",
+                "tone": "muted",
+                "text": {
+                  "type": "value",
+                  "value": "minutes"
+                }
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 10,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "button",
+                "text": "Page target",
+                "variant": "primary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    {
+                      "type": "navigate",
+                      "target": {
+                        "type": "page",
+                        "name": { "type": "literal", "value": "detail" }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Route target",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Route target forwarded to externalNavigator." }
+                    },
+                    {
+                      "type": "navigate",
+                      "target": {
+                        "type": "route",
+                        "name": { "type": "literal", "value": "native/profile" }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
         "type": "row",
         "spacing": 12,
         "verticalAlignment": "center",

@@ -383,7 +383,7 @@ class ZeroUiParserTest {
                       "type": "chipGroup",
                       "selectedKey": "topic",
                       "options": [
-                        { "label": "A", "value": "a" },
+                        { "label": "A", "value": "a", "icon": { "type": "resource", "name": "ic_a" } },
                         { "label": "B", "value": "b" }
                       ],
                       "onSelected": {
@@ -413,6 +413,7 @@ class ZeroUiParserTest {
         val chip = column.children[0] as Node.ChipGroup
         assertEquals(2, chip.options.size)
         assertEquals("a", chip.options[0].value)
+        assertEquals(IconSource.Resource("ic_a"), chip.options[0].icon)
 
         val spacer = column.children[1] as Node.Spacer
         assertEquals(12, spacer.height)

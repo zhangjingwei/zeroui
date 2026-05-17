@@ -3,6 +3,7 @@
 ## 0.1.2
 
 - Added `display` text style support with a 48sp black-weight default slot and updated default chip/secondary-button derived tokens to use neutral and inverse roles.
+- Added `ZeroUiHost(externalNavigator = ...)` so `route` / `url` / `external` navigation targets can bridge to host navigation while `page` stays on the ZeroUI page stack.
 - Added optional text `surfaceTone`, row `arrangement`, and row baseline `verticalAlignment` fields to schemaVersion 1; `card.onClick` remains on the shared interaction schema.
 - Added `inverse` tone support across JSON parsing, skin palette tokens, text/icon foreground color, and card container tokens.
 - Added JSON `support` text style parsing and made unknown text styles fall back to `body` instead of failing page parsing.

@@ -87,6 +87,7 @@ public sealed interface Node {
         val text: String,
         val onClick: Interaction,
         val variant: ButtonVariant = ButtonVariant.Primary,
+        val icon: IconSource? = null,
         val layout: Layout = Layout()
     ) : Node
 
@@ -190,5 +191,6 @@ public enum class ImageContentScale {
 
 public data class ChipOption(
     val label: String,
-    val value: String
+    val value: String,
+    val icon: IconSource? = null
 )

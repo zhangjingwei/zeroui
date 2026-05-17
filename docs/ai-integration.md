@@ -104,5 +104,6 @@ When implementing SDK behavior:
 
 1. Keep target semantics generic.
 2. Use `NavigationTargetKind` or another ZeroUI-level public type.
-3. Let `ZeroUiHost` handle page-stack behavior.
-4. Do not encode app-private route schemes into JSON.
+3. Let `ZeroUiHost` handle `page` page-stack behavior.
+4. Route host-owned `route` / `url` / `external` targets through `ZeroUiHost(externalNavigator = ...)`.
+5. Do not encode app-private route schemes into JSON.

@@ -47,7 +47,7 @@ public fun ZeroUiRenderer(
         is Node.Icon -> RenderIconNode(node, state, onInteraction, modifier)
         is Node.TextField -> RenderTextFieldNode(node, state, onInteraction, modifier)
         is Node.Switch -> RenderSwitchNode(node, state, onInteraction, modifier)
-        is Node.Button -> RenderButtonNode(node, onInteraction, modifier)
+        is Node.Button -> RenderButtonNode(node, state, onInteraction, modifier)
         is Node.ChipGroup -> RenderChipGroupNode(node, state, onInteraction, modifier)
         is Node.Card -> RenderCardNode(node, state, onInteraction, modifier)
         is Node.Spacer -> RenderSpacerNode(node, modifier)

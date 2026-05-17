@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.zero.zero_tools.zeroui.R
@@ -428,11 +431,23 @@ internal fun RenderSwitchNode(
 @Composable
 internal fun RenderButtonNode(
     node: Node.Button,
+    state: State,
     onInteraction: (Interaction, Value?) -> Unit,
     modifier: Modifier
 ) {
     val content = @Composable {
-        Text(text = node.text)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = node.text)
+            node.icon?.let { icon ->
+                Spacer(modifier = Modifier.width(4.dp))
+                RenderInlineIcon(
+                    source = icon,
+                    size = 15.dp,
+                    tone = Tone.Primary,
+                    state = state
+                )
+            }
+        }
     }
     val tokens = LocalZeroStyleResolver.current.buttonTokens(node.variant)
     val colors = ButtonDefaults.buttonColors(
@@ -477,7 +492,9 @@ internal fun RenderChipGroupNode(
 ) {
     val resolver = LocalZeroStyleResolver.current
     Row(
-        modifier = modifier.then(node.layout.toModifier()),
+        modifier = modifier
+            .then(node.layout.toModifier())
+            .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(node.spacing.dp)
     ) {
         node.options.forEach { option ->
@@ -488,7 +505,22 @@ internal fun RenderChipGroupNode(
                 onClick = {
                     onInteraction(node.onSelected, Value.Text(option.value))
                 },
-                label = { Text(text = option.label) },
+                label = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        option.icon?.let { source ->
+                            RenderInlineIcon(
+                                source = source,
+                                size = 18.dp,
+                                tone = if (selected) Tone.Primary else Tone.Muted,
+                                state = state
+                            )
+                        }
+                        Text(text = option.label)
+                    }
+                },
                 modifier = Modifier.heightIn(min = tokens.minHeight),
                 shape = RoundedCornerShape(tokens.cornerRadius),
                 colors = FilterChipDefaults.filterChipColors(
@@ -510,6 +542,44 @@ internal fun RenderChipGroupNode(
                 )
             )
         }
+    }
+}
+
+@Composable
+private fun RenderInlineIcon(
+    source: IconSource,
+    size: Dp,
+    tone: Tone,
+    state: State
+) {
+    val resolver = LocalZeroStyleResolver.current
+    val loader = LocalZeroImageLoader.current
+    val resolvedSource = source.toZeroImageSource(state)
+
+    var result by remember(resolvedSource) { mutableStateOf<ZeroImageResult?>(null) }
+
+    DisposableEffect(resolvedSource, loader) {
+        result = null
+        val cancelable = loader.load(ZeroImageRequest(source = resolvedSource)) { outcome ->
+            result = outcome
+        }
+        onDispose { cancelable.cancel() }
+    }
+
+    when (val current = result) {
+        is ZeroImageResult.Success -> Image(
+            bitmap = current.bitmap,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            colorFilter = ColorFilter.tint(tone.toColor()),
+            modifier = Modifier.size(size)
+        )
+        ZeroImageResult.Unavailable,
+        null -> Box(
+            modifier = Modifier
+                .size(size)
+                .background(resolver.unknownContainerColor)
+        )
     }
 }
 

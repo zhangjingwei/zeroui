@@ -93,6 +93,7 @@ internal fun parseNode(json: JSONObject): Node {
             text = json.getString("text"),
             onClick = parseInteraction(json.getJSONObject("onClick")),
             variant = json.optButtonVariant(),
+            icon = json.optJSONObject("icon")?.parseIconSource(),
             layout = json.optLayout()
         )
 
@@ -163,7 +164,8 @@ private fun JSONArray.toChipOptions(): List<ChipOption> {
     return mapObjects { json ->
         ChipOption(
             label = json.getString("label"),
-            value = json.getString("value")
+            value = json.getString("value"),
+            icon = json.optJSONObject("icon")?.parseIconSource()
         )
     }
 }

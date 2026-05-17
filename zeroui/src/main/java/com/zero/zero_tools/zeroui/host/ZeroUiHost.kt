@@ -30,6 +30,7 @@ import com.zero.zero_tools.zeroui.image.LocalZeroImageLoader
 import com.zero.zero_tools.zeroui.image.ZeroImageLoader
 import com.zero.zero_tools.zeroui.image.rememberDefaultZeroImageLoader
 import com.zero.zero_tools.zeroui.interaction.Interaction
+import com.zero.zero_tools.zeroui.effect.NavigationTargetKind
 import com.zero.zero_tools.zeroui.navigation.Navigator
 import com.zero.zero_tools.zeroui.node.Node
 import com.zero.zero_tools.zeroui.page.Page
@@ -45,11 +46,13 @@ import java.util.concurrent.atomic.AtomicLong
 public fun ZeroUiHost(
     startPage: String,
     modifier: Modifier = Modifier,
+    rootPadding: Int = 24,
     pageLoader: PageLoader = rememberAssetsPageLoader(),
     httpClient: HttpClient = rememberDefaultHttpClient(),
     imageLoader: ZeroImageLoader = rememberDefaultZeroImageLoader(),
     tracker: Tracker = LogcatTracker,
-    onUnknownNode: ((typeName: String, raw: String) -> Unit)? = null
+    onUnknownNode: ((typeName: String, raw: String) -> Unit)? = null,
+    externalNavigator: Navigator = Navigator.Noop
 ) {
     val context = LocalContext.current
 
@@ -69,7 +72,7 @@ public fun ZeroUiHost(
     val registry = remember { PageEntryRegistry() }
     val handlerRef = remember { Holder<(Interaction, Value?) -> Unit>() }
 
-    val navigator = remember(pageLoader) {
+    val navigator = remember(pageLoader, externalNavigator) {
         object : Navigator {
             override fun navigate(target: String) {
                 val entry = loadPageEntry(name = target, loader = pageLoader)
@@ -77,10 +80,20 @@ public fun ZeroUiHost(
                 fireOnMountIfAny(entry.page.onMount, handlerRef.value)
             }
 
+            override fun navigate(target: String, kind: NavigationTargetKind) {
+                if (kind == NavigationTargetKind.Page) {
+                    navigate(target)
+                } else {
+                    externalNavigator.navigate(target = target, kind = kind)
+                }
+            }
+
             override fun back() {
                 if (stack.size > 1) {
                     val popped = stack.removeAt(stack.lastIndex)
                     registry.cancelAll(popped.id)
+                } else {
+                    externalNavigator.back()
                 }
             }
         }
@@ -149,7 +162,7 @@ public fun ZeroUiHost(
                 Modifier.verticalScroll(rememberScrollState())
             }
         )
-        .padding(24.dp)
+        .padding(rootPadding.dp)
 
     Surface(modifier = modifier.fillMaxSize()) {
         CompositionLocalProvider(

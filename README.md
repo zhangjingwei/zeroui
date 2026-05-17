@@ -79,6 +79,21 @@ ZeroUiHost(
     httpClient = rememberDefaultHttpClient(),
     imageLoader = rememberDefaultZeroImageLoader(),
     tracker = LogcatTracker,
+    externalNavigator = object : Navigator {
+        override fun navigate(target: String, kind: NavigationTargetKind) {
+            if (kind == NavigationTargetKind.Route) {
+                navController.navigate(target)
+            }
+        }
+
+        override fun navigate(target: String) {
+            navController.navigate(target)
+        }
+
+        override fun back() {
+            navController.popBackStack()
+        }
+    },
     onUnknownNode = { typeName, raw -> /* report unsupported schema */ }
 )
 ```
@@ -86,6 +101,8 @@ ZeroUiHost(
 使用 `PageLoader` 从 assets、内存或预填充缓存中加载 schema。它在 `0.1.x` 中有意保持同步；远程 schema 应由宿主预取，并通过带缓存的 loader 提供。
 
 使用 `HttpClient` 将默认的 `HttpURLConnection` 实现替换为你自己的网络栈。使用 `Tracker` 将 `track` effect 转发到你的埋点系统。
+
+使用 `externalNavigator` 将 `navigate` 的 `route` / `url` / `external` target 转发给宿主导航，例如 Compose Navigation。`page` target 仍由 `ZeroUiHost` 自己的 JSON 页栈处理；当 ZeroUI 页栈不能继续后退时，`back` 会转交给 `externalNavigator.back()`。
 
 使用 `ZeroImageLoader` 接入你的图片/图标加载栈。内置的 `rememberDefaultZeroImageLoader()` 会对 drawable 资源（含 vector drawable）和 HTTP(S) URL 做尺寸约束、维护一份小型内存 LRU，并强制 `http`/`https` 的 scheme 白名单。如果你的业务依赖懒加载列表、动图、磁盘缓存或请求优先级，请改为通过 `ZeroUiHost(imageLoader = ...)` 接入 Coil/Glide 实现：
 
@@ -207,7 +224,7 @@ version: v0.1.2
 }
 ```
 
-`type` 可为 `page`、`route`、`url`、`external`。内置 `ZeroUiHost` 使用自己的页栈消费 `page` target；不引入 `page://`、`sdui://` 之类 app 私有 scheme。
+`type` 可为 `page`、`route`、`url`、`external`。内置 `ZeroUiHost` 使用自己的页栈消费 `page` target；`route` / `url` / `external` target 会转发给 `ZeroUiHost(externalNavigator = ...)`，可接 Compose Navigation、浏览器或宿主业务导航。不引入 `page://`、`sdui://` 之类 app 私有 scheme。
 
 节点：
 

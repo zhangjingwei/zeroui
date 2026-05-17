@@ -79,6 +79,21 @@ ZeroUiHost(
     httpClient = rememberDefaultHttpClient(),
     imageLoader = rememberDefaultZeroImageLoader(),
     tracker = LogcatTracker,
+    externalNavigator = object : Navigator {
+        override fun navigate(target: String, kind: NavigationTargetKind) {
+            if (kind == NavigationTargetKind.Route) {
+                navController.navigate(target)
+            }
+        }
+
+        override fun navigate(target: String) {
+            navController.navigate(target)
+        }
+
+        override fun back() {
+            navController.popBackStack()
+        }
+    },
     onUnknownNode = { typeName, raw -> /* report unsupported schema */ }
 )
 ```
@@ -86,6 +101,8 @@ ZeroUiHost(
 Use `PageLoader` to load schemas from assets, memory, or a prefilled cache. It is intentionally synchronous in `0.1.x`; remote schemas should be prefetched by the host and served from a cache-backed loader.
 
 Use `HttpClient` to replace the default `HttpURLConnection` implementation with your own network stack. Use `Tracker` to forward `track` effects into your analytics system.
+
+Use `externalNavigator` to forward `navigate` `route` / `url` / `external` targets into host navigation such as Compose Navigation. `page` targets still use `ZeroUiHost`'s JSON page stack; when the ZeroUI page stack cannot pop, `back` delegates to `externalNavigator.back()`.
 
 Use `ZeroImageLoader` to plug in your image/icon loading stack. The bundled `rememberDefaultZeroImageLoader()` constrains drawable resources (including vector drawables) and HTTP(S) URLs, keeps a small in-memory LRU cache, and enforces an SDK-side `http`/`https` scheme allowlist. For lazy lists, animated formats, disk caching, or request prioritisation, plug in a Coil- or Glide-backed `ZeroImageLoader` instead:
 
@@ -207,7 +224,7 @@ Common `layout` fields work on most visible nodes:
 }
 ```
 
-`type` can be `page`, `route`, `url`, or `external`. The bundled `ZeroUiHost` consumes `page` targets with its own page stack; ZeroUI does not introduce app-private schemes such as `page://` or `sdui://`.
+`type` can be `page`, `route`, `url`, or `external`. The bundled `ZeroUiHost` consumes `page` targets with its own page stack; `route` / `url` / `external` targets are forwarded to `ZeroUiHost(externalNavigator = ...)`, which can bridge to Compose Navigation, a browser, or host-owned navigation. ZeroUI does not introduce app-private schemes such as `page://` or `sdui://`.
 
 Nodes:
 
