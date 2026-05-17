@@ -81,7 +81,7 @@ These fields are not Material color role names. They are ZeroUI roles:
 | `inverseContent` | Content rendered on inverse containers |
 | `inverseContainer` | High-contrast inverse containers |
 
-Text nodes can also set `surfaceTone` in JSON. It uses these same semantic roles for a local text background container. Text color remains controlled by `tone`; when `tone` is omitted, `surfaceTone` provides the matching default content color.
+Text nodes can also set `surfaceTone` in JSON. It uses these same semantic roles for a local text background container and applies a built-in inside padding of 10dp horizontal and 4dp vertical. Text color remains controlled by `tone`; when `tone` is omitted, `surfaceTone` provides the matching default content color. `layout.padding` remains outside padding.
 
 ## Typography
 

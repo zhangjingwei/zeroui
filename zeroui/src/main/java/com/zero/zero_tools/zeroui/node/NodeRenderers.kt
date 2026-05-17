@@ -221,13 +221,24 @@ internal fun RenderTextNode(
 ) {
     val surfaceTone = node.surfaceTone
     val contentTone = node.tone ?: surfaceTone ?: Tone.Default
+    val surfaceModifier = if (surfaceTone != null) {
+        Modifier
+            .background(
+                color = surfaceTone.toContainerColor(),
+                shape = RoundedCornerShape(999.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    } else {
+        Modifier
+    }
+
     Text(
         text = node.text.resolve(state),
         style = node.style.toTextStyle(),
         color = contentTone.toColor(),
         modifier = modifier
             .then(node.layout.toModifier())
-            .then(surfaceTone?.let { Modifier.background(it.toContainerColor()) } ?: Modifier)
+            .then(surfaceModifier)
             .then(node.onClick?.let { Modifier.clickable { onInteraction(it, null) } } ?: Modifier)
     )
 }

@@ -180,7 +180,7 @@ Common `layout` fields work on most visible nodes:
 
 `text`, `image`, `card`, and `button` share the same `onClick` interaction model. `button.onClick` is still required; `text` / `image` / `card` `onClick` is optional.
 
-`text.surfaceTone` is optional and uses the same values as `tone`; it only controls the text background container. Text color is still controlled by `tone`; when `tone` is omitted, ZeroUI uses the matching `surfaceTone` content color as the default text color.
+`text.surfaceTone` is optional and uses the same values as `tone`; it controls the text background container and adds default inside padding (10dp horizontal, 4dp vertical). Text color is still controlled by `tone`; when `tone` is omitted, ZeroUI uses the matching `surfaceTone` content color as the default text color. `layout.padding` remains outside padding and can stack with the surface inside padding.
 
 `icon` is a generic icon node, not a business-specific `iconText` / `iconButton`. It uses the common source shape:
 

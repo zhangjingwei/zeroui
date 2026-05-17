@@ -180,7 +180,7 @@ version: v0.1.2
 
 `text`、`image`、`card`、`button` 使用一致的 `onClick` 交互模型。`button.onClick` 仍为必填；`text` / `image` / `card` 的 `onClick` 为可选。
 
-`text.surfaceTone` 可选，取值同 `tone`，只控制文本背景 container。文字颜色仍由 `tone` 控制；如果没有显式设置 `tone`，才会使用 `surfaceTone` 匹配的 content 作为默认文字色。
+`text.surfaceTone` 可选，取值同 `tone`，控制文本背景 container，并自带默认 inside padding（水平 10dp、垂直 4dp）。文字颜色仍由 `tone` 控制；如果没有显式设置 `tone`，才会使用 `surfaceTone` 匹配的 content 作为默认文字色。`layout.padding` 仍是 outside padding，可与 surface inside padding 叠加。
 
 `icon` 是通用图标节点，不包含业务专用 `iconText` / `iconButton`。它使用通用 source：
 
