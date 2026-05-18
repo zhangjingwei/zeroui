@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "initialState": {
+    "selectedTone": { "owner": "client", "value": "primary" },
+    "enabled": { "owner": "client", "value": true }
+  },
+  "root": {
+    "type": "column",
+    "spacing": 18,
+    "layout": {
+      "fillMaxWidth": true,
+      "padding": 20
+    },
+    "children": [
+      {
+        "type": "text",
+        "style": "title",
+        "text": { "type": "value", "value": "Skin and tones" }
+      },
+      {
+        "type": "text",
+        "tone": "muted",
+        "text": { "type": "value", "value": "Skin tokens drive component colors, surfaces, typography, shape, and spacing." }
+      },
+      {
+        "type": "chipGroup",
+        "selectedKey": "selectedTone",
+        "spacing": 8,
+        "options": [
+          { "label": "Primary", "value": "primary" },
+          { "label": "Success", "value": "success" },
+          { "label": "Warning", "value": "warning" },
+          { "label": "Error", "value": "error" }
+        ],
+        "onSelected": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "selectedTone",
+              "value": { "type": "event" }
+            }
+          ]
+        }
+      },
+      {
+        "type": "card",
+        "tone": "primary",
+        "spacing": 8,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "primary",
+            "text": { "type": "value", "value": "Primary surface" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "Used for main calls to action and selected component states." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "success",
+        "spacing": 8,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "success",
+            "text": { "type": "value", "value": "Success surface" }
+          },
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Used for complete, healthy, or confirmed states." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "warning",
+        "spacing": 8,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "warning",
+            "text": { "type": "value", "value": "Warning surface" }
+          },
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Used for cautionary states without importing Material tone names into the protocol." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "error",
+        "spacing": 8,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "error",
+            "text": { "type": "value", "value": "Error surface" }
+          },
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Used for destructive or failed states." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "inverse",
+        "spacing": 8,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "tone": "inverse",
+            "text": { "type": "value", "value": "Inverse surface" }
+          },
+          {
+            "type": "text",
+            "tone": "inverse",
+            "text": { "type": "value", "value": "Used for high-contrast overlays, banners, and reversed surfaces." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Tokenized controls" }
+          },
+          {
+            "type": "switch",
+            "text": "Switch reads skin tokens",
+            "checkedKey": "enabled",
+            "onCheckedChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "enabled",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "row",
+            "spacing": 10,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "muted",
+                "text": { "type": "value", "value": "surfaceTone" }
+              },
+              {
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "inverse",
+                "text": { "type": "value", "value": "inverse pill" }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "text": "Back to showcase",
+        "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "effects": [
+            { "type": "back" }
+          ]
+        }
+      }
+    ]
+  }
+}

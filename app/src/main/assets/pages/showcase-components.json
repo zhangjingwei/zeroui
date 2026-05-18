@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "initialState": {
+    "fieldValue": { "owner": "client", "value": "ZeroUI" },
+    "toggleValue": { "owner": "client", "value": true },
+    "selectedChip": { "owner": "client", "value": "primary" },
+    "imageUrl": {
+      "owner": "client",
+      "value": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1200&q=80"
+    }
+  },
+  "root": {
+    "type": "column",
+    "spacing": 18,
+    "layout": {
+      "fillMaxWidth": true,
+      "padding": 20
+    },
+    "children": [
+      {
+        "type": "text",
+        "style": "title",
+        "text": { "type": "value", "value": "Components" }
+      },
+      {
+        "type": "text",
+        "tone": "muted",
+        "text": { "type": "value", "value": "Core render nodes for visual and interaction smoke checks." }
+      },
+      {
+        "type": "textField",
+        "label": "TextField",
+        "value": { "type": "binding", "key": "fieldValue", "fallback": "" },
+        "onValueChange": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "fieldValue",
+              "value": { "type": "event" }
+            }
+          ]
+        },
+        "layout": { "fillMaxWidth": true }
+      },
+      {
+        "type": "switch",
+        "text": "Switch token sample",
+        "checkedKey": "toggleValue",
+        "onCheckedChange": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "toggleValue",
+              "value": { "type": "event" }
+            }
+          ]
+        }
+      },
+      {
+        "type": "chipGroup",
+        "selectedKey": "selectedChip",
+        "spacing": 8,
+        "options": [
+          { "label": "Default", "value": "default", "icon": { "type": "resource", "name": "ic_launcher_foreground" } },
+          { "label": "Primary", "value": "primary", "icon": { "type": "resource", "name": "ic_launcher_foreground" } },
+          { "label": "Muted", "value": "muted" }
+        ],
+        "onSelected": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "selectedChip",
+              "value": { "type": "event" }
+            }
+          ]
+        }
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Card, image, and icon" }
+          },
+          {
+            "type": "image",
+            "source": {
+              "type": "binding",
+              "key": "imageUrl",
+              "fallback": ""
+            },
+            "contentDescription": "Remote architecture image",
+            "contentScale": "crop",
+            "aspectRatio": 1.6,
+            "cornerRadius": 16,
+            "onClick": {
+              "effects": [
+                {
+                  "type": "toast",
+                  "message": { "type": "literal", "value": "Image clicked" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "row",
+            "spacing": 12,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "icon",
+                "source": { "type": "resource", "name": "ic_launcher_foreground" },
+                "contentDescription": "ZeroUI icon",
+                "tone": "primary",
+                "size": 28,
+                "onClick": {
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Icon clicked" }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Primary",
+                "variant": "primary",
+                "icon": { "type": "resource", "name": "ic_launcher_foreground" },
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Primary" }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Secondary",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Secondary" }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "text": "Back to showcase",
+        "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "effects": [
+            { "type": "back" }
+          ]
+        }
+      }
+    ]
+  }
+}

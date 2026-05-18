@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "initialState": {
+    "loading": { "owner": "client", "value": false },
+    "response": { "owner": "server", "value": "" },
+    "lastError": { "owner": "client", "value": "" },
+    "requestUrl": { "owner": "client", "value": "https://httpbin.org/get" }
+  },
+  "root": {
+    "type": "column",
+    "spacing": 18,
+    "layout": {
+      "fillMaxWidth": true,
+      "padding": 20
+    },
+    "children": [
+      {
+        "type": "text",
+        "style": "title",
+        "text": { "type": "value", "value": "Request and data" }
+      },
+      {
+        "type": "text",
+        "tone": "muted",
+        "text": { "type": "value", "value": "HTTP effects update state through onSuccess and onError, then the UI binds into response records." }
+      },
+      {
+        "type": "textField",
+        "label": "Request URL",
+        "value": { "type": "binding", "key": "requestUrl", "fallback": "https://httpbin.org/get" },
+        "onValueChange": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "requestUrl",
+              "value": { "type": "event" }
+            }
+          ]
+        },
+        "layout": { "fillMaxWidth": true }
+      },
+      {
+        "type": "button",
+        "text": "Send GET request",
+        "variant": "primary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "loading",
+              "value": { "type": "literal", "value": true }
+            },
+            {
+              "type": "setState",
+              "key": "lastError",
+              "value": { "type": "literal", "value": "" }
+            }
+          ],
+          "effects": [
+            {
+              "type": "http",
+              "method": "GET",
+              "url": { "type": "state", "key": "requestUrl" },
+              "headers": {
+                "Accept": { "type": "literal", "value": "application/json" }
+              },
+              "onSuccess": {
+                "actions": [
+                  {
+                    "type": "setState",
+                    "key": "response",
+                    "value": { "type": "event" }
+                  },
+                  {
+                    "type": "setState",
+                    "key": "loading",
+                    "value": { "type": "literal", "value": false }
+                  }
+                ],
+                "effects": [
+                  {
+                    "type": "track",
+                    "event": "showcase_request_success"
+                  }
+                ]
+              },
+              "onError": {
+                "actions": [
+                  {
+                    "type": "setState",
+                    "key": "lastError",
+                    "value": { "type": "event" }
+                  },
+                  {
+                    "type": "setState",
+                    "key": "loading",
+                    "value": { "type": "literal", "value": false }
+                  }
+                ],
+                "effects": [
+                  {
+                    "type": "track",
+                    "event": "showcase_request_error"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "button",
+        "text": "Use failing URL",
+        "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "requestUrl",
+              "value": { "type": "literal", "value": "https://this-domain-definitely-does-not-exist-xyz.invalid/anything" }
+            }
+          ]
+        }
+      },
+      {
+        "type": "condition",
+        "condition": { "type": "truthy", "key": "loading" },
+        "child": {
+          "type": "card",
+          "tone": "primary",
+          "children": [
+            {
+              "type": "text",
+              "style": "label",
+              "text": { "type": "value", "value": "Loading..." }
+            }
+          ]
+        }
+      },
+      {
+        "type": "condition",
+        "condition": { "type": "notBlank", "key": "lastError.error" },
+        "child": {
+          "type": "card",
+          "tone": "error",
+          "children": [
+            {
+              "type": "text",
+              "style": "sectionTitle",
+              "tone": "error",
+              "text": { "type": "value", "value": "Request failed" }
+            },
+            {
+              "type": "text",
+              "text": {
+                "type": "binding",
+                "key": "lastError.error",
+                "fallback": "(unknown)"
+              }
+            },
+            {
+              "type": "text",
+              "style": "label",
+              "tone": "muted",
+              "text": {
+                "type": "binding",
+                "key": "lastError.statusCode",
+                "fallback": "0",
+                "format": "statusCode = {value}"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "condition",
+        "condition": { "type": "notBlank", "key": "response.url" },
+        "child": {
+          "type": "card",
+          "tone": "success",
+          "children": [
+            {
+              "type": "text",
+              "style": "sectionTitle",
+              "text": { "type": "value", "value": "Response" }
+            },
+            {
+              "type": "text",
+              "text": {
+                "type": "binding",
+                "key": "response.url",
+                "fallback": "",
+                "format": "url = {value}"
+              }
+            },
+            {
+              "type": "text",
+              "text": {
+                "type": "binding",
+                "key": "response.origin",
+                "fallback": "",
+                "format": "origin = {value}"
+              }
+            },
+            {
+              "type": "text",
+              "text": {
+                "type": "binding",
+                "key": "response.headers.Host",
+                "fallback": "",
+                "format": "headers.Host = {value}"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "button",
+        "text": "Back to showcase",
+        "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "effects": [
+            { "type": "back" }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             ZerotoolsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     ZeroUiHost(
-                        startPage = "home",
+                        startPage = "showcase",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -34,6 +34,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ZeroUiHostPreview() {
     ZerotoolsTheme {
-        ZeroUiHost(startPage = "home")
+        ZeroUiHost(startPage = "showcase")
     }
 }

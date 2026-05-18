@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "initialState": {
+    "counter": { "owner": "client", "value": 2 },
+    "showAdvanced": { "owner": "client", "value": true },
+    "showDialog": { "owner": "client", "value": false },
+    "selectedMode": { "owner": "client", "value": "state" },
+    "lastAction": { "owner": "client", "value": "" }
+  },
+  "root": {
+    "type": "column",
+    "spacing": 18,
+    "layout": {
+      "fillMaxWidth": true,
+      "padding": 20
+    },
+    "children": [
+      {
+        "type": "text",
+        "style": "title",
+        "text": { "type": "value", "value": "Interaction and state" }
+      },
+      {
+        "type": "chipGroup",
+        "selectedKey": "selectedMode",
+        "spacing": 8,
+        "options": [
+          { "label": "State", "value": "state" },
+          { "label": "Effects", "value": "effects" },
+          { "label": "Nav", "value": "nav" }
+        ],
+        "onSelected": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "selectedMode",
+              "value": { "type": "event" }
+            },
+            {
+              "type": "setState",
+              "key": "lastAction",
+              "value": { "type": "template", "value": "selected {event}" }
+            }
+          ],
+          "effects": [
+            {
+              "type": "track",
+              "event": "showcase_interaction_mode_selected",
+              "params": {
+                "mode": { "type": "event" }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "card",
+        "spacing": 14,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Actions" }
+          },
+          {
+            "type": "row",
+            "spacing": 10,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "button",
+                "text": "Increment",
+                "variant": "primary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    { "type": "incrementState", "key": "counter" },
+                    {
+                      "type": "setState",
+                      "key": "lastAction",
+                      "value": { "type": "literal", "value": "incrementState" }
+                    }
+                  ],
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Counter incremented" }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "text",
+                "style": "display",
+                "tone": "primary",
+                "text": {
+                  "type": "binding",
+                  "key": "counter",
+                  "fallback": "0"
+                }
+              },
+              {
+                "type": "button",
+                "text": "Toggle",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    { "type": "toggleState", "key": "showAdvanced" },
+                    {
+                      "type": "setState",
+                      "key": "lastAction",
+                      "value": { "type": "literal", "value": "toggleState" }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "condition",
+            "condition": { "type": "truthy", "key": "showAdvanced" },
+            "child": {
+              "type": "card",
+              "tone": "success",
+              "padding": 12,
+              "spacing": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "style": "label",
+                  "tone": "success",
+                  "text": { "type": "value", "value": "Condition visible" }
+                },
+                {
+                  "type": "text",
+                  "tone": "muted",
+                  "text": { "type": "value", "value": "This card is rendered only while showAdvanced is true." }
+                }
+              ]
+            }
+          },
+          {
+            "type": "button",
+            "text": "Batch reset",
+            "variant": "secondary",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "actions": [
+                {
+                  "type": "batch",
+                  "actions": [
+                    {
+                      "type": "setState",
+                      "key": "counter",
+                      "value": { "type": "literal", "value": 0 }
+                    },
+                    {
+                      "type": "setState",
+                      "key": "showAdvanced",
+                      "value": { "type": "literal", "value": true }
+                    },
+                    {
+                      "type": "setState",
+                      "key": "lastAction",
+                      "value": { "type": "literal", "value": "batch" }
+                    }
+                  ]
+                }
+              ],
+              "effects": [
+                {
+                  "type": "log",
+                  "message": { "type": "literal", "value": "Showcase batch reset" }
+                },
+                {
+                  "type": "toast",
+                  "message": { "type": "template", "value": "Batch action complete {event}" }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Dialog, navigate, and track" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": {
+              "type": "binding",
+              "key": "lastAction",
+              "fallback": "No interaction yet",
+              "format": "lastAction = {value}"
+            }
+          },
+          {
+            "type": "button",
+            "text": "Open dialog",
+            "variant": "primary",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showDialog",
+                  "value": { "type": "literal", "value": true }
+                }
+              ],
+              "effects": [
+                {
+                  "type": "track",
+                  "event": "showcase_dialog_opened"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "dialog",
+        "visibleKey": "showDialog",
+        "title": { "type": "value", "value": "Dialog" },
+        "onDismiss": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "showDialog",
+              "value": { "type": "literal", "value": false }
+            }
+          ]
+        },
+        "children": [
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "This modal is controlled by client state and closes through onDismiss." }
+          },
+          {
+            "type": "button",
+            "text": "Close",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showDialog",
+                  "value": { "type": "literal", "value": false }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "text": "Back to showcase",
+        "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "effects": [
+            { "type": "back" }
+          ]
+        }
+      }
+    ]
+  }
+}

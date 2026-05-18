@@ -1,36 +1,5 @@
 {
   "schemaVersion": 1,
-  "initialState": {
-    "fieldValue": { "owner": "client", "value": "ZeroUI" },
-    "toggleValue": { "owner": "client", "value": true },
-    "selectedChip": { "owner": "client", "value": "primary" },
-    "showDialog": { "owner": "client", "value": false },
-    "imageUrl": {
-      "owner": "client",
-      "value": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1200&q=80"
-    },
-    "galleryItems": {
-      "owner": "client",
-      "value": [
-        {
-          "title": "Remote image",
-          "url": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=900&q=80"
-        },
-        {
-          "title": "Bound image",
-          "url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80"
-        }
-      ]
-    },
-    "iconItems": {
-      "owner": "client",
-      "value": [
-        { "title": "Resource icon", "icon": "ic_launcher_foreground" },
-        { "title": "Tinted icon", "icon": "ic_launcher_foreground" },
-        { "title": "Clickable card", "icon": "ic_launcher_foreground" }
-      ]
-    }
-  },
   "root": {
     "type": "column",
     "spacing": 18,
@@ -42,244 +11,75 @@
       {
         "type": "text",
         "style": "title",
-        "text": {
-          "type": "value",
-          "value": "ZeroUI Skin Showcase"
-        }
+        "text": { "type": "value", "value": "ZeroUI Showcase" }
       },
       {
         "type": "text",
         "tone": "muted",
         "text": {
           "type": "value",
-          "value": "Core skin-driven components for visual review."
-        },
-        "onClick": {
-          "effects": [
-            {
-              "type": "toast",
-              "message": { "type": "literal", "value": "Text click uses the same onClick interaction." }
-            }
-          ]
-        }
-      },
-      {
-        "type": "textField",
-        "label": "TextField",
-        "value": { "type": "binding", "key": "fieldValue", "fallback": "" },
-        "onValueChange": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "fieldValue",
-              "value": { "type": "event" }
-            }
-          ]
-        },
-        "layout": { "fillMaxWidth": true }
-      },
-      {
-        "type": "switch",
-        "text": "Switch token sample",
-        "checkedKey": "toggleValue",
-        "onCheckedChange": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "toggleValue",
-              "value": { "type": "event" }
-            }
-          ]
-        }
-      },
-      {
-        "type": "chipGroup",
-        "selectedKey": "selectedChip",
-        "spacing": 8,
-        "options": [
-          { "label": "Default", "value": "default" },
-          { "label": "Primary", "value": "primary" },
-          { "label": "Muted", "value": "muted" }
-        ],
-        "onSelected": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "selectedChip",
-              "value": { "type": "event" }
-            }
-          ]
+          "value": "A categorized demo suite for reviewing protocol, renderer, state, effects, data loading, and skin tokens."
         }
       },
       {
         "type": "card",
-        "spacing": 14,
+        "spacing": 12,
         "children": [
           {
             "type": "text",
             "style": "sectionTitle",
-            "text": {
-              "type": "value",
-              "value": "Protocol capabilities"
-            }
+            "text": { "type": "value", "value": "Components" }
           },
           {
             "type": "text",
             "tone": "muted",
-            "text": {
-              "type": "value",
-              "value": "Schema v1 layout, list, icon, shared onClick, navigation targets, surface text, and baseline alignment."
-            }
-          },
-          {
-            "type": "row",
-            "arrangement": "spaceBetween",
-            "verticalAlignment": "center",
-            "layout": { "fillMaxWidth": true },
-            "children": [
-              {
-                "type": "text",
-                "style": "label",
-                "surfaceTone": "muted",
-                "text": {
-                  "type": "value",
-                  "value": "surfaceTone"
-                }
-              },
-              {
-                "type": "text",
-                "style": "label",
-                "surfaceTone": "inverse",
-                "text": {
-                  "type": "value",
-                  "value": "inside padding"
-                }
-              }
-            ]
-          },
-          {
-            "type": "row",
-            "spacing": 6,
-            "verticalAlignment": "baseline",
-            "children": [
-              {
-                "type": "text",
-                "style": "display",
-                "tone": "primary",
-                "text": {
-                  "type": "value",
-                  "value": "5"
-                }
-              },
-              {
-                "type": "text",
-                "style": "label",
-                "tone": "muted",
-                "text": {
-                  "type": "value",
-                  "value": "minutes"
-                }
-              }
-            ]
-          },
-          {
-            "type": "row",
-            "spacing": 10,
-            "verticalAlignment": "center",
-            "layout": { "fillMaxWidth": true },
-            "children": [
-              {
-                "type": "button",
-                "text": "Page target",
-                "variant": "primary",
-                "layout": { "weight": 1 },
-                "onClick": {
-                  "effects": [
-                    {
-                      "type": "navigate",
-                      "target": {
-                        "type": "page",
-                        "name": { "type": "literal", "value": "detail" }
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "button",
-                "text": "Route target",
-                "variant": "secondary",
-                "layout": { "weight": 1 },
-                "onClick": {
-                  "effects": [
-                    {
-                      "type": "toast",
-                      "message": { "type": "literal", "value": "Route target forwarded to externalNavigator." }
-                    },
-                    {
-                      "type": "navigate",
-                      "target": {
-                        "type": "route",
-                        "name": { "type": "literal", "value": "native/profile" }
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "row",
-        "spacing": 12,
-        "verticalAlignment": "center",
-        "layout": { "fillMaxWidth": true },
-        "children": [
-          {
-            "type": "icon",
-            "source": { "type": "resource", "name": "ic_launcher_foreground" },
-            "contentDescription": "ZeroUI icon",
-            "tone": "primary",
-            "size": 28,
-            "onClick": {
-              "effects": [
-                {
-                  "type": "toast",
-                  "message": { "type": "literal", "value": "Icon clicked" }
-                }
-              ]
-            }
+            "text": { "type": "value", "value": "Text, fields, switches, chips, buttons, cards, image, and icon rendering." }
           },
           {
             "type": "button",
-            "text": "Primary",
+            "text": "Open components",
             "variant": "primary",
-            "layout": { "weight": 1 },
+            "layout": { "fillMaxWidth": true },
             "onClick": {
               "effects": [
                 {
-                  "type": "toast",
-                  "message": {
-                    "type": "literal",
-                    "value": "Primary"
+                  "type": "navigate",
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "showcase-components" }
                   }
                 }
               ]
             }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Layout and lists" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "Column, row, spacer, alignment, weight, LazyColumn, LazyRow, and forEach." }
           },
           {
             "type": "button",
-            "text": "Secondary",
+            "text": "Open layout",
             "variant": "secondary",
-            "layout": { "weight": 1 },
+            "layout": { "fillMaxWidth": true },
             "onClick": {
               "effects": [
                 {
-                  "type": "toast",
-                  "message": {
-                    "type": "literal",
-                    "value": "Secondary"
+                  "type": "navigate",
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "showcase-layout" }
                   }
                 }
               ]
@@ -289,119 +89,30 @@
       },
       {
         "type": "card",
-        "tone": "warning",
+        "spacing": 12,
         "children": [
           {
             "type": "text",
             "style": "sectionTitle",
-            "tone": "warning",
-            "text": {
-              "type": "value",
-              "value": "Warning tone"
-            }
+            "text": { "type": "value", "value": "Interaction and state" }
           },
           {
             "type": "text",
-            "text": {
-              "type": "value",
-              "value": "Used for cautionary states without importing Material tone names into the protocol."
-            }
-          }
-        ]
-      },
-      {
-        "type": "card",
-        "onClick": {
-          "effects": [
-            {
-              "type": "track",
-              "event": "showcase_image_card_clicked"
-            }
-          ]
-        },
-        "children": [
-          {
-            "type": "text",
-            "style": "sectionTitle",
-            "text": {
-              "type": "value",
-              "value": "Image"
-            }
+            "tone": "muted",
+            "text": { "type": "value", "value": "setState, increment, toggle, batch, conditions, dialog, toast, track, and navigation." }
           },
           {
-            "type": "image",
-            "source": {
-              "type": "binding",
-              "key": "imageUrl",
-              "fallback": ""
-            },
-            "contentDescription": "Remote architecture image",
-            "contentScale": "crop",
-            "aspectRatio": 1.6,
-            "cornerRadius": 16,
+            "type": "button",
+            "text": "Open interaction",
+            "variant": "secondary",
+            "layout": { "fillMaxWidth": true },
             "onClick": {
               "effects": [
                 {
-                  "type": "toast",
-                  "message": { "type": "literal", "value": "Image clicked" }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      {
-        "type": "card",
-        "children": [
-          {
-            "type": "text",
-            "style": "sectionTitle",
-            "text": {
-              "type": "value",
-              "value": "LazyColumn"
-            }
-          },
-          {
-            "type": "lazyColumn",
-            "spacing": 10,
-            "layout": {
-              "fillMaxWidth": true,
-              "maxHeight": 280
-            },
-            "children": [
-              {
-                "type": "text",
-                "tone": "muted",
-                "text": {
-                  "type": "value",
-                  "value": "Header item rendered before data-backed rows."
-                }
-              }
-            ],
-            "itemsKey": "galleryItems",
-            "item": {
-              "type": "card",
-              "padding": 12,
-              "spacing": 8,
-              "children": [
-                {
-                  "type": "image",
-                  "source": {
-                    "type": "binding",
-                    "key": "item.url",
-                    "fallback": ""
-                  },
-                  "contentScale": "crop",
-                  "aspectRatio": 2.2,
-                  "cornerRadius": 12
-                },
-                {
-                  "type": "text",
-                  "style": "label",
-                  "text": {
-                    "type": "binding",
-                    "key": "item.title",
-                    "fallback": "Gallery item"
+                  "type": "navigate",
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "showcase-interaction" }
                   }
                 }
               ]
@@ -411,70 +122,64 @@
       },
       {
         "type": "card",
+        "spacing": 12,
         "children": [
           {
             "type": "text",
             "style": "sectionTitle",
-            "text": {
-              "type": "value",
-              "value": "LazyRow + Icon"
-            }
+            "text": { "type": "value", "value": "Request and data" }
           },
           {
-            "type": "lazyRow",
-            "spacing": 10,
-            "verticalAlignment": "center",
-            "layout": {
-              "fillMaxWidth": true,
-              "height": 96
-            },
-            "itemsKey": "iconItems",
-            "item": {
-              "type": "card",
-              "padding": 12,
-              "spacing": 6,
-              "layout": {
-                "width": 132,
-                "height": 84
-              },
-              "onClick": {
-                "effects": [
-                  {
-                    "type": "track",
-                    "event": "showcase_icon_card_clicked",
-                    "params": {
-                      "title": { "type": "state", "key": "item.title" }
-                    }
-                  }
-                ]
-              },
-              "children": [
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "HTTP, onMount, success and error flows, event values, and dotted-path bindings." }
+          },
+          {
+            "type": "button",
+            "text": "Open request",
+            "variant": "secondary",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "effects": [
                 {
-                  "type": "row",
-                  "spacing": 8,
-                  "verticalAlignment": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "source": {
-                        "type": "binding",
-                        "key": "item.icon",
-                        "fallback": "ic_launcher_foreground"
-                      },
-                      "tone": "primary",
-                      "size": 28
-                    },
-                    {
-                      "type": "text",
-                      "style": "label",
-                      "layout": { "weight": 1 },
-                      "text": {
-                        "type": "binding",
-                        "key": "item.title",
-                        "fallback": "Icon"
-                      }
-                    }
-                  ]
+                  "type": "navigate",
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "showcase-request" }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Skin and tones" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "Tone surfaces, surfaceTone labels, inverse, warning, error, success, and token-driven controls." }
+          },
+          {
+            "type": "button",
+            "text": "Open skin",
+            "variant": "secondary",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "effects": [
+                {
+                  "type": "navigate",
+                  "target": {
+                    "type": "page",
+                    "name": { "type": "literal", "value": "showcase-skin" }
+                  }
                 }
               ]
             }
@@ -483,116 +188,14 @@
       },
       {
         "type": "button",
-        "text": "Open Dialog",
+        "text": "Back",
         "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
         "onClick": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "showDialog",
-              "value": {
-                "type": "literal",
-                "value": true
-              }
-            }
+          "effects": [
+            { "type": "back" }
           ]
-        },
-        "layout": {
-          "fillMaxWidth": true
         }
-      },
-      {
-        "type": "dialog",
-        "visibleKey": "showDialog",
-        "title": {
-          "type": "value",
-          "value": "Dialog"
-        },
-        "onDismiss": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "showDialog",
-              "value": {
-                "type": "literal",
-                "value": false
-              }
-            }
-          ]
-        },
-        "children": [
-          {
-            "type": "text",
-            "text": {
-              "type": "value",
-              "value": "This modal is controlled by client state and closes through onDismiss."
-            }
-          },
-          {
-            "type": "button",
-            "text": "Close",
-            "onClick": {
-              "actions": [
-                {
-                  "type": "setState",
-                  "key": "showDialog",
-                  "value": {
-                    "type": "literal",
-                    "value": false
-                  }
-                }
-              ]
-            },
-            "layout": {
-              "fillMaxWidth": true
-            }
-          }
-        ]
-      },
-      {
-        "type": "card",
-        "tone": "error",
-        "children": [
-          {
-            "type": "text",
-            "style": "sectionTitle",
-            "tone": "error",
-            "text": {
-              "type": "value",
-              "value": "Error tone"
-            }
-          },
-          {
-            "type": "text",
-            "text": {
-              "type": "value",
-              "value": "Used for destructive or failed states."
-            }
-          }
-        ]
-      },
-      {
-        "type": "card",
-        "tone": "inverse",
-        "children": [
-          {
-            "type": "text",
-            "style": "sectionTitle",
-            "tone": "inverse",
-            "text": {
-              "type": "value",
-              "value": "Inverse tone"
-            }
-          },
-          {
-            "type": "text",
-            "tone": "inverse",
-            "text": {
-              "type": "value",
-              "value": "Used for high-contrast overlays, banners, and reversed surfaces."
-            }
-          }
-        ]
       }
     ]
   }

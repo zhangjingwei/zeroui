@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 1,
+  "initialState": {
+    "galleryItems": {
+      "owner": "client",
+      "value": [
+        {
+          "title": "Remote image",
+          "url": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=900&q=80"
+        },
+        {
+          "title": "Bound image",
+          "url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80"
+        },
+        {
+          "title": "Cropped image",
+          "url": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=900&q=80"
+        }
+      ]
+    },
+    "iconItems": {
+      "owner": "client",
+      "value": [
+        { "title": "Resource" },
+        { "title": "Tinted" },
+        { "title": "Clickable" }
+      ]
+    },
+    "todos": {
+      "owner": "client",
+      "value": [
+        { "title": "Column spacing", "status": "Ready" },
+        { "title": "Row weight", "status": "Checked" },
+        { "title": "Item scope", "status": "Live" }
+      ]
+    }
+  },
+  "root": {
+    "type": "column",
+    "spacing": 18,
+    "layout": {
+      "fillMaxWidth": true,
+      "padding": 20
+    },
+    "children": [
+      {
+        "type": "text",
+        "style": "title",
+        "text": { "type": "value", "value": "Layout and lists" }
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Row alignment" }
+          },
+          {
+            "type": "row",
+            "arrangement": "spaceBetween",
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "muted",
+                "text": { "type": "value", "value": "spaceBetween" }
+              },
+              {
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "inverse",
+                "text": { "type": "value", "value": "center" }
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 6,
+            "verticalAlignment": "baseline",
+            "children": [
+              {
+                "type": "text",
+                "style": "display",
+                "tone": "primary",
+                "text": { "type": "value", "value": "5" }
+              },
+              {
+                "type": "text",
+                "style": "label",
+                "tone": "muted",
+                "text": { "type": "value", "value": "minutes baseline" }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "LazyColumn" }
+          },
+          {
+            "type": "lazyColumn",
+            "spacing": 10,
+            "layout": {
+              "fillMaxWidth": true,
+              "maxHeight": 280
+            },
+            "children": [
+              {
+                "type": "text",
+                "tone": "muted",
+                "text": { "type": "value", "value": "Header item rendered before data-backed rows." }
+              }
+            ],
+            "itemsKey": "galleryItems",
+            "item": {
+              "type": "card",
+              "padding": 12,
+              "spacing": 8,
+              "children": [
+                {
+                  "type": "image",
+                  "source": {
+                    "type": "binding",
+                    "key": "item.url",
+                    "fallback": ""
+                  },
+                  "contentScale": "crop",
+                  "aspectRatio": 2.2,
+                  "cornerRadius": 12
+                },
+                {
+                  "type": "text",
+                  "style": "label",
+                  "text": {
+                    "type": "binding",
+                    "key": "item.title",
+                    "fallback": "Gallery item"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "LazyRow" }
+          },
+          {
+            "type": "lazyRow",
+            "spacing": 10,
+            "verticalAlignment": "center",
+            "layout": {
+              "fillMaxWidth": true,
+              "height": 96
+            },
+            "itemsKey": "iconItems",
+            "item": {
+              "type": "card",
+              "padding": 12,
+              "spacing": 6,
+              "layout": {
+                "width": 132,
+                "height": 84
+              },
+              "children": [
+                {
+                  "type": "row",
+                  "spacing": 8,
+                  "verticalAlignment": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "source": { "type": "resource", "name": "ic_launcher_foreground" },
+                      "tone": "primary",
+                      "size": 28
+                    },
+                    {
+                      "type": "text",
+                      "style": "label",
+                      "layout": { "weight": 1 },
+                      "text": {
+                        "type": "binding",
+                        "key": "item.title",
+                        "fallback": "Icon"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "forEach and spacer" }
+          },
+          {
+            "type": "forEach",
+            "itemsKey": "todos",
+            "spacing": 8,
+            "child": {
+              "type": "row",
+              "spacing": 10,
+              "verticalAlignment": "center",
+              "layout": { "fillMaxWidth": true },
+              "children": [
+                {
+                  "type": "text",
+                  "style": "label",
+                  "layout": { "weight": 1 },
+                  "text": {
+                    "type": "binding",
+                    "key": "item.title",
+                    "fallback": "Task"
+                  }
+                },
+                {
+                  "type": "text",
+                  "style": "support",
+                  "surfaceTone": "muted",
+                  "text": {
+                    "type": "binding",
+                    "key": "item.status",
+                    "fallback": "New"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "spacer",
+            "height": 4
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "Spacer creates a predictable break before follow-up content." }
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "text": "Back to showcase",
+        "variant": "secondary",
+        "layout": { "fillMaxWidth": true },
+        "onClick": {
+          "effects": [
+            { "type": "back" }
+          ]
+        }
+      }
+    ]
+  }
+}
