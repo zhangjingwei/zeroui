@@ -137,6 +137,13 @@ ZeroSkinProvider(
 - ChipGroup
 - Switch
 - Card
+- Checkbox
+- Radio
+- Slider
+- Progress
+- Snackbar
+- Divider
+- BottomSheet
 
 示例页面 `assets/pages/showcase.json` 会覆盖这些由皮肤驱动的组件，便于视觉走查。
 
@@ -230,14 +237,17 @@ version: v0.1.4
 
 | Node | 稳定性 |
 | --- | --- |
-| `column`, `row`, `text`, `textField`, `switch`, `button`, `chipGroup`, `card`, `spacer`, `condition`, `image`, `icon` | 面向 `0.1.x` 内部或团队使用保持稳定（`image` / `icon` 需要 `ZeroImageLoader`；默认 loader 覆盖 drawable 资源与 HTTP/HTTPS URL）|
-| `forEach`, `lazyColumn`, `lazyRow`, `dialog` | `0.1.x` 实验能力；应放在服务端能力开关后 |
+| `column`, `row`, `box`, `text`, `textField`, `switch`, `button`, `chipGroup`, `card`, `spacer`, `condition`, `image`, `icon`, `divider` | 面向 `0.1.x` 内部或团队使用保持稳定（`image` / `icon` 需要 `ZeroImageLoader`；默认 loader 覆盖 drawable 资源与 HTTP/HTTPS URL）|
+| `checkbox`, `radioGroup`, `slider`, `progress`, `select`, `snackbar` | 面向 `0.1.x` 内部或团队使用保持稳定；通过 `enabledKey` 绑定布尔状态控制禁用态 |
+| `forEach`, `lazyColumn`, `lazyRow`, `dialog`, `bottomSheet` | `0.1.x` 实验能力；应放在服务端能力开关后 |
 
 动作：
-`setState`, `appendState`, `incrementState`, `toggleState`, `clearState`, `resetState`, `validate`, `batch`。
+`setState`, `appendState`, `incrementState`, `toggleState`, `clearState`, `resetState`, `validate`, `batch`。`setState` / `clearState` 支持点路径键（如 `form.name`、`items[0].status`）直接读写嵌套 Record。
 
 效果：
 `toast`, `log`, `track`, `navigate`, `back`, `http`。
+
+交互策略：交互对象可以设置 `debounceMillis` 防抖和 `throttleMillis` 节流，防止按钮快速连击或搜索输入触发过多请求。
 
 `http` 支持 `params` 查询参数构建、`timeoutMs`、`retryCount` / `retryDelayMs`、`requestKey` + `cancelPrevious`、`cachePolicy: "networkOnly" | "cacheFirst"`、`stateKey` 标准请求状态、`responseMode: "body" | "full"`、`map` 响应字段映射，以及 `onStart` / `onSuccess` / `onError` / `onFinally` 生命周期。`map` 数组项可用 `mode: "replace" | "append"`，用于刷新列表或 load-more 分页追加。
 
@@ -245,7 +255,7 @@ version: v0.1.4
 `display`, `title`, `sectionTitle`, `body`, `label`, `support`。未知 `style` 会回落到 `body`，避免单个样式拼写问题导致页面解析失败。
 
 色调：
-`default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`。
+`default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`, `info`, `accent`, `disabled`。
 
 ## 协议版本
 

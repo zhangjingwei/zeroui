@@ -28,6 +28,9 @@ public class ZeroStyleResolver(
         Tone.Error -> skin.palette.errorContent
         Tone.Warning -> skin.palette.warningContent
         Tone.Inverse -> skin.palette.inverseContent
+        Tone.Info -> skin.palette.infoContent
+        Tone.Accent -> skin.palette.accentContent
+        Tone.Disabled -> skin.palette.disabledContent
     }
 
     public fun containerColor(tone: Tone): Color = when (tone) {
@@ -38,6 +41,9 @@ public class ZeroStyleResolver(
         Tone.Error -> skin.palette.errorContainer
         Tone.Warning -> skin.palette.warningContainer
         Tone.Inverse -> skin.palette.inverseContainer
+        Tone.Info -> skin.palette.infoContainer
+        Tone.Accent -> skin.palette.accentContainer
+        Tone.Disabled -> skin.palette.disabledContainer
     }
 
     public fun buttonTokens(variant: ButtonVariant): ZeroButtonVariantTokens = when (variant) {
@@ -60,6 +66,9 @@ public class ZeroStyleResolver(
             Tone.Error -> skin.components.card.error
             Tone.Warning -> skin.components.card.warning
             Tone.Inverse -> skin.components.card.inverse
+            Tone.Info -> skin.components.card.info
+            Tone.Accent -> skin.components.card.accent
+            Tone.Disabled -> skin.components.card.disabled
         }
         return ZeroCardResolvedTokens(
             colors = toneTokens,
@@ -72,6 +81,14 @@ public class ZeroStyleResolver(
     public fun sliderTokens(): ZeroSliderTokens = skin.components.slider
 
     public fun snackbarTokens(): ZeroSnackbarTokens = skin.components.snackbar
+
+    public fun radioTokens(): ZeroRadioTokens = skin.components.radio
+
+    public fun dividerTokens(): ZeroDividerTokens = skin.components.divider
+
+    public fun progressTokens(): ZeroProgressTokens = skin.components.progress
+
+    public fun bottomSheetTokens(): ZeroBottomSheetTokens = skin.components.bottomSheet
 
     public val bodyTextStyle: ComposeTextStyle
         get() = skin.typography.body

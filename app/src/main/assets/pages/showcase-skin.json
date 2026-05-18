@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "initialState": {
-    "selectedTone": { "owner": "client", "value": "primary" },
     "enabled": { "owner": "client", "value": true }
   },
   "root": {
@@ -20,127 +19,219 @@
       {
         "type": "text",
         "tone": "muted",
-        "text": { "type": "value", "value": "Skin tokens drive component colors, surfaces, typography, shape, and spacing." }
+        "text": { "type": "value", "value": "Skin tokens drive component colors, surfaces, typography, shape, and spacing. All tone surfaces shown below are themed through ZeroPalette." }
       },
       {
-        "type": "chipGroup",
-        "selectedKey": "selectedTone",
-        "spacing": 8,
-        "options": [
-          { "label": "Primary", "value": "primary" },
-          { "label": "Success", "value": "success" },
-          { "label": "Warning", "value": "warning" },
-          { "label": "Error", "value": "error" }
-        ],
-        "onSelected": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "selectedTone",
-              "value": { "type": "event" }
-            }
-          ]
-        }
+        "type": "text",
+        "style": "sectionTitle",
+        "text": { "type": "value", "value": "Semantic tones" }
       },
       {
         "type": "card",
         "tone": "primary",
-        "spacing": 8,
+        "spacing": 6,
         "children": [
           {
             "type": "text",
-            "style": "sectionTitle",
+            "style": "label",
             "tone": "primary",
-            "text": { "type": "value", "value": "Primary surface" }
+            "text": { "type": "value", "value": "primary" }
           },
           {
             "type": "text",
             "tone": "muted",
-            "text": { "type": "value", "value": "Used for main calls to action and selected component states." }
+            "text": { "type": "value", "value": "Main call-to-action and selected states." }
           }
         ]
       },
       {
         "type": "card",
         "tone": "success",
-        "spacing": 8,
+        "spacing": 6,
         "children": [
           {
             "type": "text",
-            "style": "sectionTitle",
+            "style": "label",
             "tone": "success",
-            "text": { "type": "value", "value": "Success surface" }
+            "text": { "type": "value", "value": "success" }
           },
           {
             "type": "text",
-            "text": { "type": "value", "value": "Used for complete, healthy, or confirmed states." }
+            "text": { "type": "value", "value": "Complete, healthy, or confirmed states." }
           }
         ]
       },
       {
         "type": "card",
         "tone": "warning",
-        "spacing": 8,
+        "spacing": 6,
         "children": [
           {
             "type": "text",
-            "style": "sectionTitle",
+            "style": "label",
             "tone": "warning",
-            "text": { "type": "value", "value": "Warning surface" }
+            "text": { "type": "value", "value": "warning" }
           },
           {
             "type": "text",
-            "text": { "type": "value", "value": "Used for cautionary states without importing Material tone names into the protocol." }
+            "text": { "type": "value", "value": "Cautionary states that need attention." }
           }
         ]
       },
       {
         "type": "card",
         "tone": "error",
-        "spacing": 8,
+        "spacing": 6,
         "children": [
           {
             "type": "text",
-            "style": "sectionTitle",
+            "style": "label",
             "tone": "error",
-            "text": { "type": "value", "value": "Error surface" }
+            "text": { "type": "value", "value": "error" }
           },
           {
             "type": "text",
-            "text": { "type": "value", "value": "Used for destructive or failed states." }
+            "text": { "type": "value", "value": "Destructive or failed states." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "info",
+        "spacing": 6,
+        "children": [
+          {
+            "type": "text",
+            "style": "label",
+            "tone": "info",
+            "text": { "type": "value", "value": "info" }
+          },
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Neutral informational context, distinct from primary." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "tone": "muted",
+        "spacing": 6,
+        "children": [
+          {
+            "type": "text",
+            "style": "label",
+            "tone": "muted",
+            "text": { "type": "value", "value": "muted" }
+          },
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Subdued surfaces and secondary text." }
           }
         ]
       },
       {
         "type": "card",
         "tone": "inverse",
-        "spacing": 8,
+        "spacing": 6,
         "children": [
           {
             "type": "text",
-            "style": "sectionTitle",
+            "style": "label",
             "tone": "inverse",
-            "text": { "type": "value", "value": "Inverse surface" }
+            "text": { "type": "value", "value": "inverse" }
           },
           {
             "type": "text",
             "tone": "inverse",
-            "text": { "type": "value", "value": "Used for high-contrast overlays, banners, and reversed surfaces." }
+            "text": { "type": "value", "value": "High-contrast overlay; flips surface and content." }
           }
         ]
+      },
+      {
+        "type": "card",
+        "tone": "disabled",
+        "spacing": 6,
+        "children": [
+          {
+            "type": "text",
+            "style": "label",
+            "tone": "disabled",
+            "text": { "type": "value", "value": "disabled" }
+          },
+          {
+            "type": "text",
+            "tone": "disabled",
+            "text": { "type": "value", "value": "Non-interactive surfaces; enforced by ZeroStateLayer alpha." }
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "style": "sectionTitle",
+        "text": { "type": "value", "value": "Typography scale" }
+      },
+      {
+        "type": "card",
+        "spacing": 8,
+        "children": [
+          { "type": "text", "style": "display", "text": { "type": "value", "value": "Display" } },
+          { "type": "text", "style": "title", "text": { "type": "value", "value": "Title" } },
+          { "type": "text", "style": "sectionTitle", "text": { "type": "value", "value": "Section title" } },
+          { "type": "text", "style": "body", "text": { "type": "value", "value": "Body — the default prose style for most content." } },
+          { "type": "text", "style": "label", "text": { "type": "value", "value": "Label" } },
+          { "type": "text", "style": "support", "tone": "muted", "text": { "type": "value", "value": "Support — metadata and captions." } }
+        ]
+      },
+      {
+        "type": "text",
+        "style": "sectionTitle",
+        "text": { "type": "value", "value": "surfaceTone pills" }
+      },
+      {
+        "type": "card",
+        "spacing": 10,
+        "children": [
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "surfaceTone wraps a label in a tinted pill without a card node." }
+          },
+          {
+            "type": "row",
+            "spacing": 8,
+            "verticalAlignment": "center",
+            "children": [
+              { "type": "text", "style": "label", "surfaceTone": "primary", "text": { "type": "value", "value": "primary" } },
+              { "type": "text", "style": "label", "surfaceTone": "success", "text": { "type": "value", "value": "success" } },
+              { "type": "text", "style": "label", "surfaceTone": "warning", "text": { "type": "value", "value": "warning" } },
+              { "type": "text", "style": "label", "surfaceTone": "error", "text": { "type": "value", "value": "error" } }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 8,
+            "verticalAlignment": "center",
+            "children": [
+              { "type": "text", "style": "label", "surfaceTone": "info", "text": { "type": "value", "value": "info" } },
+              { "type": "text", "style": "label", "surfaceTone": "muted", "text": { "type": "value", "value": "muted" } },
+              { "type": "text", "style": "label", "surfaceTone": "inverse", "text": { "type": "value", "value": "inverse" } },
+              { "type": "text", "style": "label", "surfaceTone": "disabled", "text": { "type": "value", "value": "disabled" } }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "style": "sectionTitle",
+        "text": { "type": "value", "value": "Token-driven controls" }
       },
       {
         "type": "card",
         "spacing": 12,
         "children": [
           {
-            "type": "text",
-            "style": "sectionTitle",
-            "text": { "type": "value", "value": "Tokenized controls" }
-          },
-          {
             "type": "switch",
-            "text": "Switch reads skin tokens",
+            "text": "Switch — reads SwitchTokens from skin",
             "checkedKey": "enabled",
             "onCheckedChange": {
               "actions": [
@@ -153,22 +244,36 @@
             }
           },
           {
+            "type": "divider",
+            "thickness": 1,
+            "tone": "muted"
+          },
+          {
             "type": "row",
             "spacing": 10,
-            "verticalAlignment": "center",
             "layout": { "fillMaxWidth": true },
             "children": [
               {
-                "type": "text",
-                "style": "label",
-                "surfaceTone": "muted",
-                "text": { "type": "value", "value": "surfaceTone" }
+                "type": "button",
+                "text": "Primary",
+                "variant": "primary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    { "type": "toast", "message": { "type": "literal", "value": "Primary tapped" } }
+                  ]
+                }
               },
               {
-                "type": "text",
-                "style": "label",
-                "surfaceTone": "inverse",
-                "text": { "type": "value", "value": "inverse pill" }
+                "type": "button",
+                "text": "Secondary",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    { "type": "toast", "message": { "type": "literal", "value": "Secondary tapped" } }
+                  ]
+                }
               }
             ]
           }

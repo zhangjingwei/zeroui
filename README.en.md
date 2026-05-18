@@ -137,6 +137,13 @@ Current component token coverage:
 - ChipGroup
 - Switch
 - Card
+- Checkbox
+- Radio
+- Slider
+- Progress
+- Snackbar
+- Divider
+- BottomSheet
 
 The sample `assets/pages/showcase.json` page exercises these skin-driven components for visual review.
 
@@ -230,14 +237,17 @@ Nodes:
 
 | Node | Stability |
 | --- | --- |
-| `column`, `row`, `text`, `textField`, `switch`, `button`, `chipGroup`, `card`, `spacer`, `condition`, `image`, `icon` | Stable for `0.1.x` internal/team use (`image` / `icon` require a `ZeroImageLoader`; the default loader covers drawable resources + HTTP/HTTPS URLs) |
-| `forEach`, `lazyColumn`, `lazyRow`, `dialog` | Experimental in `0.1.x`; keep behind server-side capability gates |
+| `column`, `row`, `box`, `text`, `textField`, `switch`, `button`, `chipGroup`, `card`, `spacer`, `condition`, `image`, `icon`, `divider` | Stable for `0.1.x` internal/team use (`image` / `icon` require a `ZeroImageLoader`; the default loader covers drawable resources + HTTP/HTTPS URLs) |
+| `checkbox`, `radioGroup`, `slider`, `progress`, `select`, `snackbar` | Stable for `0.1.x` internal/team use; bind a boolean state via `enabledKey` for disabled state |
+| `forEach`, `lazyColumn`, `lazyRow`, `dialog`, `bottomSheet` | Experimental in `0.1.x`; keep behind server-side capability gates |
 
 Actions:
-`setState`, `appendState`, `incrementState`, `toggleState`, `clearState`, `resetState`, `validate`, `batch`.
+`setState`, `appendState`, `incrementState`, `toggleState`, `clearState`, `resetState`, `validate`, `batch`. `setState` / `clearState` support dotted-path keys such as `form.name` or `items[0].status` to read and write nested Record fields.
 
 Effects:
 `toast`, `log`, `track`, `navigate`, `back`, `http`.
+
+Interaction policies: interactions can set `debounceMillis` and `throttleMillis` to prevent rapid-tap double-submit or excessive search requests.
 
 `http` supports `params` query building, `timeoutMs`, `retryCount` / `retryDelayMs`, `requestKey` + `cancelPrevious`, `cachePolicy: "networkOnly" | "cacheFirst"`, standard request state via `stateKey`, `responseMode: "body" | "full"`, response `map`, and `onStart` / `onSuccess` / `onError` / `onFinally` lifecycle hooks. `map` array entries can use `mode: "replace" | "append"` for refresh or load-more pagination flows.
 
@@ -245,7 +255,7 @@ Text styles:
 `display`, `title`, `sectionTitle`, `body`, `label`, `support`. Unknown `style` values fall back to `body` so one typo does not fail page parsing.
 
 Tones:
-`default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`.
+`default`, `muted`, `primary`, `success`, `error`, `warning`, `inverse`, `info`, `accent`, `disabled`.
 
 ## Protocol Versioning
 

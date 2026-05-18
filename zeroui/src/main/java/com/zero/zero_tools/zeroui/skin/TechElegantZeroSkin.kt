@@ -45,9 +45,21 @@ public fun rememberTechElegantZeroSkin(darkTheme: Boolean): ZeroSkin {
                 )
             ),
             shapes = ZeroShapes(
+                extraSmall = 4.dp,
+                small = 8.dp,
+                medium = 12.dp,
+                large = 16.dp,
+                extraLarge = 28.dp,
+                full = 999.dp,
                 cardCornerRadius = 8.dp
             ),
             spacing = ZeroSpacing(
+                xs = 4.dp,
+                s = 8.dp,
+                m = 12.dp,
+                l = 16.dp,
+                xl = 24.dp,
+                xxl = 32.dp,
                 unknownNodePadding = 14.dp,
                 unknownNodeSpacing = 6.dp
             )
@@ -74,7 +86,9 @@ private fun techElegantLightPalette() = ZeroPalette(
     errorOutline = Color(0xFFC84444),
     unknownContainer = Color(0xFFF4EAD4),
     inverseContent = Color(0xFFF7F9FC),
-    inverseContainer = Color(0xFF10141F)
+    inverseContainer = Color(0xFF10141F),
+    infoContent = Color(0xFF0B7B8A),
+    infoContainer = Color(0xFFDEF5F8)
 )
 
 private fun techElegantDarkPalette() = ZeroPalette(
@@ -96,5 +110,7 @@ private fun techElegantDarkPalette() = ZeroPalette(
     errorOutline = Color(0xFFFF9999),
     unknownContainer = Color(0xFF3B3020),
     inverseContent = Color(0xFF10141F),
-    inverseContainer = Color(0xFFEAF0F8)
+    inverseContainer = Color(0xFFEAF0F8),
+    infoContent = Color(0xFF6ECFDB),
+    infoContainer = Color(0xFF0B2D33)
 )

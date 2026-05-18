@@ -48,6 +48,9 @@ private fun String.toTone(): Tone {
         "error" -> Tone.Error
         "warning" -> Tone.Warning
         "inverse" -> Tone.Inverse
+        "info" -> Tone.Info
+        "accent" -> Tone.Accent
+        "disabled" -> Tone.Disabled
         else -> error("Unsupported ZeroUI tone: $this")
     }
 }

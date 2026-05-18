@@ -23,18 +23,21 @@ data class ZeroSkin(
     val shapes: ZeroShapes = ZeroShapes(),
     val spacing: ZeroSpacing = ZeroSpacing(),
     val density: ZeroDensity = ZeroDensity.Comfortable,
+    val elevation: ZeroElevation = ZeroElevation(),
+    val stateLayer: ZeroStateLayer = ZeroStateLayer(),
     val components: ZeroComponentTokens = ZeroComponentTokens.fromPalette(palette, density)
 )
 ```
 
-Most integrations only provide `palette`, `typography`, and optionally `shapes` / `density`. `components` can usually be omitted; ZeroUI derives button, field, chip, switch, and card tokens from `palette` and `density`.
+Most integrations only provide `palette`, `typography`, and optionally `shapes` / `density`. `elevation`, `stateLayer`, and `components` have sensible defaults and can be omitted for brand packages that only need color and type customisation.
 
 ## Palette
 
-`ZeroPalette` is the semantic color set consumed by ZeroUI nodes and component tokens:
+`ZeroPalette` is the semantic color set consumed by ZeroUI nodes and component tokens. Required fields must be set; optional fields default to values derived from nearby required fields.
 
 ```kotlin
 ZeroPalette(
+    // required
     content = Color(0xFF10141F),
     mutedContent = Color(0xFF596273),
     primaryContent = Color(0xFF255CDE),
@@ -52,8 +55,15 @@ ZeroPalette(
     focusedOutline = Color(0xFF255CDE),
     errorOutline = Color(0xFFC84444),
     unknownContainer = Color(0x1A000000),
-    inverseContent = Color(0xFFF7F9FC),
-    inverseContainer = Color(0xFF10141F)
+    // optional — defaults shown
+    inverseContent = container,
+    inverseContainer = content,
+    infoContent = primaryContent,
+    infoContainer = primaryContainer,
+    accentContent = primaryContent,
+    accentContainer = primaryContainer,
+    disabledContent = content.copy(alpha = 0.38f),
+    disabledContainer = mutedContainer.copy(alpha = 0.12f)
 )
 ```
 
@@ -80,6 +90,9 @@ These fields are not Material color role names. They are ZeroUI roles:
 | `unknownContainer` | Unknown node and unavailable placeholder background |
 | `inverseContent` | Content rendered on inverse containers |
 | `inverseContainer` | High-contrast inverse containers |
+| `infoContent` / `infoContainer` | Info tone — neutral informational, distinct from primary |
+| `accentContent` / `accentContainer` | Accent tone — brand secondary color, defaults to primary |
+| `disabledContent` / `disabledContainer` | Disabled tone — non-interactive surfaces and text |
 
 Text nodes can also set `surfaceTone` in JSON. It uses these same semantic roles for a local text background container and applies a built-in inside padding of 10dp horizontal and 4dp vertical. Text color remains controlled by `tone`; when `tone` is omitted, `surfaceTone` provides the matching default content color. `layout.padding` remains outside padding.
 
@@ -106,11 +119,17 @@ JSON pages can refer to `style: "display" | "title" | "sectionTitle" | "body" | 
 
 ## Shapes
 
-`ZeroShapes` is not Material3's `small` / `medium` / `large` shape set. It is ZeroUI's own small semantic token surface:
+`ZeroShapes` provides a six-step corner radius scale plus a legacy `cardCornerRadius` field for backward compatibility:
 
 ```kotlin
 ZeroShapes(
-    cardCornerRadius = 8.dp
+    extraSmall = 4.dp,
+    small = 8.dp,
+    medium = 12.dp,    // default
+    large = 16.dp,
+    extraLarge = 28.dp,
+    full = 999.dp,
+    cardCornerRadius = 12.dp  // kept for compat; prefer medium
 )
 ```
 
@@ -118,16 +137,56 @@ Component-specific shapes are derived inside `ZeroComponentTokens` unless explic
 
 ## Spacing
 
-`ZeroSpacing` currently covers SDK-owned fallback UI:
+`ZeroSpacing` provides a named scale for use in component and layout code:
 
 ```kotlin
 ZeroSpacing(
-    unknownNodePadding = 12.dp,
+    xs = 4.dp,
+    s = 8.dp,
+    m = 12.dp,
+    l = 16.dp,
+    xl = 24.dp,
+    xxl = 32.dp,
+    unknownNodePadding = 12.dp,  // SDK fallback UI
     unknownNodeSpacing = 4.dp
 )
 ```
 
 Page layout spacing remains part of the JSON protocol (`spacing`, `layout.padding`, etc.), not the skin.
+
+## Elevation
+
+`ZeroElevation` provides shadow levels for raised surfaces:
+
+```kotlin
+ZeroElevation(
+    level0 = 0.dp,
+    level1 = 1.dp,
+    level2 = 3.dp,
+    level3 = 6.dp,
+    level4 = 8.dp
+)
+```
+
+Use `level1`–`level2` for cards and chips, `level3`–`level4` for sheets and menus.
+
+## State Layer
+
+`ZeroStateLayer` defines the alpha values applied to the content color to produce pressed, focused, hovered, selected, and disabled overlays:
+
+```kotlin
+ZeroStateLayer(
+    pressedAlpha = 0.12f,
+    focusedAlpha = 0.12f,
+    hoveredAlpha = 0.08f,
+    selectedAlpha = 0.08f,
+    draggedAlpha = 0.16f,
+    disabledContentAlpha = 0.38f,
+    disabledContainerAlpha = 0.12f
+)
+```
+
+Component renderers read `skin.stateLayer` to apply consistent interaction feedback without hardcoding alphas.
 
 ## Density
 
@@ -153,7 +212,7 @@ ZeroSkin(
 )
 ```
 
-For most brand packages, prefer palette/typography/density. That keeps the integration smaller and leaves new ZeroUI component defaults available as the SDK evolves.
+`ZeroComponentTokens.fromPalette` derives tokens for: Button, TextField, ChipGroup, Switch, Card, Checkbox, Radio, Slider, Progress, Snackbar, Divider, and BottomSheet. For most brand packages, prefer palette/typography/density. That keeps the integration smaller and leaves new ZeroUI component defaults available as the SDK evolves.
 
 ## Non-Goals In 0.1.x
 

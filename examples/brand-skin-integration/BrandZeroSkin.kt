@@ -61,7 +61,21 @@ public fun rememberBrandZeroSkin(darkTheme: Boolean): ZeroSkin {
                 )
             ),
             shapes = ZeroShapes(
+                extraSmall = 4.dp,
+                small = 8.dp,
+                medium = 12.dp,
+                large = 16.dp,
+                extraLarge = 28.dp,
+                full = 999.dp,
                 cardCornerRadius = 8.dp
+            ),
+            spacing = com.zero.zero_tools.zeroui.skin.ZeroSpacing(
+                xs = 4.dp,
+                s = 8.dp,
+                m = 12.dp,
+                l = 16.dp,
+                xl = 24.dp,
+                xxl = 32.dp
             ),
             density = ZeroDensity.Comfortable
         )

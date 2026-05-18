@@ -13,6 +13,8 @@ public data class ZeroSkin(
     val shapes: ZeroShapes = ZeroShapes(),
     val spacing: ZeroSpacing = ZeroSpacing(),
     val density: ZeroDensity = ZeroDensity.Comfortable,
+    val elevation: ZeroElevation = ZeroElevation(),
+    val stateLayer: ZeroStateLayer = ZeroStateLayer(),
     val components: ZeroComponentTokens = ZeroComponentTokens.fromPalette(palette, density)
 )
 
@@ -36,7 +38,13 @@ public data class ZeroPalette(
     val errorOutline: Color,
     val unknownContainer: Color,
     val inverseContent: Color = container,
-    val inverseContainer: Color = content
+    val inverseContainer: Color = content,
+    val infoContent: Color = primaryContent,
+    val infoContainer: Color = primaryContainer,
+    val accentContent: Color = primaryContent,
+    val accentContainer: Color = primaryContainer,
+    val disabledContent: Color = content.copy(alpha = 0.38f),
+    val disabledContainer: Color = mutedContainer.copy(alpha = 0.12f)
 )
 
 public typealias ZeroColors = ZeroPalette
@@ -53,13 +61,45 @@ public data class ZeroTypography(
 
 @Immutable
 public data class ZeroShapes(
+    val extraSmall: Dp = 4.dp,
+    val small: Dp = 8.dp,
+    val medium: Dp = 12.dp,
+    val large: Dp = 16.dp,
+    val extraLarge: Dp = 28.dp,
+    val full: Dp = 999.dp,
     val cardCornerRadius: Dp = 12.dp
 )
 
 @Immutable
 public data class ZeroSpacing(
+    val xs: Dp = 4.dp,
+    val s: Dp = 8.dp,
+    val m: Dp = 12.dp,
+    val l: Dp = 16.dp,
+    val xl: Dp = 24.dp,
+    val xxl: Dp = 32.dp,
     val unknownNodePadding: Dp = 12.dp,
     val unknownNodeSpacing: Dp = 4.dp
+)
+
+@Immutable
+public data class ZeroElevation(
+    val level0: Dp = 0.dp,
+    val level1: Dp = 1.dp,
+    val level2: Dp = 3.dp,
+    val level3: Dp = 6.dp,
+    val level4: Dp = 8.dp
+)
+
+@Immutable
+public data class ZeroStateLayer(
+    val pressedAlpha: Float = 0.12f,
+    val focusedAlpha: Float = 0.12f,
+    val hoveredAlpha: Float = 0.08f,
+    val selectedAlpha: Float = 0.08f,
+    val draggedAlpha: Float = 0.16f,
+    val disabledContentAlpha: Float = 0.38f,
+    val disabledContainerAlpha: Float = 0.12f
 )
 
 public enum class ZeroDensity {
@@ -87,7 +127,11 @@ public data class ZeroComponentTokens(
     val card: ZeroCardTokens,
     val checkbox: ZeroCheckboxTokens,
     val slider: ZeroSliderTokens,
-    val snackbar: ZeroSnackbarTokens
+    val snackbar: ZeroSnackbarTokens,
+    val radio: ZeroRadioTokens,
+    val divider: ZeroDividerTokens,
+    val progress: ZeroProgressTokens,
+    val bottomSheet: ZeroBottomSheetTokens
 ) {
     public companion object {
         public fun fromPalette(
@@ -102,7 +146,11 @@ public data class ZeroComponentTokens(
                 card = ZeroCardTokens.fromPalette(palette),
                 checkbox = ZeroCheckboxTokens.fromPalette(palette),
                 slider = ZeroSliderTokens.fromPalette(palette),
-                snackbar = ZeroSnackbarTokens.fromPalette(palette)
+                snackbar = ZeroSnackbarTokens.fromPalette(palette),
+                radio = ZeroRadioTokens.fromPalette(palette),
+                divider = ZeroDividerTokens.fromPalette(palette),
+                progress = ZeroProgressTokens.fromPalette(palette),
+                bottomSheet = ZeroBottomSheetTokens.fromPalette(palette)
             )
         }
     }
@@ -339,6 +387,18 @@ public data class ZeroCardTokens(
         container = default.content,
         content = default.container
     ),
+    val info: CardToneTokens = CardToneTokens(
+        container = primary.container,
+        content = primary.content
+    ),
+    val accent: CardToneTokens = CardToneTokens(
+        container = primary.container,
+        content = primary.content
+    ),
+    val disabled: CardToneTokens = CardToneTokens(
+        container = muted.container,
+        content = muted.content
+    ),
     val cornerRadius: Dp
 ) {
     public companion object {
@@ -351,6 +411,9 @@ public data class ZeroCardTokens(
                 error = CardToneTokens(container = palette.errorContainer, content = palette.content),
                 warning = CardToneTokens(container = palette.warningContainer, content = palette.content),
                 inverse = CardToneTokens(container = palette.inverseContainer, content = palette.inverseContent),
+                info = CardToneTokens(container = palette.infoContainer, content = palette.content),
+                accent = CardToneTokens(container = palette.accentContainer, content = palette.content),
+                disabled = CardToneTokens(container = palette.disabledContainer, content = palette.disabledContent),
                 cornerRadius = 8.dp
             )
         }
@@ -420,6 +483,70 @@ public data class ZeroSnackbarTokens(
             container = palette.inverseContainer,
             content = palette.inverseContent,
             actionContent = palette.primaryContent
+        )
+    }
+}
+
+@Immutable
+public data class ZeroRadioTokens(
+    val selected: Color,
+    val unselected: Color,
+    val disabledSelected: Color,
+    val disabledUnselected: Color
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroRadioTokens = ZeroRadioTokens(
+            selected = palette.primaryContent,
+            unselected = palette.outline,
+            disabledSelected = palette.primaryContent.copy(alpha = 0.38f),
+            disabledUnselected = palette.mutedOutline.copy(alpha = 0.38f)
+        )
+    }
+}
+
+@Immutable
+public data class ZeroDividerTokens(
+    val color: Color,
+    val thickness: Dp
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroDividerTokens = ZeroDividerTokens(
+            color = palette.mutedOutline,
+            thickness = 1.dp
+        )
+    }
+}
+
+@Immutable
+public data class ZeroProgressTokens(
+    val activeTrack: Color,
+    val inactiveTrack: Color,
+    val disabledActiveTrack: Color,
+    val disabledInactiveTrack: Color
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroProgressTokens = ZeroProgressTokens(
+            activeTrack = palette.primaryContent,
+            inactiveTrack = palette.mutedContainer,
+            disabledActiveTrack = palette.primaryContent.copy(alpha = 0.38f),
+            disabledInactiveTrack = palette.mutedContainer.copy(alpha = 0.38f)
+        )
+    }
+}
+
+@Immutable
+public data class ZeroBottomSheetTokens(
+    val container: Color,
+    val scrim: Color,
+    val dragHandle: Color,
+    val cornerRadius: Dp
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroBottomSheetTokens = ZeroBottomSheetTokens(
+            container = palette.container,
+            scrim = palette.inverseContainer.copy(alpha = 0.32f),
+            dragHandle = palette.mutedOutline,
+            cornerRadius = 16.dp
         )
     }
 }

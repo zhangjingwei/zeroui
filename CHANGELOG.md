@@ -6,6 +6,12 @@
 - Added request-key cancellation with generation guarding so stale responses from search/filter flows are dropped even when transports cannot cancel immediately.
 - Added `appendState` to support load-more pagination and mapped list appends.
 - Updated the request showcase to use standard request state and mapped responses instead of page-local loading/error plumbing.
+- Extended `ZeroSkin` with `ZeroElevation` (5 levels) and `ZeroStateLayer` (pressed/focused/hovered/selected/dragged/disabled alphas).
+- Expanded `ZeroShapes` with a six-step scale (`extraSmall`…`full`) and `ZeroSpacing` with `xs`…`xxl`.
+- Added `info`, `accent`, `disabled` tone semantics to `ZeroPalette`, `Tone` enum, JSON parser, and `ZeroStyleResolver`.
+- Added component tokens for Radio, Divider, Progress, and BottomSheet; all four are available via `ZeroComponentTokens.fromPalette` and `ZeroStyleResolver`.
+- Added `info`/`accent`/`disabled` tones to `ZeroCardTokens` so they are overridable like all other card tones.
+- Updated the skin showcase page to demonstrate all tone surfaces, typography scale, surfaceTone pills, and token-driven controls.
 
 ## 0.1.3
 

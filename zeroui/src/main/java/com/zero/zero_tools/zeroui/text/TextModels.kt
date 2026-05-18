@@ -26,5 +26,8 @@ public enum class Tone {
     Success,
     Error,
     Warning,
-    Inverse
+    Inverse,
+    Info,
+    Accent,
+    Disabled
 }

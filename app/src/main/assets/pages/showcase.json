@@ -165,7 +165,7 @@
           {
             "type": "text",
             "tone": "muted",
-            "text": { "type": "value", "value": "Tone surfaces, surfaceTone labels, inverse, warning, error, success, and token-driven controls." }
+            "text": { "type": "value", "value": "All tone surfaces (primary, success, warning, error, info, muted, inverse, disabled), typography scale, surfaceTone pills, and token-driven controls." }
           },
           {
             "type": "button",
