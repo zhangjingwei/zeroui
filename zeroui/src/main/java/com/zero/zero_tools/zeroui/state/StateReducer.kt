@@ -19,6 +19,11 @@ public fun reduceState(
             value = action.value.resolve(state, eventValue)
         )
 
+        is Action.AppendState -> state.append(
+            key = action.key,
+            value = action.value.resolve(state, eventValue)
+        )
+
         is Action.IncrementState -> state.set(
             key = action.key,
             value = Value.Number(state.getNumber(action.key) + action.step)
@@ -69,6 +74,19 @@ public fun resolveValueSource(
     eventValue: Value? = null
 ): Value {
     return source.resolve(state, eventValue)
+}
+
+private fun State.append(key: String, value: Value): State {
+    val current = getValue(key)
+    val nextItems = when (current) {
+        is Value.List -> current.items
+        null -> emptyList()
+        else -> listOf(current)
+    } + when (value) {
+        is Value.List -> value.items
+        else -> listOf(value)
+    }
+    return set(key, Value.List(nextItems))
 }
 
 private fun State.set(key: String, value: Value): State {

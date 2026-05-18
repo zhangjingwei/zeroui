@@ -26,6 +26,7 @@ import com.zero.zero_tools.zeroui.core.ZeroUiRenderer
 import com.zero.zero_tools.zeroui.core.parseZeroUiPage
 import com.zero.zero_tools.zeroui.effect.executeEffects
 import com.zero.zero_tools.zeroui.http.HttpClient
+import com.zero.zero_tools.zeroui.http.HttpResponseCache
 import com.zero.zero_tools.zeroui.http.UrlConnectionHttpClient
 import com.zero.zero_tools.zeroui.image.LocalZeroImageLoader
 import com.zero.zero_tools.zeroui.image.ZeroImageLoader
@@ -74,6 +75,7 @@ public fun ZeroUiHost(
     }
     val stack = pageStack.entries
     val registry = remember { PageEntryRegistry() }
+    val httpCache = remember { HttpResponseCache() }
     val handlerRef = remember { Holder<(Interaction, Value?) -> Unit>() }
     val scope = rememberCoroutineScope()
     val debounceJobs = remember { mutableMapOf<String, Job>() }
@@ -109,6 +111,7 @@ public fun ZeroUiHost(
     DisposableEffect(Unit) {
         onDispose {
             registry.cancelAll()
+            httpCache.clear()
             debounceJobs.values.forEach(Job::cancel)
             debounceJobs.clear()
         }
@@ -149,11 +152,27 @@ public fun ZeroUiHost(
             navigator = navigator,
             tracker = tracker,
             httpClient = httpClient,
+            httpCache = httpCache,
             onFollowUp = guardedFollowUp,
-            onCancelable = { cancelable ->
+            onHttpStart = { effect ->
+                registry.beginRequest(
+                    entryId = originEntryId,
+                    requestKey = effect.requestKey,
+                    cancelPrevious = effect.cancelPrevious
+                )
+            },
+            shouldAcceptHttpResponse = { effect, generation ->
+                registry.isCurrent(
+                    entryId = originEntryId,
+                    requestKey = effect.requestKey,
+                    generation = generation
+                )
+            },
+            onCancelable = { cancelable, effect, _ ->
                 registry.register(
                     entryId = originEntryId,
                     id = registry.nextId(),
+                    requestKey = effect.requestKey,
                     cancelable = cancelable
                 )
             }

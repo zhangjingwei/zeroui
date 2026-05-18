@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4
+
+- Added a fuller HTTP request protocol with query params, timeout, retry, scoped caching, lifecycle hooks, full response envelopes, response mapping, and standard request state.
+- Added request-key cancellation with generation guarding so stale responses from search/filter flows are dropped even when transports cannot cancel immediately.
+- Added `appendState` to support load-more pagination and mapped list appends.
+- Updated the request showcase to use standard request state and mapped responses instead of page-local loading/error plumbing.
+
 ## 0.1.3
 
 - Added high-priority interaction primitives including checkbox, radio group, slider, progress, bottom sheet, divider, select, snackbar, and enabled-state support across form controls.

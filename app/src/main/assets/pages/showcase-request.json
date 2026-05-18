@@ -1,11 +1,21 @@
 {
   "schemaVersion": 1,
   "initialState": {
-    "loading": { "owner": "client", "value": false },
+    "request": {
+      "owner": "client",
+      "value": {
+        "loading": false,
+        "data": "",
+        "error": "",
+        "statusCode": 0,
+        "headers": {},
+        "empty": true
+      }
+    },
     "canRequest": { "owner": "client", "value": true },
     "response": { "owner": "server", "value": "" },
-    "lastError": { "owner": "client", "value": "" },
-    "requestUrl": { "owner": "client", "value": "https://httpbin.org/get" }
+    "requestUrl": { "owner": "client", "value": "https://httpbin.org/get" },
+    "query": { "owner": "client", "value": "zeroui" }
   },
   "root": {
     "type": "column",
@@ -27,7 +37,7 @@
       },
       {
         "type": "textField",
-        "label": "Request URL",
+        "label": "Endpoint",
         "value": { "type": "binding", "key": "requestUrl", "fallback": "https://httpbin.org/get" },
         "enabledKey": "canRequest",
         "onValueChange": {
@@ -44,6 +54,24 @@
         "layout": { "fillMaxWidth": true }
       },
       {
+        "type": "textField",
+        "label": "Query",
+        "value": { "type": "binding", "key": "query", "fallback": "zeroui" },
+        "enabledKey": "canRequest",
+        "onValueChange": {
+          "id": "request-query-input",
+          "debounceMillis": 250,
+          "actions": [
+            {
+              "type": "setState",
+              "key": "query",
+              "value": { "type": "event" }
+            }
+          ]
+        },
+        "layout": { "fillMaxWidth": true }
+      },
+      {
         "type": "button",
         "text": "Send GET request",
         "variant": "primary",
@@ -52,49 +80,36 @@
         "onClick": {
           "id": "send-get-request",
           "throttleMillis": 1000,
-          "actions": [
-            {
-              "type": "setState",
-              "key": "loading",
-              "value": { "type": "literal", "value": true }
-            },
-            {
-              "type": "setState",
-              "key": "canRequest",
-              "value": { "type": "literal", "value": false }
-            },
-            {
-              "type": "setState",
-              "key": "lastError",
-              "value": { "type": "literal", "value": "" }
-            }
-          ],
           "effects": [
             {
               "type": "http",
               "method": "GET",
               "url": { "type": "state", "key": "requestUrl" },
+              "params": {
+                "q": { "type": "state", "key": "query" }
+              },
               "headers": {
                 "Accept": { "type": "literal", "value": "application/json" }
               },
-              "onSuccess": {
+              "timeoutMs": 8000,
+              "retryCount": 1,
+              "retryDelayMs": 300,
+              "requestKey": "showcase-request",
+              "cancelPrevious": true,
+              "stateKey": "request",
+              "map": {
+                "response": "body"
+              },
+              "onStart": {
                 "actions": [
                   {
                     "type": "setState",
-                    "key": "response",
-                    "value": { "type": "event" }
-                  },
-                  {
-                    "type": "setState",
-                    "key": "loading",
-                    "value": { "type": "literal", "value": false }
-                  },
-                  {
-                    "type": "setState",
                     "key": "canRequest",
-                    "value": { "type": "literal", "value": true }
+                    "value": { "type": "literal", "value": false }
                   }
-                ],
+                ]
+              },
+              "onSuccess": {
                 "effects": [
                   {
                     "type": "track",
@@ -103,27 +118,19 @@
                 ]
               },
               "onError": {
-                "actions": [
-                  {
-                    "type": "setState",
-                    "key": "lastError",
-                    "value": { "type": "event" }
-                  },
-                  {
-                    "type": "setState",
-                    "key": "loading",
-                    "value": { "type": "literal", "value": false }
-                  },
-                  {
-                    "type": "setState",
-                    "key": "canRequest",
-                    "value": { "type": "literal", "value": true }
-                  }
-                ],
                 "effects": [
                   {
                     "type": "track",
                     "event": "showcase_request_error"
+                  }
+                ]
+              },
+              "onFinally": {
+                "actions": [
+                  {
+                    "type": "setState",
+                    "key": "canRequest",
+                    "value": { "type": "literal", "value": true }
                   }
                 ]
               }
@@ -148,7 +155,7 @@
       },
       {
         "type": "condition",
-        "condition": { "type": "truthy", "key": "loading" },
+        "condition": { "type": "truthy", "key": "request.loading" },
         "child": {
           "type": "card",
           "tone": "primary",
@@ -163,7 +170,7 @@
       },
       {
         "type": "condition",
-        "condition": { "type": "notBlank", "key": "lastError.error" },
+        "condition": { "type": "notBlank", "key": "request.error.error" },
         "child": {
           "type": "card",
           "tone": "error",
@@ -178,7 +185,7 @@
               "type": "text",
               "text": {
                 "type": "binding",
-                "key": "lastError.error",
+                "key": "request.error.error",
                 "fallback": "(unknown)"
               }
             },
@@ -188,7 +195,7 @@
               "tone": "muted",
               "text": {
                 "type": "binding",
-                "key": "lastError.statusCode",
+                "key": "request.statusCode",
                 "fallback": "0",
                 "format": "statusCode = {value}"
               }

@@ -23,7 +23,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("com.github.zhangjingwei:zeroui:v0.1.2")
+    implementation("com.github.zhangjingwei:zeroui:v0.1.4")
 }
 ```
 
@@ -147,7 +147,7 @@ ZeroSkinProvider(
 ```text
 groupId: com.github.zhangjingwei
 artifactId: zeroui
-version: v0.1.2
+version: v0.1.4
 ```
 
 发布前先在本地验证：
@@ -158,13 +158,13 @@ version: v0.1.2
 
 然后在 GitHub 创建 release：
 
-- Tag: `v0.1.2`
+- Tag: `v0.1.4`
 - Target: `main`
-- Release title: `v0.1.2`
-- Release notes: `ZeroUI 0.1.2 增强 schemaVersion 1 布局、列表、交互、图标、导航和皮肤能力。`
+- Release title: `v0.1.4`
+- Release notes: `ZeroUI 0.1.4 增强 HTTP 请求状态、取消、缓存、重试和响应映射能力。`
 - 不勾选 `Set as a pre-release`
 
-发布后打开 [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.2)，点击 `Get it` 触发构建。构建成功后即可通过上面的 Gradle 依赖引入。
+发布后打开 [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.4)，点击 `Get it` 触发构建。构建成功后即可通过上面的 Gradle 依赖引入。
 
 ## 协议速查
 
@@ -234,10 +234,12 @@ version: v0.1.2
 | `forEach`, `lazyColumn`, `lazyRow`, `dialog` | `0.1.x` 实验能力；应放在服务端能力开关后 |
 
 动作：
-`setState`, `incrementState`, `toggleState`, `batch`。
+`setState`, `appendState`, `incrementState`, `toggleState`, `clearState`, `resetState`, `validate`, `batch`。
 
 效果：
 `toast`, `log`, `track`, `navigate`, `back`, `http`。
+
+`http` 支持 `params` 查询参数构建、`timeoutMs`、`retryCount` / `retryDelayMs`、`requestKey` + `cancelPrevious`、`cachePolicy: "networkOnly" | "cacheFirst"`、`stateKey` 标准请求状态、`responseMode: "body" | "full"`、`map` 响应字段映射，以及 `onStart` / `onSuccess` / `onError` / `onFinally` 生命周期。`map` 数组项可用 `mode: "replace" | "append"`，用于刷新列表或 load-more 分页追加。
 
 文本样式：
 `display`, `title`, `sectionTitle`, `body`, `label`, `support`。未知 `style` 会回落到 `body`，避免单个样式拼写问题导致页面解析失败。

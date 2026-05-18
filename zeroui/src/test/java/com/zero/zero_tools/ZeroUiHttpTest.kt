@@ -6,6 +6,7 @@ import com.zero.zero_tools.zeroui.effect.Effect
 import com.zero.zero_tools.zeroui.http.Cancelable
 import com.zero.zero_tools.zeroui.http.HttpClient
 import com.zero.zero_tools.zeroui.http.HttpResponse
+import com.zero.zero_tools.zeroui.http.HttpResponseCache
 import com.zero.zero_tools.zeroui.http.dispatchHttp
 import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.node.Node
@@ -43,10 +44,29 @@ class ZeroUiHttpTest {
                         "type": "http",
                         "method": "POST",
                         "url": { "type": "literal", "value": "https://x.test/api" },
+                        "params": {
+                          "q": { "type": "state", "key": "query" }
+                        },
                         "headers": {
                           "Authorization": { "type": "state", "key": "token" }
                         },
                         "body": { "type": "literal", "value": "{\"a\":1}" },
+                        "timeoutMs": 3000,
+                        "retryCount": 2,
+                        "retryDelayMs": 10,
+                        "cachePolicy": "cacheFirst",
+                        "requestKey": "search",
+                        "cancelPrevious": true,
+                        "stateKey": "usersRequest",
+                        "responseMode": "full",
+                        "map": [
+                          { "key": "users", "path": "body.items", "mode": "append" }
+                        ],
+                        "onStart": {
+                          "actions": [
+                            { "type": "setState", "key": "started", "value": { "type": "literal", "value": true } }
+                          ]
+                        },
                         "onSuccess": {
                           "actions": [
                             { "type": "setState", "key": "data", "value": { "type": "event" } }
@@ -68,8 +88,21 @@ class ZeroUiHttpTest {
         val http = (page.root as Node.Button).onClick.effects.single() as Effect.Http
         assertEquals("POST", http.method)
         assertEquals(ValueSource.Literal(Value.Text("https://x.test/api")), http.url)
+        assertEquals(ValueSource.StateValue("query"), http.params["q"])
         assertEquals(ValueSource.StateValue("token"), http.headers["Authorization"])
         assertEquals(ValueSource.Literal(Value.Text("{\"a\":1}")), http.body)
+        assertEquals(3000, http.timeoutMs)
+        assertEquals(2, http.retryCount)
+        assertEquals(10, http.retryDelayMs)
+        assertEquals(com.zero.zero_tools.zeroui.effect.HttpCachePolicy.CacheFirst, http.cachePolicy)
+        assertEquals("search", http.requestKey)
+        assertTrue(http.cancelPrevious)
+        assertEquals("usersRequest", http.stateKey)
+        assertEquals(com.zero.zero_tools.zeroui.effect.HttpResponseMode.Full, http.responseMode)
+        assertEquals("users", http.map.single().key)
+        assertEquals("body.items", http.map.single().path)
+        assertEquals(com.zero.zero_tools.zeroui.effect.HttpMapMode.Append, http.map.single().mode)
+        assertEquals(1, http.onStart.actions.size)
         assertEquals(1, http.onSuccess.actions.size)
         assertEquals(1, http.onError.actions.size)
     }
@@ -115,7 +148,7 @@ class ZeroUiHttpTest {
     @Test
     fun dispatch200RoutesToOnSuccessWithBody() {
         val responseBody = Value.Record(fields = mapOf("id" to Value.Number(7)))
-        val client = HttpClient { _, _, _, _, onResponse ->
+        val client = HttpClient { _, onResponse ->
             onResponse(HttpResponse(statusCode = 200, body = responseBody))
             Cancelable.Noop
         }
@@ -136,7 +169,7 @@ class ZeroUiHttpTest {
 
     @Test
     fun dispatch500RoutesToOnErrorWithRecord() {
-        val client = HttpClient { _, _, _, _, onResponse ->
+        val client = HttpClient { _, onResponse ->
             onResponse(HttpResponse(statusCode = 500, body = Value.Text("server fail")))
             Cancelable.Noop
         }
@@ -155,7 +188,7 @@ class ZeroUiHttpTest {
 
     @Test
     fun dispatchTransportFailureRoutesToOnErrorWithMessage() {
-        val client = HttpClient { _, _, _, _, onResponse ->
+        val client = HttpClient { _, onResponse ->
             onResponse(
                 HttpResponse(
                     statusCode = 0,
@@ -182,16 +215,24 @@ class ZeroUiHttpTest {
         val effect = Effect.Http(
             method = "POST",
             url = ValueSource.StateValue("endpoint"),
+            params = mapOf(
+                "q" to ValueSource.StateValue("query"),
+                "page" to ValueSource.Literal(Value.Number(2))
+            ),
             headers = mapOf(
                 "Authorization" to ValueSource.Template("Bearer {event}")
             ),
             body = ValueSource.StateValue("payload"),
+            timeoutMs = 1234,
+            retryCount = 3,
+            retryDelayMs = 99,
             onSuccess = Interaction(),
             onError = Interaction()
         )
         val state = State(
             values = mapOf(
                 "endpoint" to StateEntry(Value.Text("https://api.test/v1/users")),
+                "query" to StateEntry(Value.Text("Ada Lovelace")),
                 "payload" to StateEntry(Value.Text("{\"x\":1}"))
             )
         )
@@ -200,11 +241,17 @@ class ZeroUiHttpTest {
         var seenUrl: String? = null
         var seenHeaders: Map<String, String>? = null
         var seenBody: String? = null
-        val client = HttpClient { method, url, headers, body, onResponse ->
-            seenMethod = method
-            seenUrl = url
-            seenHeaders = headers
-            seenBody = body
+        var seenTimeout: Int? = null
+        var seenRetryCount: Int? = null
+        var seenRetryDelay: Int? = null
+        val client = HttpClient { request, onResponse ->
+            seenMethod = request.method
+            seenUrl = request.url
+            seenHeaders = request.headers
+            seenBody = request.body
+            seenTimeout = request.timeoutMs
+            seenRetryCount = request.retryCount
+            seenRetryDelay = request.retryDelayMs
             onResponse(HttpResponse(200, Value.Text("")))
             Cancelable.Noop
         }
@@ -212,9 +259,12 @@ class ZeroUiHttpTest {
         dispatchHttp(state, effect, eventValue = Value.Text("ABC"), client = client) { _, _ -> }
 
         assertEquals("POST", seenMethod)
-        assertEquals("https://api.test/v1/users", seenUrl)
+        assertEquals("https://api.test/v1/users?q=Ada+Lovelace&page=2", seenUrl)
         assertEquals("Bearer ABC", seenHeaders?.get("Authorization"))
         assertEquals("{\"x\":1}", seenBody)
+        assertEquals(1234, seenTimeout)
+        assertEquals(3, seenRetryCount)
+        assertEquals(99, seenRetryDelay)
     }
 
     @Test
@@ -224,7 +274,7 @@ class ZeroUiHttpTest {
         // must propagate the client's Cancelable verbatim.
         var cancelled = false
         val sentinelCancelable = Cancelable { cancelled = true }
-        val client = HttpClient { _, _, _, _, _ ->
+        val client = HttpClient { _, _ ->
             // Don't fire onResponse — simulate an in-flight request the host wants to cancel.
             sentinelCancelable
         }
@@ -247,7 +297,7 @@ class ZeroUiHttpTest {
         val effect = successEffect()
         val state = State()
         val responseBody = Value.List(items = listOf(Value.Number(1), Value.Number(2)))
-        val client = HttpClient { _, _, _, _, onResponse ->
+        val client = HttpClient { _, onResponse ->
             onResponse(HttpResponse(204, responseBody))
             Cancelable.Noop
         }
@@ -258,5 +308,168 @@ class ZeroUiHttpTest {
         }
         // 204 is in 200..299 so we should route success and pass the body verbatim.
         assertTrue(sawListInCallback)
+    }
+
+    @Test
+    fun dispatchFullResponseExposesStatusHeadersAndBodyOnSuccess() {
+        val effect = successEffect().copy(
+            responseMode = com.zero.zero_tools.zeroui.effect.HttpResponseMode.Full
+        )
+        val body = Value.Record(mapOf("name" to Value.Text("Ada")))
+        val client = HttpClient { _, onResponse ->
+            onResponse(
+                HttpResponse(
+                    statusCode = 201,
+                    body = body,
+                    headers = mapOf("ETag" to "abc")
+                )
+            )
+            Cancelable.Noop
+        }
+
+        var event: Value? = null
+        dispatchHttp(State(), effect, null, client) { _, eventValue ->
+            event = eventValue
+        }
+
+        val record = event as Value.Record
+        assertEquals(Value.Bool(true), record.fields["ok"])
+        assertEquals(Value.Number(201), record.fields["statusCode"])
+        assertEquals(body, record.fields["body"])
+        assertEquals(Value.Text("abc"), (record.fields["headers"] as Value.Record).fields["ETag"])
+    }
+
+    @Test
+    fun dispatchStateKeyAndMapProduceStandardFollowUps() {
+        val effect = successEffect().copy(
+            stateKey = "usersRequest",
+            map = listOf(
+                com.zero.zero_tools.zeroui.effect.HttpResponseMapping(
+                    "users",
+                    "body.items",
+                    com.zero.zero_tools.zeroui.effect.HttpMapMode.Append
+                )
+            ),
+            onFinally = Interaction(
+                actions = listOf(Action.SetState("finished", ValueSource.Literal(Value.Bool(true))))
+            )
+        )
+        val body = Value.Record(
+            mapOf("items" to Value.List(listOf(Value.Text("a"), Value.Text("b"))))
+        )
+        val client = HttpClient { _, onResponse ->
+            onResponse(HttpResponse(200, body, headers = mapOf("X-Trace" to "1")))
+            Cancelable.Noop
+        }
+
+        val followUps = mutableListOf<Pair<Interaction, Value?>>()
+        dispatchHttp(State(), effect, null, client) { interaction, eventValue ->
+            followUps += interaction to eventValue
+        }
+
+        val allActions = followUps.flatMap { it.first.actions }
+        assertTrue(allActions.contains(Action.SetState("usersRequest.loading", ValueSource.Literal(Value.Bool(true)))))
+        assertTrue(allActions.contains(Action.SetState("usersRequest.data", ValueSource.Literal(body))))
+        assertTrue(allActions.contains(Action.AppendState("users", ValueSource.Literal(body.fields["items"]!!))))
+        assertTrue(allActions.contains(Action.SetState("finished", ValueSource.Literal(Value.Bool(true)))))
+    }
+
+    @Test
+    fun mappedEmptyListDrivesStandardEmptyState() {
+        val effect = successEffect().copy(
+            stateKey = "usersRequest",
+            map = listOf(com.zero.zero_tools.zeroui.effect.HttpResponseMapping("users", "body.items"))
+        )
+        val body = Value.Record(mapOf("items" to Value.List(emptyList())))
+        val client = HttpClient { _, onResponse ->
+            onResponse(HttpResponse(200, body))
+            Cancelable.Noop
+        }
+
+        val followUps = mutableListOf<Interaction>()
+        dispatchHttp(State(), effect, null, client) { interaction, _ ->
+            followUps += interaction
+        }
+
+        val allActions = followUps.flatMap { it.actions }
+        assertTrue(allActions.contains(Action.SetState("usersRequest.empty", ValueSource.Literal(Value.Bool(true)))))
+    }
+
+    @Test
+    fun cacheFirstReusesSuccessfulResponseForSameMaterializedRequest() {
+        val effect = successEffect().copy(
+            url = ValueSource.Literal(Value.Text("https://x.test/cache")),
+            cachePolicy = com.zero.zero_tools.zeroui.effect.HttpCachePolicy.CacheFirst
+        )
+        var networkCalls = 0
+        val client = HttpClient { _, onResponse ->
+            networkCalls++
+            onResponse(HttpResponse(200, Value.Text("cached")))
+            Cancelable.Noop
+        }
+        val cache = HttpResponseCache()
+
+        dispatchHttp(State(), effect, null, client, cache = cache) { _, _ -> }
+        dispatchHttp(State(), effect, null, client, cache = cache) { _, _ -> }
+
+        assertEquals(1, networkCalls)
+    }
+
+    @Test
+    fun separateCachesDoNotShareCachedResponses() {
+        val effect = successEffect().copy(
+            url = ValueSource.Literal(Value.Text("https://x.test/scoped-cache")),
+            cachePolicy = com.zero.zero_tools.zeroui.effect.HttpCachePolicy.CacheFirst
+        )
+        var networkCalls = 0
+        val client = HttpClient { _, onResponse ->
+            networkCalls++
+            onResponse(HttpResponse(200, Value.Text("cached")))
+            Cancelable.Noop
+        }
+
+        dispatchHttp(State(), effect, null, client, cache = HttpResponseCache()) { _, _ -> }
+        dispatchHttp(State(), effect, null, client, cache = HttpResponseCache()) { _, _ -> }
+
+        assertEquals(2, networkCalls)
+    }
+
+    @Test
+    fun staleResponseGuardDropsFollowUps() {
+        val client = HttpClient { _, onResponse ->
+            onResponse(HttpResponse(200, Value.Text("late")))
+            Cancelable.Noop
+        }
+        var followUpCount = 0
+
+        dispatchHttp(
+            state = State(),
+            effect = successEffect(),
+            eventValue = null,
+            client = client,
+            shouldAcceptResponse = { false }
+        ) { _, _ ->
+            followUpCount++
+        }
+
+        assertEquals(0, followUpCount)
+    }
+
+    @Test
+    fun queryBuilderPreservesExistingEncodedQueryAndFragment() {
+        val effect = successEffect().copy(
+            url = ValueSource.Literal(Value.Text("https://x.test/search?already=a%20b#frag")),
+            params = mapOf("q" to ValueSource.Literal(Value.Text("c d")))
+        )
+        var seenUrl: String? = null
+        val client = HttpClient { request, onResponse ->
+            seenUrl = request.url
+            onResponse(HttpResponse(200, Value.Text("")))
+            Cancelable.Noop
+        }
+
+        dispatchHttp(State(), effect, null, client) { _, _ -> }
+
+        assertEquals("https://x.test/search?already=a%20b&q=c+d#frag", seenUrl)
     }
 }

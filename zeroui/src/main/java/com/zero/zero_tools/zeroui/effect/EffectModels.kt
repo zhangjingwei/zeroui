@@ -51,11 +51,44 @@ public sealed interface Effect {
     public data class Http(
         val method: String,
         val url: ValueSource,
+        val params: Map<String, ValueSource> = emptyMap(),
         val headers: Map<String, ValueSource> = emptyMap(),
         val body: ValueSource? = null,
+        val timeoutMs: Int? = null,
+        val retryCount: Int = 0,
+        val retryDelayMs: Int = 250,
+        val cachePolicy: HttpCachePolicy = HttpCachePolicy.NetworkOnly,
+        val requestKey: String? = null,
+        val cancelPrevious: Boolean = false,
+        val stateKey: String? = null,
+        val responseMode: HttpResponseMode = HttpResponseMode.Body,
+        val map: List<HttpResponseMapping> = emptyList(),
+        val onStart: Interaction = Interaction(),
         val onSuccess: Interaction = Interaction(),
-        val onError: Interaction = Interaction()
+        val onError: Interaction = Interaction(),
+        val onFinally: Interaction = Interaction()
     ) : Effect
+}
+
+public enum class HttpResponseMode {
+    Body,
+    Full
+}
+
+public data class HttpResponseMapping(
+    val key: String,
+    val path: String = "body",
+    val mode: HttpMapMode = HttpMapMode.Replace
+)
+
+public enum class HttpMapMode {
+    Replace,
+    Append
+}
+
+public enum class HttpCachePolicy {
+    NetworkOnly,
+    CacheFirst
 }
 
 public enum class NavigationTargetKind {

@@ -23,7 +23,7 @@ Then add the `zeroui` Android library dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.github.zhangjingwei:zeroui:v0.1.2")
+    implementation("com.github.zhangjingwei:zeroui:v0.1.4")
 }
 ```
 
@@ -147,7 +147,7 @@ The `zeroui` module publishes a release AAR with sources through JitPack:
 ```text
 groupId: com.github.zhangjingwei
 artifactId: zeroui
-version: v0.1.2
+version: v0.1.4
 ```
 
 Validate the publication locally before creating a release:
@@ -158,13 +158,13 @@ Validate the publication locally before creating a release:
 
 Then create a GitHub release:
 
-- Tag: `v0.1.2`
+- Tag: `v0.1.4`
 - Target: `main`
-- Release title: `v0.1.2`
-- Release notes: `ZeroUI 0.1.2 enhances schemaVersion 1 layout, list, interaction, icon, navigation, and skin capabilities.`
+- Release title: `v0.1.4`
+- Release notes: `ZeroUI 0.1.4 enhances HTTP request state, cancellation, caching, retry, and response mapping capabilities.`
 - Leave `Set as a pre-release` unchecked
 
-After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.2) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
+After publishing, open [JitPack](https://jitpack.io/#zhangjingwei/zeroui/v0.1.4) and click `Get it` to trigger the build. Once it succeeds, consumers can use the Gradle dependency above.
 
 ## Protocol Quick Reference
 
@@ -234,10 +234,12 @@ Nodes:
 | `forEach`, `lazyColumn`, `lazyRow`, `dialog` | Experimental in `0.1.x`; keep behind server-side capability gates |
 
 Actions:
-`setState`, `incrementState`, `toggleState`, `batch`.
+`setState`, `appendState`, `incrementState`, `toggleState`, `clearState`, `resetState`, `validate`, `batch`.
 
 Effects:
 `toast`, `log`, `track`, `navigate`, `back`, `http`.
+
+`http` supports `params` query building, `timeoutMs`, `retryCount` / `retryDelayMs`, `requestKey` + `cancelPrevious`, `cachePolicy: "networkOnly" | "cacheFirst"`, standard request state via `stateKey`, `responseMode: "body" | "full"`, response `map`, and `onStart` / `onSuccess` / `onError` / `onFinally` lifecycle hooks. `map` array entries can use `mode: "replace" | "append"` for refresh or load-more pagination flows.
 
 Text styles:
 `display`, `title`, `sectionTitle`, `body`, `label`, `support`. Unknown `style` values fall back to `body` so one typo does not fail page parsing.

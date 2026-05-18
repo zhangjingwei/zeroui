@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import com.zero.zero_tools.zeroui.http.Cancelable
 import com.zero.zero_tools.zeroui.http.HttpClient
+import com.zero.zero_tools.zeroui.http.HttpResponseCache
 import com.zero.zero_tools.zeroui.http.dispatchHttp
 import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.navigation.Navigator
@@ -24,8 +25,11 @@ public fun executeEffects(
     navigator: Navigator = Navigator.Noop,
     tracker: Tracker = Tracker.Noop,
     httpClient: HttpClient = HttpClient.Noop,
+    httpCache: HttpResponseCache? = null,
     onFollowUp: (Interaction, Value?) -> Unit = { _, _ -> },
-    onCancelable: (Cancelable) -> Unit = {}
+    onHttpStart: (Effect.Http) -> Long = { 0L },
+    shouldAcceptHttpResponse: (Effect.Http, Long) -> Boolean = { _, _ -> true },
+    onCancelable: (Cancelable, Effect.Http, Long) -> Unit = { _, _, _ -> }
 ) {
     effects.forEach { effect ->
         when (effect) {
@@ -55,14 +59,21 @@ public fun executeEffects(
             )
 
             is Effect.Http -> {
+                val requestGeneration = onHttpStart(effect)
                 val cancelable = dispatchHttp(
                     state = state,
                     effect = effect,
                     eventValue = eventValue,
                     client = httpClient,
+                    cache = httpCache,
+                    shouldAcceptResponse = {
+                        shouldAcceptHttpResponse(effect, requestGeneration)
+                    },
                     onFollowUp = onFollowUp
                 )
-                onCancelable(cancelable)
+                if (cancelable !== Cancelable.Noop) {
+                    onCancelable(cancelable, effect, requestGeneration)
+                }
             }
         }
     }

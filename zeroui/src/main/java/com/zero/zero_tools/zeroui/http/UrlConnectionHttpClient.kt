@@ -5,6 +5,7 @@ import com.zero.zero_tools.zeroui.value.parseRawValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,18 +41,25 @@ public class UrlConnectionHttpClient(
 ) : HttpClient {
 
     override fun request(
-        method: String,
-        url: String,
-        headers: Map<String, String>,
-        body: String?,
+        request: HttpRequest,
         onResponse: (HttpResponse) -> Unit
     ): Cancelable {
         val connectionRef = AtomicReference<HttpURLConnection?>(null)
 
         val job = scope.launch {
-            val response = withContext(Dispatchers.IO) {
-                runRequest(method, url, headers, body, connectionRef)
-            }
+            var response: HttpResponse
+            var attempt = 0
+            var shouldRetry: Boolean
+            do {
+                response = withContext(Dispatchers.IO) {
+                    runRequest(request, connectionRef)
+                }
+                shouldRetry = response.shouldRetry && attempt < request.retryCount && isActive
+                if (shouldRetry && request.retryDelayMs > 0) {
+                    delay(request.retryDelayMs.toLong())
+                }
+                attempt++
+            } while (shouldRetry)
             if (!isActive) return@launch
             withContext(Dispatchers.Main) {
                 if (isActive) {
@@ -64,12 +72,10 @@ public class UrlConnectionHttpClient(
     }
 
     private fun runRequest(
-        method: String,
-        url: String,
-        headers: Map<String, String>,
-        body: String?,
+        request: HttpRequest,
         connectionRef: AtomicReference<HttpURLConnection?>
     ): HttpResponse {
+        val url = request.url
         val parsed = runCatching { URL(url) }.getOrNull()
         if (parsed == null) {
             return transportError("Malformed URL: $url")
@@ -81,13 +87,13 @@ public class UrlConnectionHttpClient(
         var connection: HttpURLConnection? = null
         return try {
             connection = openConnection(url).apply {
-                requestMethod = method
-                connectTimeout = connectTimeoutMs
-                readTimeout = readTimeoutMs
+                requestMethod = request.method
+                connectTimeout = request.timeoutMs ?: connectTimeoutMs
+                readTimeout = request.timeoutMs ?: readTimeoutMs
                 useCaches = false
                 doInput = true
-                headers.forEach { (name, value) -> setRequestProperty(name, value) }
-                if (body != null) {
+                request.headers.forEach { (name, value) -> setRequestProperty(name, value) }
+                if (request.body != null) {
                     doOutput = true
                     if (getRequestProperty("Content-Type") == null) {
                         setRequestProperty("Content-Type", "application/json; charset=utf-8")
@@ -95,8 +101,8 @@ public class UrlConnectionHttpClient(
                 }
             }
             connectionRef.set(connection)
-            if (body != null) {
-                connection.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+            if (request.body != null) {
+                connection.outputStream.use { it.write(request.body.toByteArray(Charsets.UTF_8)) }
             }
 
             val statusCode = connection.responseCode
@@ -104,7 +110,8 @@ public class UrlConnectionHttpClient(
             val rawBody = stream?.use { it.toText() }.orEmpty()
             HttpResponse(
                 statusCode = statusCode,
-                body = rawBody.parseJsonValueOrText()
+                body = rawBody.parseJsonValueOrText(),
+                headers = connection.headerFields.toFlatHeaders()
             )
         } catch (t: Throwable) {
             HttpResponse(
@@ -129,6 +136,15 @@ public class UrlConnectionHttpClient(
             errorMessage = message
         )
     }
+}
+
+private val HttpResponse.shouldRetry: Boolean
+    get() = errorMessage != null || statusCode == 408 || statusCode == 429 || statusCode >= 500
+
+private fun Map<String?, List<String>>.toFlatHeaders(): Map<String, String> {
+    return entries.mapNotNull { (name, values) ->
+        if (name == null) null else name to values.joinToString(",")
+    }.toMap()
 }
 
 internal fun buildHttpCancelable(

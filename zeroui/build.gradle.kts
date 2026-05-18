@@ -16,9 +16,9 @@ val publicationGroup = if (isJitPackBuild) {
     "com.zero.zero-tools"
 }
 val publicationVersion = if (isJitPackBuild) {
-    providers.environmentVariable("VERSION").orNull ?: "0.1.3"
+    providers.environmentVariable("VERSION").orNull ?: "0.1.4"
 } else {
-    "0.1.3"
+    "0.1.4"
 }
 
 group = publicationGroup

@@ -134,6 +134,42 @@ class PageEntryRegistryTest {
         assertEquals(0, r.size())
     }
 
+    @Test
+    fun keyedRegisterDoesNotLeaveStaleKeyWhenCancelableAlreadyRetired() {
+        val r = PageEntryRegistry()
+        val cancelable = ManuallyRetirableCancelable()
+        cancelable.retire()
+
+        r.register(1, r.nextId(), "search", cancelable)
+        r.cancel(1, "search")
+
+        assertEquals(0, r.size())
+    }
+
+    @Test
+    fun beginRequestCancelsPreviousKeyAndInvalidatesOldGeneration() {
+        val r = PageEntryRegistry()
+        val first = CountingCancelable()
+        val firstGeneration = r.beginRequest(1, "search", cancelPrevious = true)
+        r.register(1, r.nextId(), "search", first)
+
+        val secondGeneration = r.beginRequest(1, "search", cancelPrevious = true)
+
+        assertTrue(first.cancelled)
+        assertFalse(r.isCurrent(1, "search", firstGeneration))
+        assertTrue(r.isCurrent(1, "search", secondGeneration))
+    }
+
+    @Test
+    fun cancelAllClearsGenerationEvenWhenNoCancelableListExists() {
+        val r = PageEntryRegistry()
+        val generation = r.beginRequest(1, "search", cancelPrevious = true)
+
+        r.cancelAll(1)
+
+        assertFalse(r.isCurrent(1, "search", generation))
+    }
+
     private class ManuallyRetirableCancelable : RetirableCancelable {
         private val callbacks = mutableListOf<() -> Unit>()
         private var retired = false

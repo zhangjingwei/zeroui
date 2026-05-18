@@ -31,16 +31,49 @@ import com.zero.zero_tools.zeroui.value.Value
  */
 public fun interface HttpClient {
     public fun request(
-        method: String,
-        url: String,
-        headers: Map<String, String>,
-        body: String?,
+        request: HttpRequest,
         onResponse: (HttpResponse) -> Unit
     ): Cancelable
 
     public companion object {
         /** Drops every request without ever invoking the callback. Useful in tests/previews. */
-        public val Noop: HttpClient = HttpClient { _, _, _, _, _ -> Cancelable.Noop }
+        public val Noop: HttpClient = HttpClient { _, _ -> Cancelable.Noop }
+    }
+}
+
+public data class HttpRequest(
+    val method: String,
+    val url: String,
+    val headers: Map<String, String> = emptyMap(),
+    val body: String? = null,
+    val timeoutMs: Int? = null,
+    val retryCount: Int = 0,
+    val retryDelayMs: Int = 250
+)
+
+public class HttpResponseCache(
+    private val maxEntries: Int = 64
+) {
+    private val entries = object : LinkedHashMap<String, HttpResponse>(maxEntries, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, HttpResponse>?): Boolean {
+            return size > maxEntries
+        }
+    }
+
+    public operator fun get(key: String): HttpResponse? = synchronized(entries) {
+        entries[key]
+    }
+
+    public operator fun set(key: String, response: HttpResponse) {
+        synchronized(entries) {
+            entries[key] = response
+        }
+    }
+
+    public fun clear() {
+        synchronized(entries) {
+            entries.clear()
+        }
     }
 }
 
@@ -56,6 +89,7 @@ public fun interface HttpClient {
 public data class HttpResponse(
     val statusCode: Int,
     val body: Value,
+    val headers: Map<String, String> = emptyMap(),
     val errorMessage: String? = null
 ) {
     val isSuccess: Boolean get() = statusCode in 200..299 && errorMessage == null

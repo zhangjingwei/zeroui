@@ -9,6 +9,11 @@ public sealed interface Action {
         val value: ValueSource
     ) : Action
 
+    public data class AppendState(
+        val key: String,
+        val value: ValueSource
+    ) : Action
+
     public data class IncrementState(
         val key: String,
         val step: Int = 1

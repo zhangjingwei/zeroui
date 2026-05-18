@@ -10,6 +10,7 @@ import com.zero.zero_tools.zeroui.state.getBoolean
 import com.zero.zero_tools.zeroui.state.getNumber
 import com.zero.zero_tools.zeroui.state.getOwner
 import com.zero.zero_tools.zeroui.state.getText
+import com.zero.zero_tools.zeroui.state.getValue
 import com.zero.zero_tools.zeroui.state.reduceState
 import com.zero.zero_tools.zeroui.value.Value
 import com.zero.zero_tools.zeroui.value.ValueSource
@@ -105,6 +106,27 @@ class ZeroUiParserReducerTest {
             eventValue = Value.Text("Alice")
         )
         assertEquals("hi Alice", reduced.getText("greeting"))
+    }
+
+    @Test
+    fun appendStateAddsItemsToExistingList() {
+        val state = State(
+            values = mapOf(
+                "items" to StateEntry(Value.List(listOf(Value.Text("a"))))
+            )
+        )
+        val reduced = reduceState(
+            state,
+            Action.AppendState(
+                key = "items",
+                value = ValueSource.Literal(Value.List(listOf(Value.Text("b"), Value.Text("c"))))
+            )
+        )
+
+        assertEquals(
+            listOf<Value>(Value.Text("a"), Value.Text("b"), Value.Text("c")),
+            reduced.getValue("items")?.let { (it as Value.List).items }
+        )
     }
 
     @Test

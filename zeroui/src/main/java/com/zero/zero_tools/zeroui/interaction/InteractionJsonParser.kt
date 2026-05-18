@@ -3,6 +3,10 @@ package com.zero.zero_tools.zeroui.interaction
 import com.zero.zero_tools.zeroui.action.Action
 import com.zero.zero_tools.zeroui.condition.parseCondition
 import com.zero.zero_tools.zeroui.effect.Effect
+import com.zero.zero_tools.zeroui.effect.HttpCachePolicy
+import com.zero.zero_tools.zeroui.effect.HttpMapMode
+import com.zero.zero_tools.zeroui.effect.HttpResponseMapping
+import com.zero.zero_tools.zeroui.effect.HttpResponseMode
 import com.zero.zero_tools.zeroui.effect.NavigationTargetKind
 import com.zero.zero_tools.zeroui.value.parseValueSource
 import org.json.JSONArray
@@ -21,6 +25,11 @@ internal fun parseInteraction(json: JSONObject): Interaction {
 private fun parseAction(json: JSONObject): Action {
     return when (val type = json.getString("type")) {
         "setState" -> Action.SetState(
+            key = json.getString("key"),
+            value = parseValueSource(json.getJSONObject("value"))
+        )
+
+        "appendState" -> Action.AppendState(
             key = json.getString("key"),
             value = parseValueSource(json.getJSONObject("value"))
         )
@@ -73,16 +82,61 @@ private fun parseEffect(json: JSONObject): Effect {
         "http" -> Effect.Http(
             method = json.optString("method", "GET"),
             url = parseValueSource(json.getJSONObject("url")),
+            params = json.optJSONObject("params")?.let(::parseValueSourceMap) ?: emptyMap(),
             headers = json.optJSONObject("headers")?.let { headersJson ->
                 headersJson.keys().asSequence().associateWith { key ->
                     parseValueSource(headersJson.getJSONObject(key))
                 }
             } ?: emptyMap(),
             body = json.optJSONObject("body")?.let(::parseValueSource),
+            timeoutMs = json.optIntOrNull("timeoutMs"),
+            retryCount = json.optInt("retryCount", 0),
+            retryDelayMs = json.optInt("retryDelayMs", 250),
+            cachePolicy = when (json.optString("cachePolicy", "networkOnly")) {
+                "cacheFirst" -> HttpCachePolicy.CacheFirst
+                else -> HttpCachePolicy.NetworkOnly
+            },
+            requestKey = json.optString("requestKey").ifBlank { null },
+            cancelPrevious = json.optBoolean("cancelPrevious", false),
+            stateKey = json.optString("stateKey").ifBlank { null },
+            responseMode = when (json.optString("responseMode", "body")) {
+                "full" -> HttpResponseMode.Full
+                else -> HttpResponseMode.Body
+            },
+            map = json.optJSONObject("map")?.let(::parseResponseMap)
+                ?: json.optJSONArray("map")?.let(::parseResponseMap)
+                ?: emptyList(),
+            onStart = json.optJSONObject("onStart")?.let(::parseInteraction) ?: Interaction(),
             onSuccess = json.optJSONObject("onSuccess")?.let(::parseInteraction) ?: Interaction(),
-            onError = json.optJSONObject("onError")?.let(::parseInteraction) ?: Interaction()
+            onError = json.optJSONObject("onError")?.let(::parseInteraction) ?: Interaction(),
+            onFinally = json.optJSONObject("onFinally")?.let(::parseInteraction) ?: Interaction()
         )
         else -> error("Unsupported ZeroUI effect type: $type")
+    }
+}
+
+private fun parseValueSourceMap(json: JSONObject): Map<String, com.zero.zero_tools.zeroui.value.ValueSource> {
+    return json.keys().asSequence().associateWith { key ->
+        parseValueSource(json.getJSONObject(key))
+    }
+}
+
+private fun parseResponseMap(json: JSONObject): List<HttpResponseMapping> {
+    return json.keys().asSequence().map { key ->
+        HttpResponseMapping(key = key, path = json.getString(key))
+    }.toList()
+}
+
+private fun parseResponseMap(json: JSONArray): List<HttpResponseMapping> {
+    return json.mapObjects { item ->
+        HttpResponseMapping(
+            key = item.getString("key"),
+            path = item.optString("path", "body"),
+            mode = when (item.optString("mode", "replace")) {
+                "append" -> HttpMapMode.Append
+                else -> HttpMapMode.Replace
+            }
+        )
     }
 }
 
@@ -125,4 +179,8 @@ private fun JSONObject.readKeys(): List<String> {
         return List(keys.length()) { index -> keys.getString(index) }
     }
     return listOf(getString("key"))
+}
+
+private fun JSONObject.optIntOrNull(name: String): Int? {
+    return if (has(name) && !isNull(name)) optInt(name) else null
 }
