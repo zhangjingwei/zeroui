@@ -20,11 +20,11 @@ public fun Expression.evaluate(state: State, eventValue: Value? = null): Value {
         is Expression.Ref -> state.getValue(key) ?: Value.Text("")
         Expression.EventRef -> eventValue ?: Value.Text("")
         is Expression.Unary -> evalUnary(op, expr.evaluate(state, eventValue))
-        is Expression.Binary -> evalBinary(
-            op,
-            lhs.evaluate(state, eventValue),
-            rhs.evaluate(state, eventValue)
-        )
+        is Expression.Binary -> {
+            val lhsVal = lhs.evaluate(state, eventValue)
+            if (op == BinaryOp.Coalesce && !isEmpty(lhsVal)) lhsVal
+            else evalBinary(op, lhsVal, rhs.evaluate(state, eventValue))
+        }
         is Expression.IfElse -> if (cond.evaluate(state, eventValue).asBoolean()) {
             then.evaluate(state, eventValue)
         } else {

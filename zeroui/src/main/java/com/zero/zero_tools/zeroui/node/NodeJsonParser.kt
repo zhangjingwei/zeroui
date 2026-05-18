@@ -34,7 +34,8 @@ internal fun parseNode(json: JSONObject): Node {
             layout = json.optLayout(),
             children = json.optChildren(),
             itemsKey = json.optStringOrNull("itemsKey"),
-            item = json.optJSONObject("item")?.let(::parseNode)
+            item = json.optJSONObject("item")?.let(::parseNode),
+            emptyChild = json.optJSONObject("emptyChild")?.let(::parseNode)
         )
 
         "lazyRow" -> Node.LazyRow(
@@ -43,7 +44,8 @@ internal fun parseNode(json: JSONObject): Node {
             layout = json.optLayout(),
             children = json.optChildren(),
             itemsKey = json.optStringOrNull("itemsKey"),
-            item = json.optJSONObject("item")?.let(::parseNode)
+            item = json.optJSONObject("item")?.let(::parseNode),
+            emptyChild = json.optJSONObject("emptyChild")?.let(::parseNode)
         )
 
         "text" -> Node.Text(
@@ -79,6 +81,7 @@ internal fun parseNode(json: JSONObject): Node {
             label = json.getString("label"),
             value = json.getJSONObject("value").parseTextBinding(),
             onValueChange = parseInteraction(json.getJSONObject("onValueChange")),
+            enabledKey = json.optStringOrNull("enabledKey"),
             layout = json.optLayout(default = Layout(fillMaxWidth = true))
         )
 
@@ -86,6 +89,7 @@ internal fun parseNode(json: JSONObject): Node {
             text = json.getString("text"),
             checkedKey = json.getString("checkedKey"),
             onCheckedChange = parseInteraction(json.getJSONObject("onCheckedChange")),
+            enabledKey = json.optStringOrNull("enabledKey"),
             layout = json.optLayout()
         )
 
@@ -94,6 +98,7 @@ internal fun parseNode(json: JSONObject): Node {
             onClick = parseInteraction(json.getJSONObject("onClick")),
             variant = json.optButtonVariant(),
             icon = json.optJSONObject("icon")?.parseIconSource(),
+            enabledKey = json.optStringOrNull("enabledKey"),
             layout = json.optLayout()
         )
 
@@ -102,6 +107,7 @@ internal fun parseNode(json: JSONObject): Node {
             options = json.getJSONArray("options").toChipOptions(),
             onSelected = parseInteraction(json.getJSONObject("onSelected")),
             spacing = json.optInt("spacing", 8),
+            enabledKey = json.optStringOrNull("enabledKey"),
             layout = json.optLayout()
         )
 
@@ -140,6 +146,79 @@ internal fun parseNode(json: JSONObject): Node {
             children = json.getChildren()
         )
 
+        "box" -> Node.Box(
+            contentAlignment = json.optBoxAlignment(),
+            layout = json.optLayout(),
+            onClick = json.optJSONObject("onClick")?.let(::parseInteraction),
+            children = json.getChildren()
+        )
+
+        "divider" -> Node.Divider(
+            thickness = json.optInt("thickness", 1),
+            tone = json.optToneOrNull("tone"),
+            layout = json.optLayout(default = Layout(fillMaxWidth = true))
+        )
+
+        "checkbox" -> Node.Checkbox(
+            text = json.getString("text"),
+            checkedKey = json.getString("checkedKey"),
+            onCheckedChange = parseInteraction(json.getJSONObject("onCheckedChange")),
+            enabledKey = json.optStringOrNull("enabledKey"),
+            layout = json.optLayout()
+        )
+
+        "radioGroup" -> Node.RadioGroup(
+            selectedKey = json.getString("selectedKey"),
+            options = json.getJSONArray("options").toRadioOptions(),
+            onSelected = parseInteraction(json.getJSONObject("onSelected")),
+            spacing = json.optInt("spacing", 8),
+            enabledKey = json.optStringOrNull("enabledKey"),
+            layout = json.optLayout()
+        )
+
+        "progress" -> Node.Progress(
+            variant = json.optProgressVariant(),
+            progressKey = json.optStringOrNull("progressKey"),
+            tone = json.optTone(),
+            layout = json.optLayout()
+        )
+
+        "slider" -> Node.Slider(
+            valueKey = json.getString("valueKey"),
+            onValueChange = parseInteraction(json.getJSONObject("onValueChange")),
+            min = json.optFloat("min", 0f),
+            max = json.optFloat("max", 1f),
+            steps = json.optInt("steps", 0),
+            enabledKey = json.optStringOrNull("enabledKey"),
+            layout = json.optLayout(default = Layout(fillMaxWidth = true))
+        )
+
+        "select" -> Node.Select(
+            selectedKey = json.getString("selectedKey"),
+            options = json.getJSONArray("options").toSelectOptions(),
+            onSelected = parseInteraction(json.getJSONObject("onSelected")),
+            label = json.optStringOrNull("label"),
+            enabledKey = json.optStringOrNull("enabledKey"),
+            layout = json.optLayout(default = Layout(fillMaxWidth = true))
+        )
+
+        "snackbar" -> Node.Snackbar(
+            visibleKey = json.getString("visibleKey"),
+            message = parseText(json.getJSONObject("message")),
+            actionLabel = json.optStringOrNull("actionLabel"),
+            onAction = json.optJSONObject("onAction")?.let(::parseInteraction),
+            onDismiss = json.optJSONObject("onDismiss")?.let(::parseInteraction) ?: com.zero.zero_tools.zeroui.interaction.Interaction()
+        )
+
+        "bottomSheet" -> Node.BottomSheet(
+            visibleKey = json.getString("visibleKey"),
+            onDismiss = json.optJSONObject("onDismiss")?.let(::parseInteraction) ?: com.zero.zero_tools.zeroui.interaction.Interaction(),
+            title = json.optJSONObject("title")?.let(::parseText),
+            spacing = json.optInt("spacing", 8),
+            padding = json.optInt("padding", 20),
+            children = json.getChildren()
+        )
+
         else -> Node.Unknown(
             typeName = type,
             raw = json.toString()
@@ -166,6 +245,24 @@ private fun JSONArray.toChipOptions(): List<ChipOption> {
             label = json.getString("label"),
             value = json.getString("value"),
             icon = json.optJSONObject("icon")?.parseIconSource()
+        )
+    }
+}
+
+private fun JSONArray.toRadioOptions(): List<RadioOption> {
+    return mapObjects { json ->
+        RadioOption(
+            label = json.getString("label"),
+            value = json.getString("value")
+        )
+    }
+}
+
+private fun JSONArray.toSelectOptions(): List<SelectOption> {
+    return mapObjects { json ->
+        SelectOption(
+            label = json.getString("label"),
+            value = json.getString("value")
         )
     }
 }
@@ -231,7 +328,8 @@ private fun JSONObject.optLayout(default: Layout = Layout()): Layout {
         minWidth = json.optInt("minWidth", default.minWidth),
         minHeight = json.optInt("minHeight", default.minHeight),
         maxWidth = json.optInt("maxWidth", default.maxWidth),
-        maxHeight = json.optInt("maxHeight", default.maxHeight)
+        maxHeight = json.optInt("maxHeight", default.maxHeight),
+        background = json.optToneOrNull("background")
     )
 }
 
@@ -298,6 +396,29 @@ private fun JSONObject.optRowArrangement(name: String): RowArrangement? {
 
 private fun JSONObject.optButtonVariant(): ButtonVariant {
     return optString("variant", "primary").toButtonVariant()
+}
+
+private fun JSONObject.optProgressVariant(): ProgressVariant {
+    return when (val value = optString("variant", "linear")) {
+        "linear" -> ProgressVariant.Linear
+        "circular" -> ProgressVariant.Circular
+        else -> error("Unsupported ZeroUI progress variant: $value")
+    }
+}
+
+private fun JSONObject.optBoxAlignment(): BoxAlignment {
+    return when (val value = optString("contentAlignment", "topStart")) {
+        "topStart" -> BoxAlignment.TopStart
+        "topCenter" -> BoxAlignment.TopCenter
+        "topEnd" -> BoxAlignment.TopEnd
+        "centerStart" -> BoxAlignment.CenterStart
+        "center" -> BoxAlignment.Center
+        "centerEnd" -> BoxAlignment.CenterEnd
+        "bottomStart" -> BoxAlignment.BottomStart
+        "bottomCenter" -> BoxAlignment.BottomCenter
+        "bottomEnd" -> BoxAlignment.BottomEnd
+        else -> error("Unsupported ZeroUI box contentAlignment: $value")
+    }
 }
 
 private fun String.toButtonVariant(): ButtonVariant {

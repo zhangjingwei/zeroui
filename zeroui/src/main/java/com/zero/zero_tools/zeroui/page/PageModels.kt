@@ -3,6 +3,7 @@ package com.zero.zero_tools.zeroui.page
 import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.node.Node
 import com.zero.zero_tools.zeroui.state.State
+import com.zero.zero_tools.zeroui.text.Tone
 
 public data class Page(
     /**
@@ -46,5 +47,6 @@ public data class Layout(
     val minWidth: Int = 0,
     val minHeight: Int = 0,
     val maxWidth: Int = 0,
-    val maxHeight: Int = 0
+    val maxHeight: Int = 0,
+    val background: Tone? = null
 )

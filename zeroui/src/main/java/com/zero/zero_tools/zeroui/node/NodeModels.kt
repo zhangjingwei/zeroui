@@ -28,7 +28,8 @@ public sealed interface Node {
         val layout: Layout = Layout(),
         val children: List<Node> = emptyList(),
         val itemsKey: String? = null,
-        val item: Node? = null
+        val item: Node? = null,
+        val emptyChild: Node? = null
     ) : Node
 
     public data class LazyRow(
@@ -37,7 +38,8 @@ public sealed interface Node {
         val layout: Layout = Layout(),
         val children: List<Node> = emptyList(),
         val itemsKey: String? = null,
-        val item: Node? = null
+        val item: Node? = null,
+        val emptyChild: Node? = null
     ) : Node
 
     public data class Text(
@@ -73,6 +75,7 @@ public sealed interface Node {
         val label: String,
         val value: Text.Binding,
         val onValueChange: Interaction,
+        val enabledKey: String? = null,
         val layout: Layout = Layout(fillMaxWidth = true)
     ) : Node
 
@@ -80,6 +83,7 @@ public sealed interface Node {
         val text: String,
         val checkedKey: String,
         val onCheckedChange: Interaction,
+        val enabledKey: String? = null,
         val layout: Layout = Layout()
     ) : Node
 
@@ -88,6 +92,7 @@ public sealed interface Node {
         val onClick: Interaction,
         val variant: ButtonVariant = ButtonVariant.Primary,
         val icon: IconSource? = null,
+        val enabledKey: String? = null,
         val layout: Layout = Layout()
     ) : Node
 
@@ -96,6 +101,7 @@ public sealed interface Node {
         val options: List<ChipOption>,
         val onSelected: Interaction,
         val spacing: Int = 8,
+        val enabledKey: String? = null,
         val layout: Layout = Layout()
     ) : Node
 
@@ -126,6 +132,79 @@ public sealed interface Node {
     ) : Node
 
     public data class Dialog(
+        val visibleKey: String,
+        val onDismiss: Interaction = Interaction(),
+        val title: com.zero.zero_tools.zeroui.text.Text? = null,
+        val spacing: Int = 8,
+        val padding: Int = 20,
+        val children: List<Node>
+    ) : Node
+
+    public data class Box(
+        val contentAlignment: BoxAlignment = BoxAlignment.TopStart,
+        val layout: Layout = Layout(),
+        val onClick: Interaction? = null,
+        val children: List<Node>
+    ) : Node
+
+    public data class Divider(
+        val thickness: Int = 1,
+        val tone: Tone? = null,
+        val layout: Layout = Layout(fillMaxWidth = true)
+    ) : Node
+
+    public data class Checkbox(
+        val text: String,
+        val checkedKey: String,
+        val onCheckedChange: Interaction,
+        val enabledKey: String? = null,
+        val layout: Layout = Layout()
+    ) : Node
+
+    public data class RadioGroup(
+        val selectedKey: String,
+        val options: List<RadioOption>,
+        val onSelected: Interaction,
+        val spacing: Int = 8,
+        val enabledKey: String? = null,
+        val layout: Layout = Layout()
+    ) : Node
+
+    public data class Progress(
+        val variant: ProgressVariant = ProgressVariant.Linear,
+        val progressKey: String? = null,
+        val tone: Tone = Tone.Primary,
+        val layout: Layout = Layout()
+    ) : Node
+
+    public data class Slider(
+        val valueKey: String,
+        val onValueChange: Interaction,
+        val min: Float = 0f,
+        val max: Float = 1f,
+        val steps: Int = 0,
+        val enabledKey: String? = null,
+        val layout: Layout = Layout(fillMaxWidth = true)
+    ) : Node
+
+    public data class Select(
+        val selectedKey: String,
+        val options: List<SelectOption>,
+        val onSelected: Interaction,
+        val label: String? = null,
+        val enabledKey: String? = null,
+        val layout: Layout = Layout(fillMaxWidth = true)
+    ) : Node
+
+    public data class Snackbar(
+        val visibleKey: String,
+        val message: com.zero.zero_tools.zeroui.text.Text,
+        val actionLabel: String? = null,
+        val onAction: Interaction? = null,
+        val onDismiss: Interaction = Interaction()
+    ) : Node
+
+    public data class BottomSheet(
         val visibleKey: String,
         val onDismiss: Interaction = Interaction(),
         val title: com.zero.zero_tools.zeroui.text.Text? = null,
@@ -193,4 +272,25 @@ public data class ChipOption(
     val label: String,
     val value: String,
     val icon: IconSource? = null
+)
+
+public enum class BoxAlignment {
+    TopStart, TopCenter, TopEnd,
+    CenterStart, Center, CenterEnd,
+    BottomStart, BottomCenter, BottomEnd
+}
+
+public enum class ProgressVariant {
+    Linear,
+    Circular
+}
+
+public data class RadioOption(
+    val label: String,
+    val value: String
+)
+
+public data class SelectOption(
+    val label: String,
+    val value: String
 )

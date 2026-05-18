@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "initialState": {
     "loading": { "owner": "client", "value": false },
+    "canRequest": { "owner": "client", "value": true },
     "response": { "owner": "server", "value": "" },
     "lastError": { "owner": "client", "value": "" },
     "requestUrl": { "owner": "client", "value": "https://httpbin.org/get" }
@@ -28,7 +29,10 @@
         "type": "textField",
         "label": "Request URL",
         "value": { "type": "binding", "key": "requestUrl", "fallback": "https://httpbin.org/get" },
+        "enabledKey": "canRequest",
         "onValueChange": {
+          "id": "request-url-input",
+          "debounceMillis": 250,
           "actions": [
             {
               "type": "setState",
@@ -43,13 +47,21 @@
         "type": "button",
         "text": "Send GET request",
         "variant": "primary",
+        "enabledKey": "canRequest",
         "layout": { "fillMaxWidth": true },
         "onClick": {
+          "id": "send-get-request",
+          "throttleMillis": 1000,
           "actions": [
             {
               "type": "setState",
               "key": "loading",
               "value": { "type": "literal", "value": true }
+            },
+            {
+              "type": "setState",
+              "key": "canRequest",
+              "value": { "type": "literal", "value": false }
             },
             {
               "type": "setState",
@@ -76,6 +88,11 @@
                     "type": "setState",
                     "key": "loading",
                     "value": { "type": "literal", "value": false }
+                  },
+                  {
+                    "type": "setState",
+                    "key": "canRequest",
+                    "value": { "type": "literal", "value": true }
                   }
                 ],
                 "effects": [
@@ -96,6 +113,11 @@
                     "type": "setState",
                     "key": "loading",
                     "value": { "type": "literal", "value": false }
+                  },
+                  {
+                    "type": "setState",
+                    "key": "canRequest",
+                    "value": { "type": "literal", "value": true }
                   }
                 ],
                 "effects": [

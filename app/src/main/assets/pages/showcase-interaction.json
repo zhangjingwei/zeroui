@@ -5,7 +5,16 @@
     "showAdvanced": { "owner": "client", "value": true },
     "showDialog": { "owner": "client", "value": false },
     "selectedMode": { "owner": "client", "value": "state" },
-    "lastAction": { "owner": "client", "value": "" }
+    "lastAction": { "owner": "client", "value": "" },
+    "form": {
+      "owner": "client",
+      "value": {
+        "name": "",
+        "error": ""
+      }
+    },
+    "canSubmit": { "owner": "client", "value": true },
+    "submitCount": { "owner": "client", "value": 0 }
   },
   "root": {
     "type": "column",
@@ -179,6 +188,160 @@
                   "message": { "type": "template", "value": "Batch action complete {event}" }
                 }
               ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Form primitives" }
+          },
+          {
+            "type": "textField",
+            "label": "Name",
+            "value": {
+              "type": "binding",
+              "key": "form.name",
+              "fallback": ""
+            },
+            "enabledKey": "canSubmit",
+            "onValueChange": {
+              "id": "form-name-change",
+              "debounceMillis": 250,
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "form.name",
+                  "value": { "type": "event" }
+                },
+                {
+                  "type": "validate",
+                  "condition": { "type": "notBlank", "key": "form.name" },
+                  "errorKey": "form.error",
+                  "message": { "type": "literal", "value": "Name is required" }
+                },
+                {
+                  "type": "setState",
+                  "key": "lastAction",
+                  "value": { "type": "literal", "value": "debounced path setState" }
+                }
+              ]
+            },
+            "layout": { "fillMaxWidth": true }
+          },
+          {
+            "type": "condition",
+            "condition": { "type": "notBlank", "key": "form.error" },
+            "child": {
+              "type": "text",
+              "tone": "error",
+              "text": {
+                "type": "binding",
+                "key": "form.error",
+                "fallback": ""
+              }
+            }
+          },
+          {
+            "type": "switch",
+            "text": "Enable submit",
+            "checkedKey": "canSubmit",
+            "onCheckedChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "canSubmit",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "row",
+            "spacing": 10,
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "button",
+                "text": "Submit",
+                "variant": "primary",
+                "enabledKey": "canSubmit",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "id": "form-submit",
+                  "throttleMillis": 1200,
+                  "actions": [
+                    {
+                      "type": "validate",
+                      "condition": { "type": "notBlank", "key": "form.name" },
+                      "errorKey": "form.error",
+                      "message": { "type": "literal", "value": "Name is required" }
+                    },
+                    { "type": "incrementState", "key": "submitCount" },
+                    {
+                      "type": "setState",
+                      "key": "lastAction",
+                      "value": { "type": "literal", "value": "throttled submit" }
+                    }
+                  ],
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Submit interaction fired" }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Clear",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    { "type": "clearState", "key": "form.error" },
+                    {
+                      "type": "setState",
+                      "key": "lastAction",
+                      "value": { "type": "literal", "value": "clearState" }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Reset",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    {
+                      "type": "resetState",
+                      "keys": ["form.name", "form.error", "submitCount"]
+                    },
+                    {
+                      "type": "setState",
+                      "key": "lastAction",
+                      "value": { "type": "literal", "value": "resetState" }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": {
+              "type": "binding",
+              "key": "submitCount",
+              "fallback": "0",
+              "format": "submitCount = {value}"
             }
           }
         ]

@@ -33,6 +33,10 @@
         { "title": "Row weight", "status": "Checked" },
         { "title": "Item scope", "status": "Live" }
       ]
+    },
+    "emptyItems": {
+      "owner": "client",
+      "value": []
     }
   },
   "root": {
@@ -255,6 +259,289 @@
             "type": "text",
             "tone": "muted",
             "text": { "type": "value", "value": "Spacer creates a predictable break before follow-up content." }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Box overlay" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "Box stacks children on the Z-axis. contentAlignment positions them within the container." }
+          },
+          {
+            "type": "box",
+            "contentAlignment": "bottomStart",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "image",
+                "source": {
+                  "type": "url",
+                  "url": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=900&q=80"
+                },
+                "contentScale": "crop",
+                "aspectRatio": 1.8,
+                "cornerRadius": 12
+              },
+              {
+                "type": "column",
+                "spacing": 2,
+                "layout": {
+                  "padding": { "all": 0, "left": 12, "bottom": 12, "right": 12 }
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "sectionTitle",
+                    "tone": "inverse",
+                    "text": { "type": "value", "value": "Box · bottomStart" }
+                  },
+                  {
+                    "type": "text",
+                    "style": "support",
+                    "tone": "inverse",
+                    "text": { "type": "value", "value": "Text overlaid on image" }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 8,
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "box",
+                "contentAlignment": "center",
+                "layout": { "weight": 1, "height": 64 },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "tone": "muted",
+                    "text": { "type": "value", "value": "center" }
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "contentAlignment": "topEnd",
+                "layout": { "weight": 1, "height": 64 },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "tone": "primary",
+                    "text": { "type": "value", "value": "topEnd" }
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "contentAlignment": "bottomStart",
+                "layout": { "weight": 1, "height": 64 },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "tone": "success",
+                    "text": { "type": "value", "value": "bottomStart" }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Container backgrounds" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "layout.background applies a tone-based container color to any node." }
+          },
+          {
+            "type": "column",
+            "spacing": 8,
+            "layout": {
+              "fillMaxWidth": true,
+              "padding": 12,
+              "background": "primary"
+            },
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "tone": "inverse",
+                "text": { "type": "value", "value": "background: primary" }
+              }
+            ]
+          },
+          {
+            "type": "column",
+            "spacing": 8,
+            "layout": {
+              "fillMaxWidth": true,
+              "padding": 12,
+              "background": "success"
+            },
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "tone": "success",
+                "text": { "type": "value", "value": "background: success" }
+              }
+            ]
+          },
+          {
+            "type": "column",
+            "spacing": 8,
+            "layout": {
+              "fillMaxWidth": true,
+              "padding": 12,
+              "background": "error"
+            },
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "tone": "error",
+                "text": { "type": "value", "value": "background: error" }
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 8,
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "column",
+                "spacing": 4,
+                "layout": {
+                  "weight": 1,
+                  "padding": 8,
+                  "background": "warning"
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "support",
+                    "tone": "warning",
+                    "text": { "type": "value", "value": "warning" }
+                  }
+                ]
+              },
+              {
+                "type": "column",
+                "spacing": 4,
+                "layout": {
+                  "weight": 1,
+                  "padding": 8,
+                  "background": "muted"
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "support",
+                    "tone": "muted",
+                    "text": { "type": "value", "value": "muted" }
+                  }
+                ]
+              },
+              {
+                "type": "column",
+                "spacing": 4,
+                "layout": {
+                  "weight": 1,
+                  "padding": 8,
+                  "background": "inverse"
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "support",
+                    "tone": "inverse",
+                    "text": { "type": "value", "value": "inverse" }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "LazyColumn empty state" }
+          },
+          {
+            "type": "text",
+            "tone": "muted",
+            "text": { "type": "value", "value": "emptyChild renders when itemsKey resolves to an empty list." }
+          },
+          {
+            "type": "lazyColumn",
+            "spacing": 8,
+            "layout": {
+              "fillMaxWidth": true,
+              "maxHeight": 140
+            },
+            "itemsKey": "emptyItems",
+            "item": {
+              "type": "text",
+              "text": { "type": "binding", "key": "item.title", "fallback": "Item" }
+            },
+            "emptyChild": {
+              "type": "column",
+              "horizontalAlignment": "center",
+              "spacing": 8,
+              "layout": {
+                "fillMaxWidth": true,
+                "padding": 24
+              },
+              "children": [
+                {
+                  "type": "icon",
+                  "source": { "type": "resource", "name": "ic_launcher_foreground" },
+                  "tone": "muted",
+                  "size": 36
+                },
+                {
+                  "type": "text",
+                  "style": "label",
+                  "tone": "muted",
+                  "text": { "type": "value", "value": "No items yet" }
+                },
+                {
+                  "type": "text",
+                  "style": "support",
+                  "tone": "muted",
+                  "text": { "type": "value", "value": "emptyItems key holds an empty array" }
+                }
+              ]
+            }
           }
         ]
       },

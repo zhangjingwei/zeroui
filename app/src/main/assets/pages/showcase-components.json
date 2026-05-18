@@ -4,9 +4,47 @@
     "fieldValue": { "owner": "client", "value": "ZeroUI" },
     "toggleValue": { "owner": "client", "value": true },
     "selectedChip": { "owner": "client", "value": "primary" },
+    "canEdit": { "owner": "client", "value": true },
+    "agreed": { "owner": "client", "value": false },
+    "selectedMode": { "owner": "client", "value": "auto" },
+    "progressValue": { "owner": "client", "value": 42 },
+    "selectedOption": { "owner": "client", "value": "alpha" },
+    "showSnack": { "owner": "client", "value": false },
+    "showSheet": { "owner": "client", "value": false },
+    "showConditional": { "owner": "client", "value": true },
+    "showDialog": { "owner": "client", "value": false },
     "imageUrl": {
       "owner": "client",
       "value": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1200&q=80"
+    },
+    "galleryItems": {
+      "owner": "client",
+      "value": [
+        {
+          "title": "LazyColumn item",
+          "url": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=900&q=80"
+        },
+        {
+          "title": "Bound image item",
+          "url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80"
+        }
+      ]
+    },
+    "rowItems": {
+      "owner": "client",
+      "value": [
+        { "title": "LazyRow" },
+        { "title": "Item scope" },
+        { "title": "Card item" }
+      ]
+    },
+    "checkItems": {
+      "owner": "client",
+      "value": [
+        { "title": "Column" },
+        { "title": "Row" },
+        { "title": "ForEach" }
+      ]
     }
   },
   "root": {
@@ -25,54 +63,9 @@
       {
         "type": "text",
         "tone": "muted",
-        "text": { "type": "value", "value": "Core render nodes for visual and interaction smoke checks." }
-      },
-      {
-        "type": "textField",
-        "label": "TextField",
-        "value": { "type": "binding", "key": "fieldValue", "fallback": "" },
-        "onValueChange": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "fieldValue",
-              "value": { "type": "event" }
-            }
-          ]
-        },
-        "layout": { "fillMaxWidth": true }
-      },
-      {
-        "type": "switch",
-        "text": "Switch token sample",
-        "checkedKey": "toggleValue",
-        "onCheckedChange": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "toggleValue",
-              "value": { "type": "event" }
-            }
-          ]
-        }
-      },
-      {
-        "type": "chipGroup",
-        "selectedKey": "selectedChip",
-        "spacing": 8,
-        "options": [
-          { "label": "Default", "value": "default", "icon": { "type": "resource", "name": "ic_launcher_foreground" } },
-          { "label": "Primary", "value": "primary", "icon": { "type": "resource", "name": "ic_launcher_foreground" } },
-          { "label": "Muted", "value": "muted" }
-        ],
-        "onSelected": {
-          "actions": [
-            {
-              "type": "setState",
-              "key": "selectedChip",
-              "value": { "type": "event" }
-            }
-          ]
+        "text": {
+          "type": "value",
+          "value": "All 26 render nodes: Column, Row, Box, LazyColumn, LazyRow, Text, Image, Icon, TextField, Switch, Button, ChipGroup, Card, Spacer, Condition, ForEach, Divider, Checkbox, RadioGroup, Progress, Slider, Select, Snackbar, BottomSheet, Dialog, Unknown."
         }
       },
       {
@@ -82,7 +75,297 @@
           {
             "type": "text",
             "style": "sectionTitle",
-            "text": { "type": "value", "value": "Card, image, and icon" }
+            "text": { "type": "value", "value": "Inputs and actions" }
+          },
+          {
+            "type": "textField",
+            "label": "TextField",
+            "value": { "type": "binding", "key": "fieldValue", "fallback": "" },
+            "onValueChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "fieldValue",
+                  "value": { "type": "event" }
+                }
+              ]
+            },
+            "layout": { "fillMaxWidth": true }
+          },
+          {
+            "type": "switch",
+            "text": "Switch token sample",
+            "checkedKey": "toggleValue",
+            "onCheckedChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "toggleValue",
+                  "value": { "type": "event" }
+                },
+                {
+                  "type": "setState",
+                  "key": "showConditional",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "chipGroup",
+            "selectedKey": "selectedChip",
+            "spacing": 8,
+            "options": [
+              { "label": "Default", "value": "default", "icon": { "type": "resource", "name": "ic_launcher_foreground" } },
+              { "label": "Primary", "value": "primary", "icon": { "type": "resource", "name": "ic_launcher_foreground" } },
+              { "label": "Muted", "value": "muted" }
+            ],
+            "onSelected": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "selectedChip",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "row",
+            "spacing": 12,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "button",
+                "text": "Primary",
+                "variant": "primary",
+                "icon": { "type": "resource", "name": "ic_launcher_foreground" },
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "effects": [
+                    {
+                      "type": "toast",
+                      "message": { "type": "literal", "value": "Primary" }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Dialog",
+                "variant": "secondary",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    {
+                      "type": "setState",
+                      "key": "showDialog",
+                      "value": { "type": "literal", "value": true }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Interaction primitives" }
+          },
+          {
+            "type": "switch",
+            "text": "Enable controls",
+            "checkedKey": "canEdit",
+            "onCheckedChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "canEdit",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "divider",
+            "thickness": 1,
+            "tone": "muted"
+          },
+          {
+            "type": "checkbox",
+            "text": "Checkbox",
+            "checkedKey": "agreed",
+            "enabledKey": "canEdit",
+            "onCheckedChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "agreed",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "radioGroup",
+            "selectedKey": "selectedMode",
+            "enabledKey": "canEdit",
+            "spacing": 0,
+            "options": [
+              { "label": "Auto", "value": "auto" },
+              { "label": "Manual", "value": "manual" }
+            ],
+            "onSelected": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "selectedMode",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "slider",
+            "valueKey": "progressValue",
+            "min": 0,
+            "max": 100,
+            "steps": 4,
+            "enabledKey": "canEdit",
+            "onValueChange": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "progressValue",
+                  "value": { "type": "event" }
+                }
+              ]
+            }
+          },
+          {
+            "type": "progress",
+            "variant": "linear",
+            "progressKey": "progressValue",
+            "tone": "primary",
+            "layout": { "fillMaxWidth": true }
+          },
+          {
+            "type": "row",
+            "spacing": 12,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "progress",
+                "variant": "circular",
+                "progressKey": "progressValue",
+                "tone": "success",
+                "layout": { "width": 40, "height": 40 }
+              },
+              {
+                "type": "select",
+                "label": "Select",
+                "selectedKey": "selectedOption",
+                "enabledKey": "canEdit",
+                "layout": { "weight": 1 },
+                "options": [
+                  { "label": "Alpha", "value": "alpha" },
+                  { "label": "Beta", "value": "beta" },
+                  { "label": "Gamma", "value": "gamma" }
+                ],
+                "onSelected": {
+                  "actions": [
+                    {
+                      "type": "setState",
+                      "key": "selectedOption",
+                      "value": { "type": "event" }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "row",
+            "spacing": 12,
+            "verticalAlignment": "center",
+            "layout": { "fillMaxWidth": true },
+            "children": [
+              {
+                "type": "button",
+                "text": "Snackbar",
+                "variant": "secondary",
+                "enabledKey": "canEdit",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    {
+                      "type": "setState",
+                      "key": "showSnack",
+                      "value": { "type": "literal", "value": true }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "button",
+                "text": "Sheet",
+                "variant": "secondary",
+                "enabledKey": "canEdit",
+                "layout": { "weight": 1 },
+                "onClick": {
+                  "actions": [
+                    {
+                      "type": "setState",
+                      "key": "showSheet",
+                      "value": { "type": "literal", "value": true }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "snackbar",
+            "visibleKey": "showSnack",
+            "message": { "type": "value", "value": "Snackbar" },
+            "actionLabel": "Hide",
+            "onAction": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showSnack",
+                  "value": { "type": "literal", "value": false }
+                }
+              ]
+            },
+            "onDismiss": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showSnack",
+                  "value": { "type": "literal", "value": false }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Media and layout" }
           },
           {
             "type": "image",
@@ -106,7 +389,7 @@
           },
           {
             "type": "row",
-            "spacing": 12,
+            "arrangement": "spaceBetween",
             "verticalAlignment": "center",
             "layout": { "fillMaxWidth": true },
             "children": [
@@ -126,35 +409,236 @@
                 }
               },
               {
-                "type": "button",
-                "text": "Primary",
-                "variant": "primary",
-                "icon": { "type": "resource", "name": "ic_launcher_foreground" },
-                "layout": { "weight": 1 },
-                "onClick": {
-                  "effects": [
-                    {
-                      "type": "toast",
-                      "message": { "type": "literal", "value": "Primary" }
-                    }
-                  ]
-                }
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "muted",
+                "text": { "type": "value", "value": "Row + Icon" }
               },
               {
-                "type": "button",
-                "text": "Secondary",
-                "variant": "secondary",
-                "layout": { "weight": 1 },
-                "onClick": {
-                  "effects": [
-                    {
-                      "type": "toast",
-                      "message": { "type": "literal", "value": "Secondary" }
-                    }
-                  ]
-                }
+                "type": "text",
+                "style": "label",
+                "surfaceTone": "inverse",
+                "text": { "type": "value", "value": "Text" }
               }
             ]
+          },
+          {
+            "type": "spacer",
+            "height": 4
+          },
+          {
+            "type": "condition",
+            "condition": { "type": "truthy", "key": "showConditional" },
+            "child": {
+              "type": "card",
+              "tone": "success",
+              "padding": 12,
+              "spacing": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "style": "label",
+                  "tone": "success",
+                  "text": { "type": "value", "value": "Condition node is visible" }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Lists" }
+          },
+          {
+            "type": "lazyColumn",
+            "spacing": 10,
+            "layout": {
+              "fillMaxWidth": true,
+              "maxHeight": 220
+            },
+            "children": [
+              {
+                "type": "text",
+                "tone": "muted",
+                "text": { "type": "value", "value": "LazyColumn header" }
+              }
+            ],
+            "itemsKey": "galleryItems",
+            "item": {
+              "type": "card",
+              "padding": 12,
+              "spacing": 8,
+              "children": [
+                {
+                  "type": "image",
+                  "source": {
+                    "type": "binding",
+                    "key": "item.url",
+                    "fallback": ""
+                  },
+                  "contentScale": "crop",
+                  "aspectRatio": 2.4,
+                  "cornerRadius": 12
+                },
+                {
+                  "type": "text",
+                  "style": "label",
+                  "text": {
+                    "type": "binding",
+                    "key": "item.title",
+                    "fallback": "Gallery item"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "lazyRow",
+            "spacing": 10,
+            "verticalAlignment": "center",
+            "layout": {
+              "fillMaxWidth": true,
+              "height": 86
+            },
+            "itemsKey": "rowItems",
+            "item": {
+              "type": "card",
+              "padding": 12,
+              "layout": {
+                "width": 132,
+                "height": 72
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "style": "label",
+                  "text": {
+                    "type": "binding",
+                    "key": "item.title",
+                    "fallback": "Item"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "forEach",
+            "itemsKey": "checkItems",
+            "spacing": 8,
+            "child": {
+              "type": "row",
+              "spacing": 10,
+              "verticalAlignment": "center",
+              "layout": { "fillMaxWidth": true },
+              "children": [
+                {
+                  "type": "icon",
+                  "source": { "type": "resource", "name": "ic_launcher_foreground" },
+                  "tone": "primary",
+                  "size": 18
+                },
+                {
+                  "type": "text",
+                  "style": "label",
+                  "layout": { "weight": 1 },
+                  "text": {
+                    "type": "binding",
+                    "key": "item.title",
+                    "fallback": "Node"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "spacing": 12,
+        "children": [
+          {
+            "type": "text",
+            "style": "sectionTitle",
+            "text": { "type": "value", "value": "Dialog and fallback" }
+          },
+          {
+            "type": "futureComponent",
+            "comment": "Unsupported node type intentionally triggers Node.Unknown fallback.",
+            "payload": { "name": "Unknown fallback demo" }
+          }
+        ]
+      },
+      {
+        "type": "dialog",
+        "visibleKey": "showDialog",
+        "title": { "type": "value", "value": "Dialog node" },
+        "onDismiss": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "showDialog",
+              "value": { "type": "literal", "value": false }
+            }
+          ]
+        },
+        "children": [
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "Dialog is part of the current 17 render-node coverage." }
+          },
+          {
+            "type": "button",
+            "text": "Close",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showDialog",
+                  "value": { "type": "literal", "value": false }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "bottomSheet",
+        "visibleKey": "showSheet",
+        "title": { "type": "value", "value": "BottomSheet node" },
+        "onDismiss": {
+          "actions": [
+            {
+              "type": "setState",
+              "key": "showSheet",
+              "value": { "type": "literal", "value": false }
+            }
+          ]
+        },
+        "children": [
+          {
+            "type": "text",
+            "text": { "type": "value", "value": "This is the first BottomSheet implementation in the ZeroUI demo." }
+          },
+          {
+            "type": "button",
+            "text": "Close sheet",
+            "layout": { "fillMaxWidth": true },
+            "onClick": {
+              "actions": [
+                {
+                  "type": "setState",
+                  "key": "showSheet",
+                  "value": { "type": "literal", "value": false }
+                }
+              ]
+            }
           }
         ]
       },

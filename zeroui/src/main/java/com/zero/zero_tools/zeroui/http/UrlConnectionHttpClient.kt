@@ -92,10 +92,12 @@ public class UrlConnectionHttpClient(
                     if (getRequestProperty("Content-Type") == null) {
                         setRequestProperty("Content-Type", "application/json; charset=utf-8")
                     }
-                    outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
                 }
             }
             connectionRef.set(connection)
+            if (body != null) {
+                connection.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+            }
 
             val statusCode = connection.responseCode
             val stream = if (statusCode in 200..299) connection.inputStream else connection.errorStream

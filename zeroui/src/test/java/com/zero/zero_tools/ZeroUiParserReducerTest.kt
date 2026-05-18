@@ -1,6 +1,7 @@
 package com.zero.zero_tools
 
 import com.zero.zero_tools.zeroui.action.Action
+import com.zero.zero_tools.zeroui.condition.Condition
 import com.zero.zero_tools.zeroui.interaction.Interaction
 import com.zero.zero_tools.zeroui.state.State
 import com.zero.zero_tools.zeroui.state.StateEntry
@@ -145,5 +146,106 @@ class ZeroUiParserReducerTest {
         )
         assertEquals("b", reduced.getText("remote"))
         assertEquals(StateOwner.Server, reduced.getOwner("remote"))
+    }
+
+    @Test
+    fun setStateUpdatesDottedRecordPath() {
+        val state = State(
+            values = mapOf(
+                "form" to StateEntry(
+                    Value.Record(
+                        mapOf(
+                            "name" to Value.Text("before"),
+                            "age" to Value.Number(3)
+                        )
+                    )
+                )
+            )
+        )
+
+        val reduced = reduceState(
+            state,
+            Action.SetState("form.name", ValueSource.Literal(Value.Text("after")))
+        )
+
+        assertEquals("after", reduced.getText("form.name"))
+        assertEquals(3, reduced.getNumber("form.age"))
+    }
+
+    @Test
+    fun setStateUpdatesListItemPath() {
+        val state = State(
+            values = mapOf(
+                "items" to StateEntry(
+                    Value.List(
+                        listOf(
+                            Value.Record(mapOf("title" to Value.Text("first"))),
+                            Value.Record(mapOf("title" to Value.Text("second")))
+                        )
+                    )
+                )
+            )
+        )
+
+        val reduced = reduceState(
+            state,
+            Action.SetState("items[1].title", ValueSource.Literal(Value.Text("changed")))
+        )
+
+        assertEquals("first", reduced.getText("items[0].title"))
+        assertEquals("changed", reduced.getText("items[1].title"))
+    }
+
+    @Test
+    fun clearAndResetStateSupportKeysAndInitialState() {
+        val initial = State(
+            values = mapOf(
+                "name" to StateEntry(Value.Text("initial")),
+                "form" to StateEntry(Value.Record(mapOf("error" to Value.Text(""))))
+            )
+        )
+        val state = State(
+            values = mapOf(
+                "name" to StateEntry(Value.Text("changed")),
+                "form" to StateEntry(Value.Record(mapOf("error" to Value.Text("bad")))),
+                "temp" to StateEntry(Value.Text("remove"))
+            )
+        )
+
+        val cleared = reduceState(state, Action.ClearState(listOf("temp", "form.error")))
+        assertEquals("", cleared.getText("temp"))
+        assertEquals("", cleared.getText("form.error"))
+
+        val reset = reduceState(
+            state = state,
+            action = Action.ResetState(listOf("name", "form.error")),
+            initialState = initial
+        )
+        assertEquals("initial", reset.getText("name"))
+        assertEquals("", reset.getText("form.error"))
+    }
+
+    @Test
+    fun validateWritesMessageOnlyWhenConditionFails() {
+        val state = State(values = mapOf("name" to StateEntry(Value.Text(""))))
+        val invalid = reduceState(
+            state,
+            Action.Validate(
+                condition = Condition.NotBlank("name"),
+                errorKey = "nameError",
+                message = ValueSource.Literal(Value.Text("Required"))
+            )
+        )
+        assertEquals("Required", invalid.getText("nameError"))
+
+        val valid = reduceState(
+            state = invalid.copy(values = invalid.values + ("name" to StateEntry(Value.Text("Ada")))),
+            action = Action.Validate(
+                condition = Condition.NotBlank("name"),
+                errorKey = "nameError",
+                message = ValueSource.Literal(Value.Text("Required"))
+            )
+        )
+        assertEquals("", valid.getText("nameError"))
     }
 }

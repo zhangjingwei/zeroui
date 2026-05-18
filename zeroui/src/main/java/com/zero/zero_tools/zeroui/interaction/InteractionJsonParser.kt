@@ -1,6 +1,7 @@
 package com.zero.zero_tools.zeroui.interaction
 
 import com.zero.zero_tools.zeroui.action.Action
+import com.zero.zero_tools.zeroui.condition.parseCondition
 import com.zero.zero_tools.zeroui.effect.Effect
 import com.zero.zero_tools.zeroui.effect.NavigationTargetKind
 import com.zero.zero_tools.zeroui.value.parseValueSource
@@ -9,6 +10,9 @@ import org.json.JSONObject
 
 internal fun parseInteraction(json: JSONObject): Interaction {
     return Interaction(
+        id = json.optString("id").ifBlank { null },
+        debounceMillis = json.optInt("debounceMillis", 0),
+        throttleMillis = json.optInt("throttleMillis", 0),
         actions = json.optJSONArray("actions")?.mapObjects(::parseAction) ?: emptyList(),
         effects = json.optJSONArray("effects")?.mapObjects(::parseEffect) ?: emptyList()
     )
@@ -28,6 +32,20 @@ private fun parseAction(json: JSONObject): Action {
 
         "toggleState" -> Action.ToggleState(
             key = json.getString("key")
+        )
+
+        "clearState" -> Action.ClearState(
+            keys = json.readKeys()
+        )
+
+        "resetState" -> Action.ResetState(
+            keys = json.readKeys()
+        )
+
+        "validate" -> Action.Validate(
+            condition = parseCondition(json.getJSONObject("condition")),
+            errorKey = json.getString("errorKey"),
+            message = parseValueSource(json.getJSONObject("message"))
         )
 
         "batch" -> Action.Batch(
@@ -100,4 +118,11 @@ private fun String.toNavigationTargetKind(): NavigationTargetKind {
 
 internal fun <T> JSONArray.mapObjects(transform: (JSONObject) -> T): List<T> {
     return List(length()) { index -> transform(getJSONObject(index)) }
+}
+
+private fun JSONObject.readKeys(): List<String> {
+    optJSONArray("keys")?.let { keys ->
+        return List(keys.length()) { index -> keys.getString(index) }
+    }
+    return listOf(getString("key"))
 }

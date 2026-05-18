@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.util.LruCache
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.zero.zero_tools.zeroui.http.Cancelable
@@ -101,7 +102,7 @@ internal class DefaultZeroImageLoader(
     }
 
     private fun drawResource(id: Int, maxDim: Int): ImageBitmap? {
-        val drawable = context.getDrawable(id) ?: return null
+        val drawable = ContextCompat.getDrawable(context, id) ?: return null
         val intrinsicWidth = drawable.intrinsicWidth.takeIf { it > 0 } ?: maxDim
         val intrinsicHeight = drawable.intrinsicHeight.takeIf { it > 0 } ?: maxDim
         val scale = minOf(

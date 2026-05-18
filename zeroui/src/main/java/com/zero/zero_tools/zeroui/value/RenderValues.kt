@@ -1,5 +1,6 @@
 package com.zero.zero_tools.zeroui.value
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ internal fun Tone.toColor() = LocalZeroStyleResolver.current.contentColor(this)
 @Composable
 internal fun Tone.toContainerColor() = LocalZeroStyleResolver.current.containerColor(this)
 
+@Composable
 internal fun Layout.toModifier(): Modifier {
     var result: Modifier = Modifier
 
@@ -73,6 +75,11 @@ internal fun Layout.toModifier(): Modifier {
             min = minHeight.takeIf { it > 0 }?.dp ?: androidx.compose.ui.unit.Dp.Unspecified,
             max = maxHeight.takeIf { it > 0 }?.dp ?: androidx.compose.ui.unit.Dp.Unspecified
         )
+    }
+
+    // background applied before padding so it covers the full container area
+    background?.let { tone ->
+        result = result.background(color = tone.toContainerColor())
     }
 
     val start = paddingStart ?: padding

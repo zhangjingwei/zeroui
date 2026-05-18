@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zero.zero_tools.zeroui.core.LocalZeroUiUnknownNodeHandler
 import com.zero.zero_tools.zeroui.core.ZeroUiRenderer
@@ -40,13 +41,16 @@ import com.zero.zero_tools.zeroui.state.StateOwner
 import com.zero.zero_tools.zeroui.state.reduceState
 import com.zero.zero_tools.zeroui.tracking.Tracker
 import com.zero.zero_tools.zeroui.value.Value
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicLong
 
 @Composable
 public fun ZeroUiHost(
     startPage: String,
     modifier: Modifier = Modifier,
-    rootPadding: Int = 24,
+    rootPadding: Dp = 24.dp,
     pageLoader: PageLoader = rememberAssetsPageLoader(),
     httpClient: HttpClient = rememberDefaultHttpClient(),
     imageLoader: ZeroImageLoader = rememberDefaultZeroImageLoader(),
@@ -71,6 +75,9 @@ public fun ZeroUiHost(
     val stack = pageStack.entries
     val registry = remember { PageEntryRegistry() }
     val handlerRef = remember { Holder<(Interaction, Value?) -> Unit>() }
+    val scope = rememberCoroutineScope()
+    val debounceJobs = remember { mutableMapOf<String, Job>() }
+    val throttleTimes = remember { mutableMapOf<String, Long>() }
 
     val navigator = remember(pageLoader, externalNavigator) {
         object : Navigator {
@@ -100,23 +107,32 @@ public fun ZeroUiHost(
     }
 
     DisposableEffect(Unit) {
-        onDispose { registry.cancelAll() }
+        onDispose {
+            registry.cancelAll()
+            debounceJobs.values.forEach(Job::cancel)
+            debounceJobs.clear()
+        }
     }
 
     BackHandler(enabled = stack.size > 1) {
         navigator.back()
     }
 
-    fun handleInteraction(interaction: Interaction, eventValue: Value?) {
+    fun processInteraction(interaction: Interaction, eventValue: Value?) {
         val current = stack.last()
-        val nextState = reduceState(current.state, interaction, eventValue)
+        val nextState = reduceState(
+            state = current.state,
+            interaction = interaction,
+            eventValue = eventValue,
+            initialState = current.page.initialState
+        )
         stack[stack.lastIndex] = current.copy(state = nextState)
 
         val originEntryId = current.id
         val guardedFollowUp = pageScopedFollowUp(
             originEntryId = originEntryId,
             currentTopId = { stack.lastOrNull()?.id },
-            onAllow = ::handleInteraction,
+            onAllow = handlerRef.value ?: ::processInteraction,
             onDrop = { origin, now ->
                 Log.w(
                     LateResponseLogTag,
@@ -144,7 +160,27 @@ public fun ZeroUiHost(
         )
     }
 
-    handlerRef.value = ::handleInteraction
+    fun dispatchInteraction(interaction: Interaction, eventValue: Value?) {
+        val key = interaction.id ?: interaction.hashCode().toString()
+        val now = System.currentTimeMillis()
+        if (interaction.throttleMillis > 0) {
+            val last = throttleTimes[key] ?: 0L
+            if (now - last < interaction.throttleMillis) return
+            throttleTimes[key] = now
+        }
+
+        if (interaction.debounceMillis > 0) {
+            debounceJobs.remove(key)?.cancel()
+            debounceJobs[key] = scope.launch {
+                delay(interaction.debounceMillis.toLong())
+                processInteraction(interaction, eventValue)
+            }
+        } else {
+            processInteraction(interaction, eventValue)
+        }
+    }
+
+    handlerRef.value = ::dispatchInteraction
 
     LaunchedEffect(startPage, pageLoader, pageStack.restored) {
         if (!pageStack.restored) {
@@ -153,16 +189,17 @@ public fun ZeroUiHost(
     }
 
     val top = stack.last()
+    val scrollState = rememberScrollState()
     val rootModifier = Modifier
         .fillMaxSize()
         .then(
             if (top.page.root is Node.LazyColumn) {
                 Modifier
             } else {
-                Modifier.verticalScroll(rememberScrollState())
+                Modifier.verticalScroll(scrollState)
             }
         )
-        .padding(rootPadding.dp)
+        .padding(rootPadding)
 
     Surface(modifier = modifier.fillMaxSize()) {
         CompositionLocalProvider(
@@ -172,7 +209,7 @@ public fun ZeroUiHost(
             ZeroUiRenderer(
                 node = top.page.root,
                 state = top.state,
-                onInteraction = ::handleInteraction,
+                onInteraction = ::dispatchInteraction,
                 modifier = rootModifier
             )
         }
@@ -230,19 +267,29 @@ private fun restorablePageStackSaver(
     return Saver(
         save = { pageStack -> pageStack.entries.map(::savePageStackEntry) },
         restore = { saved ->
-            val entries = (saved as? List<*>)
+            val savedList = saved as? List<*>
+            val entries = savedList
                 ?.mapNotNull { restorePageStackEntry(it, loader) }
                 .orEmpty()
+            val partialRestore = savedList != null && entries.size < savedList.size
 
+            if (partialRestore) {
+                Log.w(
+                    "ZeroUiHost",
+                    "Page stack restore incomplete (${entries.size}/${savedList!!.size}); falling back to start page"
+                )
+            }
+
+            val useRestored = entries.isNotEmpty() && !partialRestore
             RestorablePageStack(
                 entries = mutableStateListOf<PageStackEntry>().apply {
-                    if (entries.isEmpty()) {
-                        add(loadPageEntry(name = startPage, loader = loader))
-                    } else {
+                    if (useRestored) {
                         addAll(entries)
+                    } else {
+                        add(loadPageEntry(name = startPage, loader = loader))
                     }
                 },
-                restored = entries.isNotEmpty()
+                restored = useRestored
             )
         }
     )

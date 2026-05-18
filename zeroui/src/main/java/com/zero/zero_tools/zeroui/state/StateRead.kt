@@ -9,15 +9,27 @@ import com.zero.zero_tools.zeroui.value.Value
  * walks into the `item` record's `title` field. Used by `forEach` item scopes.
  */
 public fun State.getValue(key: String): Value? {
-    if (!key.contains('.')) return values[key]?.value
+    val parts = key.split('.').filter { it.isNotBlank() }
+    if (parts.isEmpty()) return null
 
-    val parts = key.split('.')
-    var current: Value? = values[parts.first()]?.value
+    var current: Value? = values[parts.first().substringBefore('[')]?.value
+    current = current.resolveBracket(parts.first())
     for (segment in parts.drop(1)) {
-        val record = current as? Value.Record ?: return null
-        current = record.fields[segment]
+        current = current.readSegment(segment)
     }
     return current
+}
+
+private fun Value?.readSegment(segment: String): Value? {
+    val name = segment.substringBefore('[')
+    val fromRecord = if (name.isBlank()) this else (this as? Value.Record)?.fields?.get(name)
+    return fromRecord.resolveBracket(segment)
+}
+
+private fun Value?.resolveBracket(segment: String): Value? {
+    if (!segment.contains('[')) return this
+    val index = segment.substringAfter('[').substringBefore(']').toIntOrNull() ?: return null
+    return (this as? Value.List)?.items?.getOrNull(index)
 }
 
 public fun State.getOwner(key: String): StateOwner? = values[key]?.owner
@@ -31,7 +43,6 @@ public fun State.getBoolean(key: String): Boolean = getValue(key).asBoolean()
 public fun State.getList(key: String): List<Value> {
     return when (val value = getValue(key)) {
         is Value.List -> value.items
-        null -> emptyList()
         else -> emptyList()
     }
 }

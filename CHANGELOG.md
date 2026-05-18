@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3
+
+- Added high-priority interaction primitives including checkbox, radio group, slider, progress, bottom sheet, divider, select, snackbar, and enabled-state support across form controls.
+- Added interaction policies for `debounceMillis` and `throttleMillis`, plus state utility actions for `validate`, `clearState`, and `resetState`.
+- Added path-based state reads and writes such as `form.name` and `items[1].title`.
+- Updated showcase pages to use showcase as the primary demo surface and demonstrate request guards, form primitives, layout overlays, and loading states.
+
 ## 0.1.2
 
 - Added `display` text style support with a 48sp black-weight default slot and updated default chip/secondary-button derived tokens to use neutral and inverse roles.

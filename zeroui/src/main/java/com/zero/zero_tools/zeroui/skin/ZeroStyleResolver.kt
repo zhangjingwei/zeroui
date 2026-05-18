@@ -67,6 +67,12 @@ public class ZeroStyleResolver(
         )
     }
 
+    public fun checkboxTokens(): ZeroCheckboxTokens = skin.components.checkbox
+
+    public fun sliderTokens(): ZeroSliderTokens = skin.components.slider
+
+    public fun snackbarTokens(): ZeroSnackbarTokens = skin.components.snackbar
+
     public val bodyTextStyle: ComposeTextStyle
         get() = skin.typography.body
 

@@ -84,7 +84,10 @@ public data class ZeroComponentTokens(
     val field: ZeroFieldTokens,
     val chip: ZeroChipTokens,
     val switch: ZeroSwitchTokens,
-    val card: ZeroCardTokens
+    val card: ZeroCardTokens,
+    val checkbox: ZeroCheckboxTokens,
+    val slider: ZeroSliderTokens,
+    val snackbar: ZeroSnackbarTokens
 ) {
     public companion object {
         public fun fromPalette(
@@ -96,7 +99,10 @@ public data class ZeroComponentTokens(
                 field = ZeroFieldTokens.fromPalette(palette, density),
                 chip = ZeroChipTokens.fromPalette(palette, density),
                 switch = ZeroSwitchTokens.fromPalette(palette),
-                card = ZeroCardTokens.fromPalette(palette)
+                card = ZeroCardTokens.fromPalette(palette),
+                checkbox = ZeroCheckboxTokens.fromPalette(palette),
+                slider = ZeroSliderTokens.fromPalette(palette),
+                snackbar = ZeroSnackbarTokens.fromPalette(palette)
             )
         }
     }
@@ -362,3 +368,58 @@ public data class ZeroCardResolvedTokens(
     val colors: CardToneTokens,
     val cornerRadius: Dp
 )
+
+@Immutable
+public data class ZeroCheckboxTokens(
+    val checked: Color,
+    val unchecked: Color,
+    val checkmark: Color,
+    val disabledChecked: Color,
+    val disabledUnchecked: Color
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroCheckboxTokens = ZeroCheckboxTokens(
+            checked = palette.primaryContent,
+            unchecked = palette.outline,
+            checkmark = palette.container,
+            disabledChecked = palette.primaryContent.copy(alpha = 0.38f),
+            disabledUnchecked = palette.mutedOutline.copy(alpha = 0.38f)
+        )
+    }
+}
+
+@Immutable
+public data class ZeroSliderTokens(
+    val thumb: Color,
+    val activeTrack: Color,
+    val inactiveTrack: Color,
+    val disabledThumb: Color,
+    val disabledActiveTrack: Color,
+    val disabledInactiveTrack: Color
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroSliderTokens = ZeroSliderTokens(
+            thumb = palette.primaryContent,
+            activeTrack = palette.primaryContent,
+            inactiveTrack = palette.mutedContainer,
+            disabledThumb = palette.content.copy(alpha = 0.38f),
+            disabledActiveTrack = palette.primaryContent.copy(alpha = 0.38f),
+            disabledInactiveTrack = palette.mutedContainer.copy(alpha = 0.38f)
+        )
+    }
+}
+
+@Immutable
+public data class ZeroSnackbarTokens(
+    val container: Color,
+    val content: Color,
+    val actionContent: Color
+) {
+    public companion object {
+        public fun fromPalette(palette: ZeroPalette): ZeroSnackbarTokens = ZeroSnackbarTokens(
+            container = palette.inverseContainer,
+            content = palette.inverseContent,
+            actionContent = palette.primaryContent
+        )
+    }
+}

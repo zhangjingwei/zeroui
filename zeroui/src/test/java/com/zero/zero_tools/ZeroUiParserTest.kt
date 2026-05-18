@@ -10,6 +10,7 @@ import com.zero.zero_tools.zeroui.node.ButtonVariant
 import com.zero.zero_tools.zeroui.node.HorizontalAlignment
 import com.zero.zero_tools.zeroui.node.IconSource
 import com.zero.zero_tools.zeroui.node.Node
+import com.zero.zero_tools.zeroui.node.ProgressVariant
 import com.zero.zero_tools.zeroui.node.RowArrangement
 import com.zero.zero_tools.zeroui.node.VerticalAlignment
 import com.zero.zero_tools.zeroui.page.ZeroUiSchemaVersion
@@ -426,6 +427,127 @@ class ZeroUiParserTest {
     }
 
     @Test
+    fun parsesNewInteractionComponentsAndEnabledKeys() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "root": {
+                  "type": "column",
+                  "children": [
+                    { "type": "divider", "thickness": 2, "tone": "muted" },
+                    {
+                      "type": "checkbox",
+                      "text": "Agree",
+                      "checkedKey": "agree",
+                      "enabledKey": "canEdit",
+                      "onCheckedChange": {
+                        "actions": [{ "type": "setState", "key": "agree", "value": { "type": "event" } }]
+                      }
+                    },
+                    {
+                      "type": "radioGroup",
+                      "selectedKey": "mode",
+                      "enabledKey": "canEdit",
+                      "options": [
+                        { "label": "A", "value": "a" },
+                        { "label": "B", "value": "b" }
+                      ],
+                      "onSelected": {
+                        "actions": [{ "type": "setState", "key": "mode", "value": { "type": "event" } }]
+                      }
+                    },
+                    { "type": "progress", "variant": "circular", "progressKey": "pct", "tone": "primary" },
+                    {
+                      "type": "slider",
+                      "valueKey": "pct",
+                      "min": 0,
+                      "max": 100,
+                      "steps": 4,
+                      "enabledKey": "canEdit",
+                      "onValueChange": {
+                        "actions": [{ "type": "setState", "key": "pct", "value": { "type": "event" } }]
+                      }
+                    },
+                    {
+                      "type": "select",
+                      "label": "Mode",
+                      "selectedKey": "mode",
+                      "enabledKey": "canEdit",
+                      "options": [
+                        { "label": "A", "value": "a" },
+                        { "label": "B", "value": "b" }
+                      ],
+                      "onSelected": {
+                        "actions": [{ "type": "setState", "key": "mode", "value": { "type": "event" } }]
+                      }
+                    },
+                    {
+                      "type": "snackbar",
+                      "visibleKey": "showSnack",
+                      "message": { "type": "value", "value": "Saved" },
+                      "actionLabel": "Undo",
+                      "onAction": {
+                        "actions": [{ "type": "toggleState", "key": "undone" }]
+                      },
+                      "onDismiss": {
+                        "actions": [{ "type": "setState", "key": "showSnack", "value": { "type": "literal", "value": false } }]
+                      }
+                    },
+                    {
+                      "type": "bottomSheet",
+                      "visibleKey": "showSheet",
+                      "title": { "type": "value", "value": "Sheet" },
+                      "children": [
+                        { "type": "text", "text": { "type": "value", "value": "Content" } }
+                      ]
+                    }
+                  ]
+                }
+              }
+            """.trimIndent()
+        )
+
+        val column = page.root as Node.Column
+        val divider = column.children[0] as Node.Divider
+        assertEquals(2, divider.thickness)
+        assertEquals(Tone.Muted, divider.tone)
+
+        val checkbox = column.children[1] as Node.Checkbox
+        assertEquals("canEdit", checkbox.enabledKey)
+        assertTrue(checkbox.onCheckedChange.actions.single() is Action.SetState)
+
+        val radio = column.children[2] as Node.RadioGroup
+        assertEquals("canEdit", radio.enabledKey)
+        assertEquals(2, radio.options.size)
+        assertEquals("b", radio.options[1].value)
+
+        val progress = column.children[3] as Node.Progress
+        assertEquals(ProgressVariant.Circular, progress.variant)
+        assertEquals("pct", progress.progressKey)
+
+        val slider = column.children[4] as Node.Slider
+        assertEquals("pct", slider.valueKey)
+        assertEquals(100f, slider.max, 0.001f)
+        assertEquals(4, slider.steps)
+        assertEquals("canEdit", slider.enabledKey)
+
+        val select = column.children[5] as Node.Select
+        assertEquals("Mode", select.label)
+        assertEquals("canEdit", select.enabledKey)
+        assertEquals("a", select.options[0].value)
+
+        val snackbar = column.children[6] as Node.Snackbar
+        assertEquals("showSnack", snackbar.visibleKey)
+        assertEquals("Undo", snackbar.actionLabel)
+        assertTrue(snackbar.onAction?.actions?.single() is Action.ToggleState)
+
+        val sheet = column.children[7] as Node.BottomSheet
+        assertEquals("showSheet", sheet.visibleKey)
+        assertEquals(Text.Value("Sheet"), sheet.title)
+        assertTrue(sheet.children.single() is Node.Text)
+    }
+
+    @Test
     fun parsesErrorWarningAndInverseTones() {
         val page = parseZeroUiPage(
             """
@@ -517,6 +639,50 @@ class ZeroUiParserTest {
 
         assertTrue(interaction.effects[0] is Effect.Log)
         assertTrue(interaction.effects[1] is Effect.Toast)
+    }
+
+    @Test
+    fun parsesInteractionPoliciesAndStateUtilityActions() {
+        val page = parseZeroUiPage(
+            """
+              {
+                "root": {
+                  "type": "button",
+                  "text": "Submit",
+                  "onClick": {
+                    "id": "submit-form",
+                    "debounceMillis": 250,
+                    "throttleMillis": 1000,
+                    "actions": [
+                      { "type": "setState", "key": "form.name", "value": { "type": "event" } },
+                      { "type": "clearState", "keys": ["form.error", "toast"] },
+                      { "type": "resetState", "key": "submitting" },
+                      {
+                        "type": "validate",
+                        "condition": { "type": "notBlank", "key": "form.name" },
+                        "errorKey": "form.error",
+                        "message": { "type": "literal", "value": "Required" }
+                      }
+                    ]
+                  }
+                }
+              }
+            """.trimIndent()
+        )
+
+        val interaction = (page.root as Node.Button).onClick
+        assertEquals("submit-form", interaction.id)
+        assertEquals(250, interaction.debounceMillis)
+        assertEquals(1000, interaction.throttleMillis)
+
+        assertTrue(interaction.actions[0] is Action.SetState)
+        val clear = interaction.actions[1] as Action.ClearState
+        assertEquals(listOf("form.error", "toast"), clear.keys)
+        val reset = interaction.actions[2] as Action.ResetState
+        assertEquals(listOf("submitting"), reset.keys)
+        val validate = interaction.actions[3] as Action.Validate
+        assertTrue(validate.condition is Condition.NotBlank)
+        assertEquals("form.error", validate.errorKey)
     }
 
     @Test
